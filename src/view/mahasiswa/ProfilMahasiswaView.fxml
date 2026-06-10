@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+git remote add origin https://github.com/username/projek-saya.git<?xml version="1.0" encoding="UTF-8"?>
 <!-- View Profil Mahasiswa -->
 <!-- Use case: Lihat Data Mahasiswa (dari sisi Mahasiswa) -->
 <?import javafx.scene.layout.*?>
