@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- View Data Dosen (Admin) -->
+<!-- Use case: Input Data Dosen & Lihat Data Dosen -->
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="controller.admin.DataDosenController"
+            styleClass="content-pane">
+
+    <!-- TODO: Layout halaman data dosen -->
+    <!-- - Tabel daftar dosen -->
+    <!-- - Form input/edit dosen -->
+    <!-- - Tombol tambah, edit, hapus -->
+    <!-- - Search bar -->
+
+</AnchorPane>

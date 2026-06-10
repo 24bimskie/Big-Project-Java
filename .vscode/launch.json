@@ -1,0 +1,33 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "App",
+            "vmArgs": "--module-path \"C:\\Program Files\\Java\\javafx-sdk-26.0.1\\lib\" --add-modules javafx.controls,javafx.fxml"
+        },
+        {
+            "type": "java",
+            "name": "HelloFX",
+            "request": "launch",
+            "mainClass": "HelloFX",
+            "vmArgs": "--module-path \"C:\\Program Files\\Java\\javafx-sdk-26.0.1\\lib\" --add-modules javafx.controls,javafx.fxml"
+        },
+        {
+            "type": "java",
+            "name": "Launch Login",
+            "request": "launch",
+            "mainClass": "App",
+            "vmArgs": "--module-path \"C:\\Program Files\\Java\\javafx-sdk-26.0.1\\lib\" --add-modules javafx.controls,javafx.fxml"
+        },
+        {
+            "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "app.Main",
+            "vmArgs": "--module-path \"C:\\Program Files\\Java\\javafx-sdk-26.0.1\\lib\" --add-modules javafx.controls,javafx.fxml"
+        },
+    ]
+}

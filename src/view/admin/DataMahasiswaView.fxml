@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- View Data Mahasiswa (Admin) -->
+<!-- Use case: Input Data Mahasiswa & Lihat Data Mahasiswa -->
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="controller.admin.DataMahasiswaController"
+            styleClass="content-pane">
+
+    <!-- TODO: Layout halaman data mahasiswa -->
+    <!-- - Tabel daftar mahasiswa -->
+    <!-- - Form input/edit mahasiswa -->
+    <!-- - Tombol tambah, edit, hapus -->
+    <!-- - Search bar -->
+
+</AnchorPane>

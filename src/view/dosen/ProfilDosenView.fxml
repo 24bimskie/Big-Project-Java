@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- View Profil Dosen -->
+<!-- Use case: Lihat Data Dosen (dari sisi Dosen) -->
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="controller.dosen.ProfilDosenController"
+            styleClass="content-pane">
+
+    <!-- TODO: Layout halaman profil dosen -->
+    <!-- - Tampilkan info dosen (NIDN, Nama, dll) -->
+    <!-- - Edit profil (opsional) -->
+
+</AnchorPane>

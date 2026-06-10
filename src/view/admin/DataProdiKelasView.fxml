@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- View Data Prodi & Kelas (Admin) -->
+<!-- Use case: Input Data Prodi & Input Kelas -->
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="controller.admin.DataProdiKelasController"
+            styleClass="content-pane">
+
+    <!-- TODO: Layout halaman data prodi dan kelas -->
+    <!-- - Tabel daftar prodi -->
+    <!-- - Tabel daftar kelas (filter by prodi) -->
+    <!-- - Form input prodi -->
+    <!-- - Form input kelas -->
+
+</AnchorPane>

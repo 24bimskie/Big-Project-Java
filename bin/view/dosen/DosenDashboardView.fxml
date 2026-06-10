@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- View Dashboard Dosen -->
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="controller.dosen.DosenDashboardController"
+            prefWidth="1100" prefHeight="700" styleClass="dashboard-pane">
+
+    <!-- TODO: Layout dashboard dosen -->
+    <!-- LEFT: Sidebar menu (Mulai Absen, Rekap Absen, Profil) -->
+    <!-- CENTER: Content area -->
+    <!-- TOP: Header dengan info dosen dan logout -->
+
+</BorderPane>

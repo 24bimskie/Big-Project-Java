@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- View Rekap Absen (Dosen) -->
+<!-- Use case: Rekap Absen (extend dari Mulai Absen) -->
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="controller.dosen.RekapAbsenController"
+            styleClass="content-pane">
+
+    <!-- TODO: Layout halaman rekap absen -->
+    <!-- - Pilih jadwal/mata kuliah -->
+    <!-- - Tabel rekap kehadiran per mahasiswa -->
+    <!-- - Statistik (persentase hadir, izin, sakit, alpha) -->
+
+</AnchorPane>

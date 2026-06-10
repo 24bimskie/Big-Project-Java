@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- View Dashboard Mahasiswa -->
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="controller.mahasiswa.MahasiswaDashboardController"
+            prefWidth="1100" prefHeight="700" styleClass="dashboard-pane">
+
+    <!-- TODO: Layout dashboard mahasiswa -->
+    <!-- LEFT: Sidebar menu (Data Absen, Profil) -->
+    <!-- CENTER: Content area -->
+    <!-- TOP: Header dengan info mahasiswa dan logout -->
+
+</BorderPane>

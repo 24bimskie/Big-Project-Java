@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- View Data Absen (Mahasiswa) -->
+<!-- Use case: Data Absen -->
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="controller.mahasiswa.DataAbsenMahasiswaController"
+            styleClass="content-pane">
+
+    <!-- TODO: Layout halaman data absen mahasiswa -->
+    <!-- - Daftar mata kuliah yang diikuti -->
+    <!-- - Riwayat absensi per mata kuliah -->
+    <!-- - Statistik kehadiran pribadi -->
+
+</AnchorPane>
