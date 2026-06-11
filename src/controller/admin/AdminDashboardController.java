@@ -1,12 +1,167 @@
 package controller.admin;
 
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
+import model.User;
+import util.AlertHelper;
+import util.SceneManager;
+import util.UserSession;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
+
 /**
  * Controller untuk Dashboard Admin.
  * Navigasi ke semua fitur admin: data mahasiswa, dosen, prodi, kelas, matkul, jadwal.
  */
-public class AdminDashboardController {
+public class AdminDashboardController implements Initializable {
 
-    // TODO: Bind FXML components dan implement navigation
-    // - Menu navigasi ke setiap fitur
-    // - Logout functionality
+    // ===== FXML Bindings =====
+
+    /** Label untuk menampilkan nama user yang sedang login */
+    @FXML
+    private Label labelNamaUser;
+
+    /** Label untuk menampilkan role user */
+    @FXML
+    private Label labelRole;
+
+    /** Area utama tempat konten sub-halaman ditampilkan */
+    @FXML
+    private StackPane contentArea;
+
+    // Tombol-tombol menu sidebar
+    @FXML
+    private Button btnMahasiswa;
+
+    @FXML
+    private Button btnDosen;
+
+    @FXML
+    private Button btnProdiKelas;
+
+    @FXML
+    private Button btnMataKuliah;
+
+    @FXML
+    private Button btnJadwal;
+
+    @FXML
+    private Button btnLogout;
+
+    // ===== Lifecycle =====
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        // Tampilkan info user yang sedang login
+        User currentUser = UserSession.getCurrentUser();
+        if (currentUser != null) {
+            labelNamaUser.setText(currentUser.getUsername());
+            labelRole.setText("Role: " + currentUser.getRole());
+        }
+
+        // Tampilkan halaman Data Mahasiswa sebagai default saat pertama masuk
+        loadContent("/view/admin/DataMahasiswaView.fxml");
+        setActiveButton(btnMahasiswa);
+    }
+
+    // ===== Navigasi Sidebar =====
+
+    /** Navigasi ke halaman Data Mahasiswa */
+    @FXML
+    private void handleMenuMahasiswa(ActionEvent event) {
+        loadContent("/view/admin/DataMahasiswaView.fxml");
+        setActiveButton(btnMahasiswa);
+    }
+
+    /** Navigasi ke halaman Data Dosen */
+    @FXML
+    private void handleMenuDosen(ActionEvent event) {
+        loadContent("/view/admin/DataDosenView.fxml");
+        setActiveButton(btnDosen);
+    }
+
+    /** Navigasi ke halaman Data Prodi & Kelas */
+    @FXML
+    private void handleMenuProdiKelas(ActionEvent event) {
+        loadContent("/view/admin/DataProdiKelasView.fxml");
+        setActiveButton(btnProdiKelas);
+    }
+
+    /** Navigasi ke halaman Data Mata Kuliah */
+    @FXML
+    private void handleMenuMataKuliah(ActionEvent event) {
+        loadContent("/view/admin/DataMataKuliahView.fxml");
+        setActiveButton(btnMataKuliah);
+    }
+
+    /** Navigasi ke halaman Data Jadwal */
+    @FXML
+    private void handleMenuJadwal(ActionEvent event) {
+        loadContent("/view/admin/DataJadwalView.fxml");
+        setActiveButton(btnJadwal);
+    }
+
+    // ===== Logout =====
+
+    /** Logout dari sistem dan kembali ke halaman Login */
+    @FXML
+    private void handleLogout(ActionEvent event) {
+        boolean konfirmasi = AlertHelper.showConfirmation(
+                "Konfirmasi Logout",
+                "Apakah Anda yakin ingin keluar?"
+        );
+
+        if (konfirmasi) {
+            UserSession.clearSession();
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            SceneManager.switchScene(stage, "/view/login/LoginView.fxml", "Login - Sistem Akademik");
+        }
+    }
+
+    // ===== Helper Methods =====
+
+    /**
+     * Memuat konten FXML ke dalam contentArea (StackPane).
+     * @param fxmlPath Path ke file FXML yang akan dimuat
+     */
+    private void loadContent(String fxmlPath) {
+        try {
+            URL fxmlUrl = getClass().getResource(fxmlPath);
+            if (fxmlUrl == null) {
+                AlertHelper.showError("Error", "Halaman tidak ditemukan: " + fxmlPath);
+                return;
+            }
+            Parent content = FXMLLoader.load(fxmlUrl);
+            contentArea.getChildren().setAll(content);
+        } catch (IOException e) {
+            AlertHelper.showError("Error", "Gagal memuat halaman: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Menandai tombol sidebar yang sedang aktif dengan style CSS "active".
+     * @param activeButton Tombol yang ingin ditandai aktif
+     */
+    private void setActiveButton(Button activeButton) {
+        Button[] allButtons = {btnMahasiswa, btnDosen, btnProdiKelas, btnMataKuliah, btnJadwal};
+        for (Button btn : allButtons) {
+            if (btn != null) {
+                btn.getStyleClass().remove("sidebar-btn-active");
+            }
+        }
+        if (activeButton != null) {
+            activeButton.getStyleClass().add("sidebar-btn-active");
+        }
+    }
 }
