@@ -23,10 +23,10 @@ public class UserDAO {
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     return new User(
-                            rs.getString("user_id"),
+                            rs.getString("id"),
                             rs.getString("username"),
                             rs.getString("password"),
-                            rs.getString("role"));
+                            rs.getString("level"));
                 }
             }
         } catch (SQLException e) {
@@ -36,7 +36,16 @@ public class UserDAO {
     }
 
     public void insert(User user) {
-        // INSERT user baru
+        String query = "INSERT INTO user (username, password, level) VALUES (?, ?, ?)";
+        try (Connection conn = config.DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, user.getUsername());
+            stmt.setString(2, user.getPassword());
+            stmt.setString(3, user.getRole());
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void updatePassword(String userId, String newPassword) {

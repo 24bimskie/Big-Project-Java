@@ -61,4 +61,10 @@ public class LoginController {
             AlertHelper.showError("Login Gagal", "Username atau Password salah!");
         }
     }
+
+    @FXML
+    private void handleGoToRegister(ActionEvent event) {
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        SceneManager.switchScene(stage, "/view/login/RegisterView.fxml", "Register");
+    }
 }

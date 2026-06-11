@@ -31,6 +31,11 @@
             <PasswordField fx:id="passwordField" promptText="Masukkan password" styleClass="text-field" />
             
             <Button text="Login" onAction="#handleLogin" maxWidth="Infinity" styleClass="btn-primary" />
+            
+            <HBox alignment="CENTER" spacing="5.0">
+                <Label text="Belum punya akun?" />
+                <Hyperlink text="Daftar di sini" onAction="#handleGoToRegister" />
+            </HBox>
         </VBox>
     </VBox>
 
