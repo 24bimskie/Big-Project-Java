@@ -1,16 +1,85 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- View Data Mahasiswa (Admin) -->
-<!-- Use case: Input Data Mahasiswa & Lihat Data Mahasiswa -->
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="controller.admin.DataMahasiswaController"
-            styleClass="content-pane">
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="controller.admin.DataMahasiswaController"
+      spacing="15" styleClass="content-pane" prefWidth="800" prefHeight="600">
 
-    <!-- TODO: Layout halaman data mahasiswa -->
-    <!-- - Tabel daftar mahasiswa -->
-    <!-- - Form input/edit mahasiswa -->
-    <!-- - Tombol tambah, edit, hapus -->
-    <!-- - Search bar -->
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
 
-</AnchorPane>
+    <!-- Header & Search -->
+    <HBox spacing="15" alignment="CENTER_LEFT">
+        <Label text="Data Mahasiswa" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+        <Region HBox.hgrow="ALWAYS" />
+        <TextField fx:id="fieldSearch" promptText="Cari NIM/Nama/Email..." prefWidth="200" />
+        <ComboBox fx:id="filterKelas" promptText="Filter Kelas" prefWidth="150" />
+        <Button fx:id="btnResetFilter" text="Reset" onAction="#handleResetFilter" />
+    </HBox>
+
+    <!-- Content Area: Table (Left) and Form (Right) -->
+    <HBox spacing="20" VBox.vgrow="ALWAYS">
+        
+        <!-- Table -->
+        <TableView fx:id="tableMahasiswa" HBox.hgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="colNim" text="NIM" prefWidth="100"/>
+                <TableColumn fx:id="colNama" text="Nama" prefWidth="150"/>
+                <TableColumn fx:id="colJenisKelamin" text="L/P" prefWidth="80"/>
+                <TableColumn fx:id="colAlamat" text="Alamat" prefWidth="150"/>
+                <TableColumn fx:id="colNoTelp" text="No Telp" prefWidth="100"/>
+                <TableColumn fx:id="colEmail" text="Email" prefWidth="150"/>
+                <TableColumn fx:id="colIdKelas" text="Kelas" prefWidth="80"/>
+            </columns>
+        </TableView>
+
+        <!-- Form Input -->
+        <VBox spacing="10" prefWidth="300" style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 5; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 0);">
+            <Label text="Form Mahasiswa" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+            
+            <GridPane hgap="10" vgap="10">
+                <columnConstraints>
+                    <ColumnConstraints prefWidth="90" />
+                    <ColumnConstraints hgrow="ALWAYS" />
+                </columnConstraints>
+                
+                <Label text="NIM:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                <TextField fx:id="fieldNim" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                
+                <Label text="Nama:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                <TextField fx:id="fieldNama" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                
+                <Label text="J. Kelamin:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                <ComboBox fx:id="comboJenisKelamin" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                
+                <Label text="Alamat:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                <TextField fx:id="fieldAlamat" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                
+                <Label text="No Telp:" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+                <TextField fx:id="fieldNoTelp" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+                
+                <Label text="Email:" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
+                <TextField fx:id="fieldEmail" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+                
+                <Label text="Kelas:" GridPane.columnIndex="0" GridPane.rowIndex="6"/>
+                <ComboBox fx:id="comboKelas" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
+                
+                <Label text="Password:" GridPane.columnIndex="0" GridPane.rowIndex="7"/>
+                <PasswordField fx:id="fieldPassword" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
+            </GridPane>
+            
+            <!-- Buttons -->
+            <HBox spacing="10" alignment="CENTER_RIGHT" style="-fx-padding: 10 0 0 0;">
+                <Button fx:id="btnBatal" text="Batal" onAction="#handleBatal" style="-fx-background-color: #95a5a6; -fx-text-fill: white;" />
+                <Button fx:id="btnHapus" text="Hapus" onAction="#handleHapus" style="-fx-background-color: #e74c3c; -fx-text-fill: white;" />
+                <Button fx:id="btnEdit" text="Edit" onAction="#handleEdit" style="-fx-background-color: #f39c12; -fx-text-fill: white;" />
+                <Button fx:id="btnTambah" text="Tambah" onAction="#handleTambah" style="-fx-background-color: #2ecc71; -fx-text-fill: white;" />
+            </HBox>
+        </VBox>
+        
+    </HBox>
+
+</VBox>

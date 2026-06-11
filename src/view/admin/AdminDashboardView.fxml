@@ -2,13 +2,59 @@
 <!-- View Dashboard Admin -->
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
 
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="controller.admin.AdminDashboardController"
-            prefWidth="1100" prefHeight="700" styleClass="dashboard-pane">
+            prefWidth="1100" prefHeight="700" styleClass="dashboard-pane" stylesheets="@../../style/style.css">
 
-    <!-- TODO: Layout dashboard admin -->
+    <!-- TOP: Header dengan info user -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="20" styleClass="header" prefHeight="70">
+            <padding>
+                <Insets top="15" right="20" bottom="15" left="20"/>
+            </padding>
+            <Label text="Sistem Akademik - Admin Dashboard" styleClass="header-title"/>
+            <Region HBox.hgrow="ALWAYS" />
+            <VBox alignment="CENTER_RIGHT" spacing="5">
+                <Label fx:id="labelNamaUser" text="Nama User" styleClass="header-user"/>
+                <Label fx:id="labelRole" text="Role: Admin" styleClass="header-role"/>
+            </VBox>
+        </HBox>
+    </top>
+
     <!-- LEFT: Sidebar menu navigasi -->
+    <left>
+        <VBox spacing="5" styleClass="sidebar" prefWidth="250">
+            <padding>
+                <Insets top="20" right="10" bottom="20" left="10"/>
+            </padding>
+            
+            <Label text="Menu Utama" styleClass="sidebar-title" />
+            
+            <Button fx:id="btnMahasiswa" text="Data Mahasiswa" onAction="#handleMenuMahasiswa" maxWidth="Infinity" styleClass="sidebar-btn" />
+            <Button fx:id="btnDosen" text="Data Dosen" onAction="#handleMenuDosen" maxWidth="Infinity" styleClass="sidebar-btn" />
+            <Button fx:id="btnProdiKelas" text="Data Prodi &amp; Kelas" onAction="#handleMenuProdiKelas" maxWidth="Infinity" styleClass="sidebar-btn" />
+            <Button fx:id="btnMataKuliah" text="Data Mata Kuliah" onAction="#handleMenuMataKuliah" maxWidth="Infinity" styleClass="sidebar-btn" />
+            <Button fx:id="btnJadwal" text="Data Jadwal" onAction="#handleMenuJadwal" maxWidth="Infinity" styleClass="sidebar-btn" />
+            
+            <Region VBox.vgrow="ALWAYS" />
+            
+            <Button fx:id="btnLogout" text="Logout" onAction="#handleLogout" maxWidth="Infinity" styleClass="btn-logout">
+                <VBox.margin>
+                    <Insets top="10" right="5" bottom="0" left="5"/>
+                </VBox.margin>
+            </Button>
+        </VBox>
+    </left>
+
     <!-- CENTER: Content area (berubah sesuai menu yang dipilih) -->
-    <!-- TOP: Header dengan info user dan logout -->
+    <center>
+        <StackPane fx:id="contentArea" styleClass="content-pane">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+            <!-- Konten dari FXML lain akan dimuat di sini oleh Controller -->
+        </StackPane>
+    </center>
 
 </BorderPane>

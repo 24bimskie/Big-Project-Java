@@ -1,7 +1,10 @@
 {
-    "java.project.sourcePaths": ["src"],
+    "java.project.sourcePaths": [
+        "src"
+    ],
     "java.project.outputPath": "bin",
     "java.project.referencedLibraries": [
-        "d:/praktikum/praktikum/javafx/javafx-sdk-17.0.19/lib/*.jar"
+        "c:/Program Files/Java/javafx-sdk-26.0.1/lib/*.jar",
+        "c:\\Users\\DANANG\\Downloads\\mysql-connector-j-9.3.0.jar"
     ]
 }
