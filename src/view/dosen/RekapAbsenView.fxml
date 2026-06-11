@@ -1,15 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- View Rekap Absen (Dosen) -->
-<!-- Use case: Rekap Absen (extend dari Mulai Absen) -->
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="controller.dosen.RekapAbsenController"
-            styleClass="content-pane">
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="controller.dosen.RekapAbsenController"
+      styleClass="content-pane" spacing="20" stylesheets="@../../style/style.css">
 
-    <!-- TODO: Layout halaman rekap absen -->
-    <!-- - Pilih jadwal/mata kuliah -->
-    <!-- - Tabel rekap kehadiran per mahasiswa -->
-    <!-- - Statistik (persentase hadir, izin, sakit, alpha) -->
+    <Label text="Rekap Absensi Mahasiswa" styleClass="header-title" />
 
-</AnchorPane>
+    <VBox styleClass="card" spacing="15">
+        <HBox spacing="15" alignment="CENTER_LEFT">
+            <Label text="Mata Kuliah:" style="-fx-font-weight: bold; -fx-text-fill: #475569;" />
+            <ComboBox promptText="-- Semua Mata Kuliah --" prefWidth="250" styleClass="combo-box" />
+            
+            <Label text="Tanggal:" style="-fx-font-weight: bold; -fx-text-fill: #475569;" />
+            <DatePicker promptText="Tanggal Absen" styleClass="text-field" />
+            
+            <Button text="Filter" styleClass="btn-primary" />
+            <Button text="Export PDF" styleClass="btn-secondary" />
+        </HBox>
+    </VBox>
+
+    <HBox spacing="20">
+        <VBox styleClass="card" HBox.hgrow="ALWAYS">
+            <Label text="Persentase Kehadiran" styleClass="card-title" />
+            <Label text="85%" styleClass="card-value" style="-fx-text-fill: #10b981;" />
+        </VBox>
+        <VBox styleClass="card" HBox.hgrow="ALWAYS">
+            <Label text="Mahasiswa Sering Alpha" styleClass="card-title" />
+            <Label text="3 Orang" styleClass="card-value" style="-fx-text-fill: #ef4444;" />
+        </VBox>
+    </HBox>
+
+    <VBox styleClass="card" VBox.vgrow="ALWAYS" spacing="15">
+        <Label text="Data Kehadiran Detail" styleClass="card-title" />
+        <TableView styleClass="table-view" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn text="NIM" prefWidth="120" />
+                <TableColumn text="Nama Mahasiswa" prefWidth="250" />
+                <TableColumn text="Hadir" prefWidth="100" />
+                <TableColumn text="Izin" prefWidth="100" />
+                <TableColumn text="Sakit" prefWidth="100" />
+                <TableColumn text="Alpha" prefWidth="100" />
+            </columns>
+        </TableView>
+    </VBox>
+
+</VBox>
