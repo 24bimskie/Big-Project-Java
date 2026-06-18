@@ -32,6 +32,8 @@
             
             <Button text="Login" onAction="#handleLogin" maxWidth="Infinity" styleClass="btn-primary" />
             
+            <Label fx:id="statusLabel" textFill="green" alignment="CENTER" maxWidth="Infinity" />
+            
             <HBox alignment="CENTER" spacing="5.0">
                 <Label text="Belum punya akun?" />
                 <Hyperlink text="Daftar di sini" onAction="#handleGoToRegister" />

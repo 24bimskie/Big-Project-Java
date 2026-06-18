@@ -11,6 +11,9 @@ import model.User;
 import util.AlertHelper;
 import util.SceneManager;
 import util.UserSession;
+import javafx.animation.PauseTransition;
+import javafx.util.Duration;
+import javafx.scene.control.Label;
 
 /**
  * Controller untuk halaman Login.
@@ -24,6 +27,9 @@ public class LoginController {
     @FXML
     private PasswordField passwordField;
 
+    @FXML
+    private Label statusLabel;
+
     private UserDAO userDAO = new UserDAO();
 
     @FXML
@@ -36,30 +42,19 @@ public class LoginController {
             return;
         }
 
-        User user = userDAO.login(username, password);
+        // Bypass autentikasi database seperti yang diminta
+        User dummyUser = new User("1", username, password, "Admin");
+        UserSession.setCurrentUser(dummyUser);
 
-        if (user != null) {
-            UserSession.setCurrentUser(user);
-            AlertHelper.showInfo("Login Berhasil", "Selamat datang, " + user.getUsername() + "!");
-            
+        statusLabel.setText("Login Berhasil! ✔");
+        statusLabel.setStyle("-fx-text-fill: green;");
+
+        PauseTransition pause = new PauseTransition(Duration.seconds(1.5));
+        pause.setOnFinished(e -> {
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            
-            switch (user.getRole().toLowerCase()) {
-                case "admin":
-                    SceneManager.switchScene(stage, "/view/admin/AdminDashboardView.fxml", "Admin Dashboard");
-                    break;
-                case "dosen":
-                    SceneManager.switchScene(stage, "/view/dosen/DosenDashboardView.fxml", "Dosen Dashboard");
-                    break;
-                case "mahasiswa":
-                    SceneManager.switchScene(stage, "/view/mahasiswa/MahasiswaDashboardView.fxml", "Mahasiswa Dashboard");
-                    break;
-                default:
-                    AlertHelper.showError("Error", "Role tidak dikenali: " + user.getRole());
-            }
-        } else {
-            AlertHelper.showError("Login Gagal", "Username atau Password salah!");
-        }
+            SceneManager.switchScene(stage, "/view/admin/AdminDashboardView.fxml", "Admin Dashboard");
+        });
+        pause.play();
     }
 
     @FXML

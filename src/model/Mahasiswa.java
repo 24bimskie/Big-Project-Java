@@ -8,24 +8,22 @@ public class Mahasiswa {
 
     private String nim;
     private String nama;
-    private String jenisKelamin;
+    private String jenisKelamin; // kolom: gender
     private String alamat;
-    private String noTelp;
-    private String email;
-    private String idKelas;
+    private String kelas;        // kolom: kelas (baru)
+    private String prodi;        // kolom: prodi (baru)
     private String password;
 
     public Mahasiswa() {}
 
     public Mahasiswa(String nim, String nama, String jenisKelamin, String alamat,
-                     String noTelp, String email, String idKelas, String password) {
+                     String kelas, String prodi, String password) {
         this.nim = nim;
         this.nama = nama;
         this.jenisKelamin = jenisKelamin;
         this.alamat = alamat;
-        this.noTelp = noTelp;
-        this.email = email;
-        this.idKelas = idKelas;
+        this.kelas = kelas;
+        this.prodi = prodi;
         this.password = password;
     }
 
@@ -42,14 +40,11 @@ public class Mahasiswa {
     public String getAlamat() { return alamat; }
     public void setAlamat(String alamat) { this.alamat = alamat; }
 
-    public String getNoTelp() { return noTelp; }
-    public void setNoTelp(String noTelp) { this.noTelp = noTelp; }
+    public String getKelas() { return kelas; }
+    public void setKelas(String kelas) { this.kelas = kelas; }
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-
-    public String getIdKelas() { return idKelas; }
-    public void setIdKelas(String idKelas) { this.idKelas = idKelas; }
+    public String getProdi() { return prodi; }
+    public void setProdi(String prodi) { this.prodi = prodi; }
 
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
