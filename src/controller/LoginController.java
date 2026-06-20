@@ -42,9 +42,22 @@ public class LoginController {
             return;
         }
 
-        // Bypass autentikasi database seperti yang diminta
-        User dummyUser = new User("1", username, password, "Admin");
-        UserSession.setCurrentUser(dummyUser);
+        // Coba autentikasi menggunakan database
+        User loggedInUser = userDAO.login(username, password);
+        
+        // Jika gagal dari database, kita buat fallback dummy (untuk testing jika DB belum siap)
+        if (loggedInUser == null) {
+            String role = "Admin"; // Default
+            if (username.toLowerCase().contains("dosen")) {
+                role = "Dosen";
+            } else if (username.toLowerCase().contains("mahasiswa") || username.toLowerCase().contains("mhs")) {
+                role = "Mahasiswa";
+            }
+            loggedInUser = new User("dummy-id", username, password, role);
+            System.out.println("⚠️ Menggunakan Dummy Login karena user tidak ditemukan di DB. Role: " + role);
+        }
+
+        UserSession.setCurrentUser(loggedInUser);
 
         statusLabel.setText("Login Berhasil! ✔");
         statusLabel.setStyle("-fx-text-fill: green;");
@@ -52,7 +65,16 @@ public class LoginController {
         PauseTransition pause = new PauseTransition(Duration.seconds(1.5));
         pause.setOnFinished(e -> {
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            SceneManager.switchScene(stage, "/view/admin/AdminDashboardView.fxml", "Admin Dashboard");
+            
+            // Redirect sesuai role
+            String role = UserSession.getCurrentUser().getRole();
+            if ("Dosen".equalsIgnoreCase(role)) {
+                SceneManager.switchScene(stage, "/view/dosen/DosenDashboardView.fxml", "Dashboard Dosen");
+            } else if ("Mahasiswa".equalsIgnoreCase(role)) {
+                SceneManager.switchScene(stage, "/view/mahasiswa/MahasiswaDashboardView.fxml", "Dashboard Mahasiswa");
+            } else {
+                SceneManager.switchScene(stage, "/view/admin/AdminDashboardView.fxml", "Admin Dashboard");
+            }
         });
         pause.play();
     }
