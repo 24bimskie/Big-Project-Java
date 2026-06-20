@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.3
+-- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jun 18, 2026 at 03:43 PM
--- Server version: 8.0.30
--- PHP Version: 8.4.20
+-- Generation Time: Jun 20, 2026 at 08:43 AM
+-- Server version: 5.7.39
+-- PHP Version: 8.1.10
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -24,15 +24,32 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `absensi`
+--
+
+CREATE TABLE `absensi` (
+  `id` int(11) NOT NULL,
+  `tanggal` date NOT NULL,
+  `jadwal_id` int(11) NOT NULL,
+  `peran` enum('Dosen','Mahasiswa') NOT NULL,
+  `aktor_id` int(11) NOT NULL,
+  `status` enum('Hadir','Izin','Sakit','Alpha') NOT NULL,
+  `keterangan` text
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `dosen`
 --
 
 CREATE TABLE `dosen` (
-  `id` int NOT NULL,
-  `nip` varchar(20) NOT NULL,
-  `nama` varchar(100) NOT NULL,
-  `gender` enum('L','P') NOT NULL,
-  `alamat` text,
+  `id` int(11) NOT NULL,
+  `nidn` varchar(20) NOT NULL,
+  `nama_lengkap` varchar(100) DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `fakultas` varchar(100) DEFAULT NULL,
+  `foto_profil` varchar(255) DEFAULT 'default.jpg',
   `password` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -40,8 +57,11 @@ CREATE TABLE `dosen` (
 -- Dumping data for table `dosen`
 --
 
-INSERT INTO `dosen` (`id`, `nip`, `nama`, `gender`, `alamat`, `password`) VALUES
-(1, 'Yanto', 'Yanto', 'L', NULL, 'yanto123');
+INSERT INTO `dosen` (`id`, `nidn`, `nama_lengkap`, `email`, `fakultas`, `foto_profil`, `password`) VALUES
+(1, '12345', 'joko', 'Laki-laki', 'pwr', 'default.jpg', '123'),
+(2, 'qq', 'qq', 'L', NULL, 'default.jpg', '11'),
+(3, 'jokowidodo', 'jokowidodo', 'L', NULL, 'default.jpg', '111'),
+(4, 'gibran', 'gibran', 'L', NULL, 'default.jpg', '321');
 
 -- --------------------------------------------------------
 
@@ -50,12 +70,12 @@ INSERT INTO `dosen` (`id`, `nip`, `nama`, `gender`, `alamat`, `password`) VALUES
 --
 
 CREATE TABLE `jadwal` (
-  `id` int NOT NULL,
+  `id` int(11) NOT NULL,
   `hari` varchar(20) NOT NULL,
   `jam` time NOT NULL,
-  `kelas_id` int NOT NULL,
-  `dosen_id` int NOT NULL,
-  `matkul_id` int NOT NULL
+  `kelas_id` int(11) NOT NULL,
+  `dosen_id` int(11) NOT NULL,
+  `matkul_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -65,7 +85,7 @@ CREATE TABLE `jadwal` (
 --
 
 CREATE TABLE `kelas` (
-  `id` int NOT NULL,
+  `id` int(11) NOT NULL,
   `Prodi` varchar(100) NOT NULL,
   `kelas` varchar(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -77,22 +97,13 @@ CREATE TABLE `kelas` (
 --
 
 CREATE TABLE `mahasiswa` (
-  `id` int NOT NULL,
+  `id` int(11) NOT NULL,
   `nim` varchar(15) NOT NULL,
   `nama` varchar(100) NOT NULL,
   `gender` enum('L','P') NOT NULL,
   `alamat` text,
-  `password` varchar(255) NOT NULL,
-  `kelas` varchar(10) DEFAULT NULL,
-  `prodi` varchar(50) DEFAULT NULL
+  `password` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `mahasiswa`
---
-
-INSERT INTO `mahasiswa` (`id`, `nim`, `nama`, `gender`, `alamat`, `password`, `kelas`, `prodi`) VALUES
-(1, 'Andi', 'Andi', 'L', NULL, 'andi321', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -101,7 +112,7 @@ INSERT INTO `mahasiswa` (`id`, `nim`, `nama`, `gender`, `alamat`, `password`, `k
 --
 
 CREATE TABLE `mata_kuliah` (
-  `id` int NOT NULL,
+  `id` int(11) NOT NULL,
   `Mata_Kuliah` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -112,32 +123,42 @@ CREATE TABLE `mata_kuliah` (
 --
 
 CREATE TABLE `user` (
-  `id` int NOT NULL,
+  `id` int(11) NOT NULL,
   `username` varchar(50) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `level` varchar(20) NOT NULL
+  `level` varchar(20) NOT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `alamat` text
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `user`
 --
 
-INSERT INTO `user` (`id`, `username`, `password`, `level`) VALUES
-(1, 'alex', 'alex123', 'Admin'),
-(2, 'Yanto', 'yanto123', 'Dosen'),
-(3, 'Andi', 'andi321', 'Mahasiswa'),
-(4, 'admin', 'admin321', 'Admin');
+INSERT INTO `user` (`id`, `username`, `password`, `level`, `email`, `alamat`) VALUES
+(1, 'joko', '123', 'admin', 'jokotingkir@gmail.com', 'purworejo'),
+(31, 'jokooo', '123', 'admin', 'joko@gmail.com', 'per'),
+(32, 'qq', '11', 'Dosen', NULL, NULL),
+(33, 'jokowidodo', '111', 'Dosen', NULL, NULL),
+(34, 'gibran', '321', 'Dosen', NULL, NULL);
 
 --
 -- Indexes for dumped tables
 --
 
 --
+-- Indexes for table `absensi`
+--
+ALTER TABLE `absensi`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `jadwal_id` (`jadwal_id`);
+
+--
 -- Indexes for table `dosen`
 --
 ALTER TABLE `dosen`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `nip` (`nip`);
+  ADD UNIQUE KEY `nip` (`nidn`);
 
 --
 -- Indexes for table `jadwal`
@@ -181,44 +202,56 @@ ALTER TABLE `user`
 --
 
 --
+-- AUTO_INCREMENT for table `absensi`
+--
+ALTER TABLE `absensi`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `dosen`
 --
 ALTER TABLE `dosen`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `jadwal`
 --
 ALTER TABLE `jadwal`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `kelas`
 --
 ALTER TABLE `kelas`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `mahasiswa`
 --
 ALTER TABLE `mahasiswa`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `mata_kuliah`
 --
 ALTER TABLE `mata_kuliah`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `absensi`
+--
+ALTER TABLE `absensi`
+  ADD CONSTRAINT `absensi_ibfk_jadwal` FOREIGN KEY (`jadwal_id`) REFERENCES `jadwal` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `jadwal`
