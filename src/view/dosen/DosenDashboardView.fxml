@@ -6,98 +6,64 @@
 <?import javafx.scene.shape.Circle?>
 
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="controller.dosen.DosenDashboardController"
-            prefWidth="1200" prefHeight="800" styleClass="dashboard-pane" stylesheets="@../../style/style.css">
+            prefWidth="1100" prefHeight="700" styleClass="dashboard-pane" stylesheets="@../../style/style.css, @../../style/Dosen.css">
 
-    <!-- LEFT: Sidebar menu -->
-    <left>
-        <VBox styleClass="sidebar" prefWidth="250">
-            <!-- App Logo / Title -->
-            <Label text="Sistem Absensi" styleClass="sidebar-title" />
+    <!-- TOP: Header dengan info user -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="20" styleClass="header" prefHeight="70">
+            <padding>
+                <Insets top="15" right="20" bottom="15" left="20"/>
+            </padding>
+            <Button fx:id="btnToggleSidebar" text="☰" styleClass="btn-secondary" minWidth="-Infinity" />
+            <Label text="Sistem Akademik - Dashboard Dosen" styleClass="header-title"/>
+            <Region HBox.hgrow="ALWAYS" />
             
-            <Separator opacity="0.2" />
+            <HBox alignment="CENTER" spacing="10">
+                <children>
+                    <TextField fx:id="txtSearch" promptText="Cari data mahasiswa..." styleClass="search-field" prefWidth="250" />
+                    <Button fx:id="btnCari" text="Cari" styleClass="btn-primary" minWidth="-Infinity" />
+                </children>
+            </HBox>
             
-            <VBox spacing="5" VBox.vgrow="ALWAYS">
-                <VBox.margin>
-                    <Insets top="20"/>
-                </VBox.margin>
-                <Button text="Dashboard" styleClass="sidebar-btn, active" maxWidth="Infinity" />
-                <Button text="Mulai Absen" styleClass="sidebar-btn" maxWidth="Infinity" />
-                <Button text="Rekap Absen" styleClass="sidebar-btn" maxWidth="Infinity" />
-                <Button text="Profil" styleClass="sidebar-btn" maxWidth="Infinity" />
+            <VBox alignment="CENTER_RIGHT" spacing="5">
+                <Label fx:id="lblNamaDosen" text="Nama Dosen" styleClass="header-user"/>
+                <Label text="Role: Dosen" styleClass="header-role"/>
             </VBox>
+            <Circle radius="18" fill="#cbd5e1" />
+        </HBox>
+    </top>
+
+    <!-- LEFT: Sidebar menu navigasi -->
+    <left>
+        <VBox fx:id="sidebar" spacing="5" styleClass="sidebar" prefWidth="250">
+            <padding>
+                <Insets top="20" right="10" bottom="20" left="10"/>
+            </padding>
             
-            <!-- Bottom: Logout -->
-            <Button text="Logout" styleClass="sidebar-btn" maxWidth="Infinity" />
+            <Label text="Menu Utama" styleClass="sidebar-title" />
+            
+            <Button fx:id="btnDashboard" text="Dashboard" styleClass="sidebar-btn" maxWidth="Infinity" />
+            <Button fx:id="btnMulaiAbsen" text="Mulai Absen" styleClass="sidebar-btn" maxWidth="Infinity" />
+            <Button fx:id="btnRekapAbsen" text="Rekap Absen" styleClass="sidebar-btn" maxWidth="Infinity" />
+            <Button fx:id="btnProfil" text="Profil" styleClass="sidebar-btn" maxWidth="Infinity" />
+            
+            <Region VBox.vgrow="ALWAYS" />
+            
+            <Button fx:id="btnLogout" text="Logout" styleClass="btn-logout" maxWidth="Infinity">
+                <VBox.margin>
+                    <Insets top="10" right="5" bottom="0" left="5"/>
+                </VBox.margin>
+            </Button>
+            
         </VBox>
     </left>
 
     <!-- CENTER: Content area -->
     <center>
-        <BorderPane>
-            <!-- TOP: Header dengan info dosen -->
-            <top>
-                <HBox styleClass="header-pane" alignment="CENTER_LEFT" spacing="20">
-                    <Label text="Dashboard Dosen" styleClass="header-title" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
-                    
-                    <!-- Search Bar -->
-                    <HBox alignment="CENTER" spacing="10">
-                        <TextField promptText="Cari data mahasiswa..." styleClass="text-field" prefWidth="250"/>
-                        <Button text="Cari" styleClass="btn-primary" />
-                    </HBox>
-                    
-                    <Pane HBox.hgrow="ALWAYS" />
-                    
-                    <!-- Profile Area -->
-                    <HBox alignment="CENTER" spacing="10">
-                        <Label text="Nama Dosen" style="-fx-font-weight: bold; -fx-text-fill: #475569;" />
-                        <Circle radius="18" fill="#cbd5e1" />
-                    </HBox>
-                </HBox>
-            </top>
-
-            <!-- CENTER: Main Content Area -->
-            <center>
-                <VBox styleClass="content-pane">
-                    
-                    <!-- Statistics Cards -->
-                    <HBox spacing="20">
-                        <VBox styleClass="card" HBox.hgrow="ALWAYS">
-                            <Label text="Total Mahasiswa Diampu" styleClass="card-title" />
-                            <Label text="120" styleClass="card-value" />
-                        </VBox>
-                        <VBox styleClass="card" HBox.hgrow="ALWAYS">
-                            <Label text="Hadir Hari Ini" styleClass="card-title" />
-                            <Label text="105" styleClass="card-value" style="-fx-text-fill: #10b981;" />
-                        </VBox>
-                        <VBox styleClass="card" HBox.hgrow="ALWAYS">
-                            <Label text="Tidak Hadir" styleClass="card-title" />
-                            <Label text="15" styleClass="card-value" style="-fx-text-fill: #ef4444;" />
-                        </VBox>
-                    </HBox>
-                    
-                    <!-- CRUD Area / Table Rekap Absen -->
-                    <VBox styleClass="card" VBox.vgrow="ALWAYS" spacing="15">
-                        <HBox alignment="CENTER_LEFT" spacing="15">
-                            <Label text="Data Rekap Absen Terbaru" styleClass="card-title" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
-                            <Button text="+ Tambah Absensi Manual" styleClass="btn-primary" />
-                            <Button text="Edit Absensi" styleClass="btn-secondary" />
-                            <Button text="Hapus Data" styleClass="btn-danger" />
-                        </HBox>
-                        
-                        <TableView styleClass="table-view" VBox.vgrow="ALWAYS">
-                            <columns>
-                                <TableColumn text="NIM" prefWidth="120" />
-                                <TableColumn text="Nama Mahasiswa" prefWidth="250" />
-                                <TableColumn text="Mata Kuliah" prefWidth="200" />
-                                <TableColumn text="Tanggal" prefWidth="150" />
-                                <TableColumn text="Status Kehadiran" prefWidth="150" />
-                            </columns>
-                        </TableView>
-                    </VBox>
-                    
-                </VBox>
-            </center>
-        </BorderPane>
+        <StackPane fx:id="papanKontenTengah" styleClass="content-pane">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+        </StackPane>
     </center>
-
 </BorderPane>

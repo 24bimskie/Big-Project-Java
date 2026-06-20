@@ -38,8 +38,8 @@
 
 /* --- Dashboard --- */
 .dashboard-pane {
-<<<<<<< HEAD
-    -fx-background-color: #f4f6f8;
+    -fx-background-color: #f3f4f6;
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
 }
 
 .header {
@@ -66,25 +66,11 @@
 
 /* --- Content Area --- */
 .content-pane {
-    -fx-background-color: #f4f6f8;
-=======
     -fx-background-color: #f3f4f6;
-    -fx-font-family: "Segoe UI", Arial, sans-serif;
->>>>>>> cae3388 (update)
 }
 
 /* --- Sidebar --- */
 .sidebar {
-<<<<<<< HEAD
-    -fx-background-color: #2c3e50;
-}
-
-.sidebar-title {
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #95a5a6;
-    -fx-padding: 0 0 10 10;
-=======
     -fx-background-color: #1e293b;
     -fx-padding: 20px 0px 20px 0px;
     -fx-spacing: 10px;
@@ -95,28 +81,27 @@
     -fx-font-size: 20px;
     -fx-font-weight: bold;
     -fx-padding: 0 0 20px 20px;
->>>>>>> cae3388 (update)
 }
 
 .sidebar-btn {
     -fx-background-color: transparent;
-<<<<<<< HEAD
-    -fx-text-fill: #bdc3c7;
+    -fx-text-fill: #94a3b8;
     -fx-font-size: 14px;
-    -fx-padding: 12px 15px;
-    -fx-cursor: hand;
+    -fx-font-weight: bold;
     -fx-alignment: BASELINE_LEFT;
+    -fx-padding: 15px 20px 15px 25px;
+    -fx-cursor: hand;
 }
 
 .sidebar-btn:hover {
-    -fx-background-color: #34495e;
+    -fx-background-color: #334155;
     -fx-text-fill: #ffffff;
 }
 
 .sidebar-btn-active {
-    -fx-background-color: #3498db;
+    -fx-background-color: #3b82f6;
     -fx-text-fill: #ffffff;
-    -fx-border-color: transparent transparent transparent #3498db;
+    -fx-border-color: transparent transparent transparent #3b82f6;
     -fx-border-width: 0 0 0 4px;
 }
 
@@ -137,27 +122,7 @@
 
 .btn-logout:hover {
     -fx-background-color: #c0392b;
-=======
-    -fx-text-fill: #94a3b8;
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
-    -fx-alignment: BASELINE_LEFT;
-    -fx-padding: 15px 20px 15px 25px;
-    -fx-cursor: hand;
 }
-
-.sidebar-btn:hover {
-    -fx-background-color: #334155;
-    -fx-text-fill: #ffffff;
-}
-
-.sidebar-btn.active {
-    -fx-background-color: #3b82f6;
-    -fx-text-fill: #ffffff;
-    -fx-border-color: #ffffff;
-    -fx-border-width: 0 0 0 4px;
-}
-
 /* --- Header --- */
 .header-pane {
     -fx-background-color: #ffffff;
@@ -194,7 +159,6 @@
     -fx-font-size: 28px;
     -fx-font-weight: bold;
     -fx-text-fill: #1e293b;
->>>>>>> cae3388 (update)
 }
 
 /* --- Table --- */
