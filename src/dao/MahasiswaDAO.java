@@ -3,113 +3,146 @@ package dao;
 import config.DatabaseConnection;
 import model.Mahasiswa;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * DAO untuk operasi CRUD data Mahasiswa.
- * Menggunakan skema tabel: mahasiswa(id, nim, nama, gender, alamat, password)
- * gender: enum 'L' atau 'P'
- * Catatan: kolom id_kelas & email tidak ada di DB, diabaikan saat insert/update.
+ * Kolom DB: id, nim, nama, gender, alamat, password, kelas, prodi
  */
 public class MahasiswaDAO {
 
-    public void insert(Mahasiswa mahasiswa) {
-        String query = "INSERT INTO mahasiswa (nim, nama, gender, alamat, password) VALUES (?, ?, ?, ?, ?)";
+    public void insert(Mahasiswa m) {
+        String sql = "INSERT INTO mahasiswa (nim, nama, gender, alamat, password, kelas, prodi) VALUES (?, ?, ?, ?, ?, ?, ?)";
+
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, mahasiswa.getNim());
-            stmt.setString(2, mahasiswa.getNama());
-            stmt.setString(3, toGenderEnum(mahasiswa.getJenisKelamin()));
-            stmt.setString(4, mahasiswa.getAlamat());
-            stmt.setString(5, mahasiswa.getPassword());
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, m.getNim());
+            stmt.setString(2, m.getNama());
+            stmt.setString(3, toGenderEnum(m.getJenisKelamin()));
+            stmt.setString(4, m.getAlamat());
+            stmt.setString(5, m.getPassword());
+            stmt.setString(6, m.getKelas());
+            stmt.setString(7, m.getProdi());
+
             stmt.executeUpdate();
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public void update(Mahasiswa mahasiswa) {
-        String query = "UPDATE mahasiswa SET nama=?, gender=?, alamat=? WHERE nim=?";
+    public void update(Mahasiswa m) {
+        String sql = "UPDATE mahasiswa SET nama=?, gender=?, alamat=?, password=?, kelas=?, prodi=? WHERE nim=?";
+
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, mahasiswa.getNama());
-            stmt.setString(2, toGenderEnum(mahasiswa.getJenisKelamin()));
-            stmt.setString(3, mahasiswa.getAlamat());
-            stmt.setString(4, mahasiswa.getNim());
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, m.getNama());
+            stmt.setString(2, toGenderEnum(m.getJenisKelamin()));
+            stmt.setString(3, m.getAlamat());
+            stmt.setString(4, m.getPassword());
+            stmt.setString(5, m.getKelas());
+            stmt.setString(6, m.getProdi());
+            stmt.setString(7, m.getNim());
+
             stmt.executeUpdate();
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
     public void delete(String nim) {
-        String query = "DELETE FROM mahasiswa WHERE nim=?";
+        String sql = "DELETE FROM mahasiswa WHERE nim=?";
+
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
             stmt.setString(1, nim);
             stmt.executeUpdate();
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
     public Mahasiswa getByNim(String nim) {
-        String query = "SELECT * FROM mahasiswa WHERE nim=?";
+        String sql = "SELECT * FROM mahasiswa WHERE nim=?";
+
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
             stmt.setString(1, nim);
+
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) return mapRow(rs);
+                if (rs.next()) {
+                    return map(rs);
+                }
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
         return null;
     }
 
     public List<Mahasiswa> getAll() {
         List<Mahasiswa> list = new ArrayList<>();
-        String query = "SELECT * FROM mahasiswa ORDER BY nama";
+
+        String sql = "SELECT * FROM mahasiswa ORDER BY nama";
+
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query);
-             ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) list.add(mapRow(rs));
+                PreparedStatement stmt = conn.prepareStatement(sql);
+                ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                list.add(map(rs));
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
         return list;
     }
 
-    public List<Mahasiswa> getByKelas(String idKelas) {
-        // Tabel mahasiswa tidak memiliki kolom id_kelas di DB saat ini
-        // Kembalikan semua, filtering dilakukan di controller jika diperlukan
-        return getAll();
+    public List<Mahasiswa> getByKelas(String kelas) {
+        List<Mahasiswa> hasil = new ArrayList<>();
+
+        for (Mahasiswa m : getAll()) {
+            if (kelas.equalsIgnoreCase(m.getKelas())) {
+                hasil.add(m);
+            }
+        }
+
+        return hasil;
     }
 
-    /** Konversi tampilan UI ("Laki-laki"/"Perempuan") ke enum DB ('L'/'P') */
     private String toGenderEnum(String jenisKelamin) {
-        if (jenisKelamin == null) return "L";
+        if (jenisKelamin == null)
+            return "L";
         return jenisKelamin.equalsIgnoreCase("Perempuan") ? "P" : "L";
     }
 
-    /** Konversi enum DB ('L'/'P') ke tampilan UI */
     private String fromGenderEnum(String gender) {
         return "P".equalsIgnoreCase(gender) ? "Perempuan" : "Laki-laki";
     }
 
-    /** Memetakan satu baris ResultSet ke objek Mahasiswa */
-    private Mahasiswa mapRow(ResultSet rs) throws SQLException {
+    private Mahasiswa map(ResultSet rs) throws SQLException {
         return new Mahasiswa(
                 rs.getString("nim"),
                 rs.getString("nama"),
                 fromGenderEnum(rs.getString("gender")),
                 rs.getString("alamat"),
-                "",    // no_telp tidak ada di DB
-                "",    // email tidak ada di DB
-                "",    // id_kelas tidak ada di DB
-                rs.getString("password")
-        );
+                rs.getString("kelas"),
+                rs.getString("prodi"),
+                rs.getString("password"));
     }
 }

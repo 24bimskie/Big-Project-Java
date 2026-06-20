@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.0
+-- version 5.2.3
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jun 08, 2026 at 07:34 AM
--- Server version: 5.7.39
--- PHP Version: 8.1.10
+-- Generation Time: Jun 18, 2026 at 03:43 PM
+-- Server version: 8.0.30
+-- PHP Version: 8.4.20
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -28,13 +28,20 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `dosen` (
-  `id` int(11) NOT NULL,
+  `id` int NOT NULL,
   `nip` varchar(20) NOT NULL,
   `nama` varchar(100) NOT NULL,
   `gender` enum('L','P') NOT NULL,
   `alamat` text,
   `password` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `dosen`
+--
+
+INSERT INTO `dosen` (`id`, `nip`, `nama`, `gender`, `alamat`, `password`) VALUES
+(1, 'Yanto', 'Yanto', 'L', NULL, 'yanto123');
 
 -- --------------------------------------------------------
 
@@ -43,12 +50,12 @@ CREATE TABLE `dosen` (
 --
 
 CREATE TABLE `jadwal` (
-  `id` int(11) NOT NULL,
+  `id` int NOT NULL,
   `hari` varchar(20) NOT NULL,
   `jam` time NOT NULL,
-  `kelas_id` int(11) NOT NULL,
-  `dosen_id` int(11) NOT NULL,
-  `matkul_id` int(11) NOT NULL
+  `kelas_id` int NOT NULL,
+  `dosen_id` int NOT NULL,
+  `matkul_id` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -58,7 +65,7 @@ CREATE TABLE `jadwal` (
 --
 
 CREATE TABLE `kelas` (
-  `id` int(11) NOT NULL,
+  `id` int NOT NULL,
   `Prodi` varchar(100) NOT NULL,
   `kelas` varchar(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -70,13 +77,22 @@ CREATE TABLE `kelas` (
 --
 
 CREATE TABLE `mahasiswa` (
-  `id` int(11) NOT NULL,
+  `id` int NOT NULL,
   `nim` varchar(15) NOT NULL,
   `nama` varchar(100) NOT NULL,
   `gender` enum('L','P') NOT NULL,
   `alamat` text,
-  `password` varchar(255) NOT NULL
+  `password` varchar(255) NOT NULL,
+  `kelas` varchar(10) DEFAULT NULL,
+  `prodi` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `mahasiswa`
+--
+
+INSERT INTO `mahasiswa` (`id`, `nim`, `nama`, `gender`, `alamat`, `password`, `kelas`, `prodi`) VALUES
+(1, 'Andi', 'Andi', 'L', NULL, 'andi321', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -85,7 +101,7 @@ CREATE TABLE `mahasiswa` (
 --
 
 CREATE TABLE `mata_kuliah` (
-  `id` int(11) NOT NULL,
+  `id` int NOT NULL,
   `Mata_Kuliah` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -96,11 +112,21 @@ CREATE TABLE `mata_kuliah` (
 --
 
 CREATE TABLE `user` (
-  `id` int(11) NOT NULL,
+  `id` int NOT NULL,
   `username` varchar(50) NOT NULL,
   `password` varchar(255) NOT NULL,
   `level` varchar(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `user`
+--
+
+INSERT INTO `user` (`id`, `username`, `password`, `level`) VALUES
+(1, 'alex', 'alex123', 'Admin'),
+(2, 'Yanto', 'yanto123', 'Dosen'),
+(3, 'Andi', 'andi321', 'Mahasiswa'),
+(4, 'admin', 'admin321', 'Admin');
 
 --
 -- Indexes for dumped tables
@@ -158,37 +184,37 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT for table `dosen`
 --
 ALTER TABLE `dosen`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `jadwal`
 --
 ALTER TABLE `jadwal`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `kelas`
 --
 ALTER TABLE `kelas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `mahasiswa`
 --
 ALTER TABLE `mahasiswa`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `mata_kuliah`
 --
 ALTER TABLE `mata_kuliah`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- Constraints for dumped tables

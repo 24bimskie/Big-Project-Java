@@ -13,37 +13,43 @@
             <padding>
                 <Insets top="15" right="20" bottom="15" left="20"/>
             </padding>
-            <Label text="Sistem Akademik - Admin Dashboard" styleClass="header-title"/>
+            <Label text="Sistem Absensi Mahasiswa - Admin Dashboard" styleClass="header-title"/>
             <Region HBox.hgrow="ALWAYS" />
-            <VBox alignment="CENTER_RIGHT" spacing="5">
-                <Label fx:id="labelNamaUser" text="Nama User" styleClass="header-user"/>
-                <Label fx:id="labelRole" text="Role: Admin" styleClass="header-role"/>
-            </VBox>
+            <HBox alignment="CENTER_RIGHT" spacing="15">
+                <VBox alignment="CENTER_RIGHT" spacing="2">
+                    <Label fx:id="labelNamaUser" text="Nama User" styleClass="header-user"/>
+                    <Label fx:id="labelRole" text="Role: Admin" styleClass="header-role"/>
+                </VBox>
+                <Button fx:id="btnLogout" text="Logout" onAction="#handleLogout" styleClass="btn-logout" />
+            </HBox>
         </HBox>
     </top>
 
     <!-- LEFT: Sidebar menu navigasi -->
     <left>
-        <VBox spacing="5" styleClass="sidebar" prefWidth="250">
+        <VBox spacing="12" styleClass="sidebar" prefWidth="250">
             <padding>
                 <Insets top="20" right="10" bottom="20" left="10"/>
             </padding>
             
-            <Label text="Menu Utama" styleClass="sidebar-title" />
-            
-            <Button fx:id="btnMahasiswa" text="Data Mahasiswa" onAction="#handleMenuMahasiswa" maxWidth="Infinity" styleClass="sidebar-btn" />
-            <Button fx:id="btnDosen" text="Data Dosen" onAction="#handleMenuDosen" maxWidth="Infinity" styleClass="sidebar-btn" />
+
+            <Button fx:id="btnMahasiswa" text="Data Mahasiswa ▼" onAction="#handleMenuMahasiswaToggle" maxWidth="Infinity" styleClass="sidebar-btn" />
+            <VBox fx:id="submenuMahasiswa" visible="false" managed="false" spacing="5">
+                <padding><Insets left="15"/></padding>
+                <Button fx:id="btnMahasiswaLihat" text="Lihat Data" onAction="#handleMenuMahasiswaLihat" maxWidth="Infinity" styleClass="sidebar-btn" style="-fx-font-size: 13px; -fx-padding: 8px 15px;" />
+                <Button fx:id="btnMahasiswaInput" text="Input Data" onAction="#handleMenuMahasiswaInput" maxWidth="Infinity" styleClass="sidebar-btn" style="-fx-font-size: 13px; -fx-padding: 8px 15px;" />
+            </VBox>
+            <Button fx:id="btnDosen" text="Data Dosen ▼" onAction="#handleMenuDosenToggle" maxWidth="Infinity" styleClass="sidebar-btn" />
+            <VBox fx:id="submenuDosen" visible="false" managed="false" spacing="5">
+                <padding><Insets left="15"/></padding>
+                <Button fx:id="btnDosenLihat" text="Lihat Data" onAction="#handleMenuDosenLihat" maxWidth="Infinity" styleClass="sidebar-btn" style="-fx-font-size: 13px; -fx-padding: 8px 15px;" />
+                <Button fx:id="btnDosenInput" text="Input Data" onAction="#handleMenuDosenInput" maxWidth="Infinity" styleClass="sidebar-btn" style="-fx-font-size: 13px; -fx-padding: 8px 15px;" />
+            </VBox>
             <Button fx:id="btnProdiKelas" text="Data Prodi &amp; Kelas" onAction="#handleMenuProdiKelas" maxWidth="Infinity" styleClass="sidebar-btn" />
             <Button fx:id="btnMataKuliah" text="Data Mata Kuliah" onAction="#handleMenuMataKuliah" maxWidth="Infinity" styleClass="sidebar-btn" />
             <Button fx:id="btnJadwal" text="Data Jadwal" onAction="#handleMenuJadwal" maxWidth="Infinity" styleClass="sidebar-btn" />
             
             <Region VBox.vgrow="ALWAYS" />
-            
-            <Button fx:id="btnLogout" text="Logout" onAction="#handleLogout" maxWidth="Infinity" styleClass="btn-logout">
-                <VBox.margin>
-                    <Insets top="10" right="5" bottom="0" left="5"/>
-                </VBox.margin>
-            </Button>
         </VBox>
     </left>
 

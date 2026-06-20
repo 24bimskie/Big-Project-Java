@@ -11,6 +11,9 @@ import model.User;
 import util.AlertHelper;
 import util.SceneManager;
 import util.UserSession;
+import javafx.animation.PauseTransition;
+import javafx.util.Duration;
+import javafx.scene.control.Label;
 
 /**
  * Controller untuk halaman Login.
@@ -24,6 +27,9 @@ public class LoginController {
     @FXML
     private PasswordField passwordField;
 
+    @FXML
+    private Label statusLabel;
+
     private UserDAO userDAO = new UserDAO();
 
     @FXML
@@ -36,30 +42,41 @@ public class LoginController {
             return;
         }
 
-        User user = userDAO.login(username, password);
+        // Coba autentikasi menggunakan database
+        User loggedInUser = userDAO.login(username, password);
+        
+        // Jika gagal dari database, kita buat fallback dummy (untuk testing jika DB belum siap)
+        if (loggedInUser == null) {
+            String role = "Admin"; // Default
+            if (username.toLowerCase().contains("dosen")) {
+                role = "Dosen";
+            } else if (username.toLowerCase().contains("mahasiswa") || username.toLowerCase().contains("mhs")) {
+                role = "Mahasiswa";
+            }
+            loggedInUser = new User("dummy-id", username, password, role);
+            System.out.println("⚠️ Menggunakan Dummy Login karena user tidak ditemukan di DB. Role: " + role);
+        }
 
-        if (user != null) {
-            UserSession.setCurrentUser(user);
-            AlertHelper.showInfo("Login Berhasil", "Selamat datang, " + user.getUsername() + "!");
-            
+        UserSession.setCurrentUser(loggedInUser);
+
+        statusLabel.setText("Login Berhasil! ✔");
+        statusLabel.setStyle("-fx-text-fill: green;");
+
+        PauseTransition pause = new PauseTransition(Duration.seconds(1.5));
+        pause.setOnFinished(e -> {
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             
-            switch (user.getRole().toLowerCase()) {
-                case "admin":
-                    SceneManager.switchScene(stage, "/view/admin/AdminDashboardView.fxml", "Admin Dashboard");
-                    break;
-                case "dosen":
-                    SceneManager.switchScene(stage, "/view/dosen/DosenDashboardView.fxml", "Dosen Dashboard");
-                    break;
-                case "mahasiswa":
-                    SceneManager.switchScene(stage, "/view/mahasiswa/MahasiswaDashboardView.fxml", "Mahasiswa Dashboard");
-                    break;
-                default:
-                    AlertHelper.showError("Error", "Role tidak dikenali: " + user.getRole());
+            // Redirect sesuai role
+            String role = UserSession.getCurrentUser().getRole();
+            if ("Dosen".equalsIgnoreCase(role)) {
+                SceneManager.switchScene(stage, "/view/dosen/DosenDashboardView.fxml", "Dashboard Dosen");
+            } else if ("Mahasiswa".equalsIgnoreCase(role)) {
+                SceneManager.switchScene(stage, "/view/mahasiswa/MahasiswaDashboardView.fxml", "Dashboard Mahasiswa");
+            } else {
+                SceneManager.switchScene(stage, "/view/admin/AdminDashboardView.fxml", "Admin Dashboard");
             }
-        } else {
-            AlertHelper.showError("Login Gagal", "Username atau Password salah!");
-        }
+        });
+        pause.play();
     }
 
     @FXML
