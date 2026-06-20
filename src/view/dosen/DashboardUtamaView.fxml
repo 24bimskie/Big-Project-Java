@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+
+<ScrollPane xmlns:fx="http://javafx.com/fxml" fitToWidth="true" styleClass="main-scroll" stylesheets="@../../style/style.css">
+    <content>
+        <VBox styleClass="content-pane" spacing="20">
+            <padding>
+                <Insets top="25" right="25" bottom="25" left="25"/>
+            </padding>
+            <children>
+                <HBox spacing="20">
+                    <children>
+                        <VBox styleClass="card" HBox.hgrow="ALWAYS">
+                            <children>
+                                <Label text="Total Mahasiswa Diampu" styleClass="card-title" />
+                                <Label text="0" styleClass="card-value" />
+                            </children>
+                        </VBox>
+                        <VBox styleClass="card" HBox.hgrow="ALWAYS">
+                            <children>
+                                <Label text="Hadir Hari Ini" styleClass="card-title" />
+                                <Label text="0" styleClass="card-value" style="-fx-text-fill: #10b981;" />
+                            </children>
+                        </VBox>
+                        <VBox styleClass="card" HBox.hgrow="ALWAYS">
+                            <children>
+                                <Label text="Tidak Hadir" styleClass="card-title" />
+                                <Label text="0" styleClass="card-value" style="-fx-text-fill: #ef4444;" />
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+                
+                <VBox styleClass="card-table" spacing="15" VBox.vgrow="ALWAYS">
+                    <children>
+                        <HBox alignment="CENTER_LEFT" spacing="15">
+                            <children>
+                                <Label text="Data Rekap Absen Terbaru" styleClass="table-title" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
+                                <Button text="+ Tambah Absensi Manual" styleClass="btn-primary" minWidth="-Infinity" />
+                                <Button text="Edit Absensi" styleClass="btn-secondary" minWidth="-Infinity" />
+                                <Button text="Hapus Data" styleClass="btn-danger" minWidth="-Infinity" />
+                            </children>
+                        </HBox>
+                        
+                        <TableView styleClass="custom-table" prefHeight="350" VBox.vgrow="ALWAYS">
+                            <columnResizePolicy>
+                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                            </columnResizePolicy>
+                            <columns>
+                                <TableColumn text="NIM" prefWidth="120" />
+                                <TableColumn text="Nama Mahasiswa" prefWidth="250" />
+                                <TableColumn text="Mata Kuliah" prefWidth="200" />
+                                <TableColumn text="Tanggal" prefWidth="150" />
+                                <TableColumn text="Status Kehadiran" prefWidth="150" />
+                            </columns>
+                        </TableView>
+                    </children>
+                </VBox>
+            </children>
+        </VBox>
+    </content>
+</ScrollPane>

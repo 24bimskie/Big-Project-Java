@@ -1,52 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- View Profil Dosen -->
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.shape.Circle?>
 
-<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="controller.dosen.ProfilDosenController"
-      styleClass="content-pane" spacing="20" stylesheets="@../../style/style.css" alignment="TOP_CENTER">
+<ScrollPane xmlns:fx="http://javafx.com/fxml" fx:controller="controller.dosen.ProfilDosenController"
+            fitToWidth="true" fitToHeight="true" style="-fx-background-color: transparent;" stylesheets="@../../style/style.css">
+    <content>
+        <VBox styleClass="content-pane" spacing="20" alignment="TOP_CENTER">
+            <padding>
+                <Insets top="20" right="25" bottom="20" left="25"/>
+            </padding>
+            
+            <Label text="Profil Dosen" styleClass="header-title" alignment="CENTER_LEFT" maxWidth="Infinity" minWidth="-Infinity" />
 
-    <Label text="Profil Dosen" styleClass="header-title" alignment="CENTER_LEFT" maxWidth="Infinity" />
+            <VBox styleClass="card" spacing="20" maxWidth="600" alignment="CENTER">
+                <VBox.margin>
+                    <Insets top="10" />
+                </VBox.margin>
+                
+                <Circle radius="60" fill="#cbd5e1" />
+                <Button fx:id="btnUbahFoto" text="Ubah Foto" styleClass="btn-secondary" minWidth="-Infinity" />
 
-    <VBox styleClass="card" spacing="20" maxWidth="600" alignment="CENTER">
-        <VBox.margin>
-            <Insets top="30" />
-        </VBox.margin>
-        
-        <Circle radius="60" fill="#cbd5e1" />
-        <Button text="Ubah Foto" styleClass="btn-secondary" />
-
-        <GridPane hgap="15" vgap="15" alignment="CENTER">
-            <columnConstraints>
-                <ColumnConstraints halignment="RIGHT" minWidth="120" />
-                <ColumnConstraints hgrow="ALWAYS" minWidth="300" />
-            </columnConstraints>
-            
-            <Label text="NIDN :" GridPane.columnIndex="0" GridPane.rowIndex="0" style="-fx-font-weight: bold; -fx-text-fill: #475569;" />
-            <TextField text="0011223344" styleClass="text-field" GridPane.columnIndex="1" GridPane.rowIndex="0" editable="false" />
-            
-            <Label text="Nama Lengkap :" GridPane.columnIndex="0" GridPane.rowIndex="1" style="-fx-font-weight: bold; -fx-text-fill: #475569;" />
-            <TextField text="Dr. Budi Santoso, M.Kom." styleClass="text-field" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            
-            <Label text="Email :" GridPane.columnIndex="0" GridPane.rowIndex="2" style="-fx-font-weight: bold; -fx-text-fill: #475569;" />
-            <TextField text="budi.santoso@univ.edu" styleClass="text-field" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-            
-            <Label text="Fakultas :" GridPane.columnIndex="0" GridPane.rowIndex="3" style="-fx-font-weight: bold; -fx-text-fill: #475569;" />
-            <TextField text="Ilmu Komputer" styleClass="text-field" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-            
-            <Label text="Password Baru :" GridPane.columnIndex="0" GridPane.rowIndex="4" style="-fx-font-weight: bold; -fx-text-fill: #475569;" />
-            <PasswordField promptText="Isi jika ingin mengubah password" styleClass="text-field" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-        </GridPane>
-        
-        <HBox alignment="CENTER" spacing="15">
-            <VBox.margin>
-                <Insets top="20" />
-            </VBox.margin>
-            <Button text="Simpan Perubahan" styleClass="btn-primary" />
-            <Button text="Batal" styleClass="btn-secondary" />
-        </HBox>
-    </VBox>
-
-</VBox>
+                <GridPane hgap="15" vgap="15" alignment="CENTER">
+                    <columnConstraints>
+                        <ColumnConstraints halignment="RIGHT" minWidth="120" />
+                        <ColumnConstraints hgrow="ALWAYS" minWidth="300" />
+                    </columnConstraints>
+                    
+                    <Label text="NIDN :" GridPane.columnIndex="0" GridPane.rowIndex="0" style="-fx-font-weight: bold; -fx-text-fill: #475569;" />
+                    <TextField fx:id="txtNidn" promptText="NIDN (Otomatis dari DB)" styleClass="text-field" GridPane.columnIndex="1" GridPane.rowIndex="0" editable="false" style="-fx-background-color: #f1f5f9;" />
+                    
+                    <Label text="Nama Lengkap :" GridPane.columnIndex="0" GridPane.rowIndex="1" style="-fx-font-weight: bold; -fx-text-fill: #475569;" />
+                    <TextField fx:id="txtNama" promptText="Nama (Otomatis dari DB)" styleClass="text-field" GridPane.columnIndex="1" GridPane.rowIndex="1" editable="false" style="-fx-background-color: #f1f5f9;" />
+                    
+                    <Label text="Email :" GridPane.columnIndex="0" GridPane.rowIndex="2" style="-fx-font-weight: bold; -fx-text-fill: #475569;" />
+                    <TextField fx:id="txtEmail" promptText="Email (Otomatis dari DB)" styleClass="text-field" GridPane.columnIndex="1" GridPane.rowIndex="2" editable="false" style="-fx-background-color: #f1f5f9;" />
+                    
+                    <Label text="Fakultas :" GridPane.columnIndex="0" GridPane.rowIndex="3" style="-fx-font-weight: bold; -fx-text-fill: #475569;" />
+                    <TextField fx:id="txtFakultas" promptText="Fakultas (Otomatis dari DB)" styleClass="text-field" GridPane.columnIndex="1" GridPane.rowIndex="3" editable="false" style="-fx-background-color: #f1f5f9;" />
+                    
+                    <Label text="Password Baru :" GridPane.columnIndex="0" GridPane.rowIndex="4" style="-fx-font-weight: bold; -fx-text-fill: #475569;" />
+                    <PasswordField fx:id="txtPassword" promptText="Isi jika ingin mengubah password" styleClass="text-field" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                </GridPane>
+                
+                <HBox alignment="CENTER" spacing="15">
+                    <VBox.margin>
+                        <Insets top="20" />
+                    </VBox.margin>
+                    <Button fx:id="btnSimpan" text="Simpan Password" styleClass="btn-primary" minWidth="-Infinity" />
+                    <Button fx:id="btnBatal" text="Batal" styleClass="btn-secondary" minWidth="-Infinity" />
+                </HBox>
+            </VBox>
+        </VBox>
+    </content>
+</ScrollPane>

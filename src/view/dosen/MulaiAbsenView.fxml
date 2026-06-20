@@ -1,36 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- View Mulai Absen (Dosen) -->
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.geometry.Insets?>
 
-<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="controller.dosen.MulaiAbsenController"
-      styleClass="content-pane" spacing="20" stylesheets="@../../style/style.css">
+<ScrollPane xmlns:fx="http://javafx.com/fxml" fx:controller="controller.dosen.MulaiAbsenController"
+            fitToWidth="true" fitToHeight="true" style="-fx-background-color: transparent;" stylesheets="@../../style/style.css">
+    <content>
+        <VBox styleClass="content-pane" spacing="20">
+            <padding>
+                <Insets top="20" right="25" bottom="20" left="25"/>
+            </padding>
+            
+            <Label text="Mulai Absensi Kelas" styleClass="header-title" />
 
-    <Label text="Mulai Absensi Kelas" styleClass="header-title" />
+            <VBox styleClass="card" spacing="15">
+                <HBox spacing="15" alignment="CENTER_LEFT">
+                    <Label text="Pilih Jadwal / Mata Kuliah:" style="-fx-font-weight: bold; -fx-text-fill: #475569;" minWidth="-Infinity" />
+                    <ComboBox fx:id="comboMataKuliah" promptText="-- Pilih Mata Kuliah --" prefWidth="300" styleClass="combo-box" />
+                    <Button fx:id="btnTampilkan" text="Tampilkan Mahasiswa" styleClass="btn-primary" minWidth="-Infinity" />
+                </HBox>
+            </VBox>
 
-    <VBox styleClass="card" spacing="15">
-        <HBox spacing="15" alignment="CENTER_LEFT">
-            <Label text="Pilih Jadwal / Mata Kuliah:" style="-fx-font-weight: bold; -fx-text-fill: #475569;" />
-            <ComboBox promptText="-- Pilih Mata Kuliah --" prefWidth="300" styleClass="combo-box" />
-            <Button text="Tampilkan Mahasiswa" styleClass="btn-primary" />
-        </HBox>
-    </VBox>
-
-    <VBox styleClass="card" VBox.vgrow="ALWAYS" spacing="15">
-        <Label text="Daftar Mahasiswa" styleClass="card-title" />
-        <TableView styleClass="table-view" VBox.vgrow="ALWAYS">
-            <columns>
-                <TableColumn text="NIM" prefWidth="120" />
-                <TableColumn text="Nama Lengkap" prefWidth="250" />
-                <TableColumn text="Kehadiran" prefWidth="200" />
-                <TableColumn text="Keterangan" prefWidth="200" />
-            </columns>
-        </TableView>
-        <HBox alignment="CENTER_RIGHT" spacing="15">
-            <Button text="Reset" styleClass="btn-secondary" />
-            <Button text="Simpan Absensi" styleClass="btn-primary" />
-        </HBox>
-    </VBox>
-
-</VBox>
+            <VBox styleClass="card" VBox.vgrow="ALWAYS" spacing="15">
+                <Label text="Daftar Mahasiswa" styleClass="card-title" minWidth="-Infinity" />
+                <TableView fx:id="tableMahasiswa" styleClass="table-view" VBox.vgrow="ALWAYS" minHeight="300">
+                    <columns>
+                        <TableColumn fx:id="colNim" text="NIM" prefWidth="120" />
+                        <TableColumn fx:id="colNama" text="Nama Lengkap" prefWidth="250" />
+                        <TableColumn fx:id="colKehadiran" text="Kehadiran" prefWidth="200" />
+                        <TableColumn fx:id="colKeterangan" text="Keterangan" prefWidth="200" />
+                    </columns>
+                </TableView>
+                <HBox alignment="CENTER_RIGHT" spacing="15">
+                    <Button fx:id="btnReset" text="Reset" styleClass="btn-secondary" />
+                    <Button fx:id="btnSimpan" text="Simpan Absensi" styleClass="btn-primary" />
+                </HBox>
+            </VBox>
+        </VBox>
+    </content>
+</ScrollPane>
