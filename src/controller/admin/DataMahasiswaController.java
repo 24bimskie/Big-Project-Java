@@ -1,6 +1,5 @@
 package controller.admin;
 
-import dao.KelasDAO;
 import dao.MahasiswaDAO;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -10,7 +9,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import model.Kelas;
 import model.Mahasiswa;
 import util.AlertHelper;
 
@@ -19,97 +17,45 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 /**
- * Controller untuk use case: Input Data Mahasiswa & Lihat Data Mahasiswa.
- * Admin dapat menambah, mengedit, menghapus, dan melihat data mahasiswa.
+ * Controller Data Mahasiswa.
+ * Kolom DB: nim, nama, gender, alamat, password, kelas, prodi
  */
 public class DataMahasiswaController implements Initializable {
 
-    // ===== FXML Bindings — TableView =====
+    @FXML private TabPane tabPane;
 
-    @FXML
-    private TableView<Mahasiswa> tableMahasiswa;
+    // ===== TableView =====
+    @FXML private TableView<Mahasiswa>         tableMahasiswa;
+    @FXML private TableColumn<Mahasiswa, Integer> colNo;
+    @FXML private TableColumn<Mahasiswa, String>  colNim;
+    @FXML private TableColumn<Mahasiswa, String>  colNama;
+    @FXML private TableColumn<Mahasiswa, String>  colGender;
+    @FXML private TableColumn<Mahasiswa, String>  colAlamat;
+    @FXML private TableColumn<Mahasiswa, String>  colKelas;
+    @FXML private TableColumn<Mahasiswa, String>  colProdi;
 
-    @FXML
-    private TableColumn<Mahasiswa, String> colNim;
+    // ===== Form Input =====
+    @FXML private TextField     fieldNim;
+    @FXML private TextField     fieldNama;
+    @FXML private ComboBox<String> comboGender;
+    @FXML private TextField     fieldAlamat;
+    @FXML private TextField     fieldKelas;
+    @FXML private TextField     fieldProdi;
+    @FXML private PasswordField fieldPassword;
 
-    @FXML
-    private TableColumn<Mahasiswa, String> colNama;
-
-    @FXML
-    private TableColumn<Mahasiswa, String> colJenisKelamin;
-
-    @FXML
-    private TableColumn<Mahasiswa, String> colAlamat;
-
-    @FXML
-    private TableColumn<Mahasiswa, String> colNoTelp;
-
-    @FXML
-    private TableColumn<Mahasiswa, String> colEmail;
-
-    @FXML
-    private TableColumn<Mahasiswa, String> colIdKelas;
-
-    // ===== FXML Bindings — Form Input =====
-
-    @FXML
-    private TextField fieldNim;
-
-    @FXML
-    private TextField fieldNama;
-
-    @FXML
-    private ComboBox<String> comboJenisKelamin;
-
-    @FXML
-    private TextField fieldAlamat;
-
-    @FXML
-    private TextField fieldNoTelp;
-
-    @FXML
-    private TextField fieldEmail;
-
-    @FXML
-    private ComboBox<Kelas> comboKelas;
-
-    @FXML
-    private PasswordField fieldPassword;
-
-    // ===== FXML Bindings — Kontrol =====
-
-    @FXML
-    private TextField fieldSearch;
-
-    @FXML
-    private ComboBox<Kelas> filterKelas;
-
-    @FXML
-    private Button btnResetFilter;
-
-    @FXML
-    private Button btnTambah;
-
-    @FXML
-    private Button btnEdit;
-
-    @FXML
-    private Button btnHapus;
-
-    @FXML
-    private Button btnBatal;
+    // ===== Kontrol =====
+    @FXML private TextField fieldSearch;
+    @FXML private Button    btnResetFilter;
+    @FXML private Button    btnTambah;
+    @FXML private Button    btnEdit;
+    @FXML private Button    btnHapus;
+    @FXML private Button    btnBatal;
 
     // ===== State =====
-
     private final MahasiswaDAO mahasiswaDAO = new MahasiswaDAO();
-    private final KelasDAO kelasDAO         = new KelasDAO();
-
     private final ObservableList<Mahasiswa> mahasiswaList = FXCollections.observableArrayList();
     private FilteredList<Mahasiswa> filteredList;
-
     private boolean isEditMode = false;
-
-    // ===== Lifecycle =====
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -123,74 +69,49 @@ public class DataMahasiswaController implements Initializable {
 
     // ===== Setup =====
 
-    /** Mapping kolom TableView ke properti model Mahasiswa */
     private void setupTable() {
+        colNo.setCellFactory(col -> new TableCell<Mahasiswa, Integer>() {
+            @Override
+            protected void updateItem(Integer item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty ? null : String.valueOf(getIndex() + 1));
+            }
+        });
         colNim.setCellValueFactory(new PropertyValueFactory<>("nim"));
         colNama.setCellValueFactory(new PropertyValueFactory<>("nama"));
-        colJenisKelamin.setCellValueFactory(new PropertyValueFactory<>("jenisKelamin"));
+        colGender.setCellValueFactory(new PropertyValueFactory<>("jenisKelamin"));
         colAlamat.setCellValueFactory(new PropertyValueFactory<>("alamat"));
-        colNoTelp.setCellValueFactory(new PropertyValueFactory<>("noTelp"));
-        colEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
-        colIdKelas.setCellValueFactory(new PropertyValueFactory<>("idKelas"));
+        colKelas.setCellValueFactory(new PropertyValueFactory<>("kelas"));
+        colProdi.setCellValueFactory(new PropertyValueFactory<>("prodi"));
+
+        tableMahasiswa.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
 
-    /** Mengisi ComboBox jenis kelamin dan kelas */
     private void setupComboBoxes() {
-        comboJenisKelamin.setItems(FXCollections.observableArrayList("Laki-laki", "Perempuan"));
-
-        List<Kelas> kelasList = kelasDAO.getAll();
-        ObservableList<Kelas> kelasObs = kelasList != null
-                ? FXCollections.observableArrayList(kelasList)
-                : FXCollections.observableArrayList();
-
-        javafx.util.StringConverter<Kelas> converter = new javafx.util.StringConverter<Kelas>() {
-            @Override public String toString(Kelas k) {
-                return k == null ? "Semua Kelas" : k.getIdKelas() + " - " + k.getNamaKelas();
-            }
-            @Override public Kelas fromString(String s) { return null; }
-        };
-
-        comboKelas.setItems(kelasObs);
-        comboKelas.setConverter(converter);
-
-        filterKelas.setItems(kelasObs);
-        filterKelas.setConverter(converter);
+        comboGender.setItems(FXCollections.observableArrayList("L", "P"));
     }
 
-    /** Search real-time (NIM/Nama/Email) + filter kelas */
     private void setupSearchAndFilter() {
         filteredList = new FilteredList<>(mahasiswaList, p -> true);
-        tableJadwal();
-
-        fieldSearch.textProperty().addListener((obs, o, n) -> applyFilter());
-        filterKelas.valueProperty().addListener((obs, o, n) -> applyFilter());
-    }
-
-    private void tableJadwal() {
         tableMahasiswa.setItems(filteredList);
+        fieldSearch.textProperty().addListener((obs, o, n) -> applyFilter());
     }
 
     private void applyFilter() {
-        String keyword      = fieldSearch.getText() == null ? "" : fieldSearch.getText().toLowerCase().trim();
-        Kelas kelasFilter   = filterKelas.getValue();
-
+        String keyword = fieldSearch.getText() == null ? "" : fieldSearch.getText().toLowerCase().trim();
         filteredList.setPredicate(m -> {
-            boolean matchSearch = keyword.isEmpty()
-                    || m.getNim().toLowerCase().contains(keyword)
-                    || m.getNama().toLowerCase().contains(keyword)
-                    || m.getEmail().toLowerCase().contains(keyword);
-            boolean matchKelas = kelasFilter == null
-                    || m.getIdKelas().equals(kelasFilter.getIdKelas());
-            return matchSearch && matchKelas;
+            if (keyword.isEmpty()) return true;
+            return m.getNim().toLowerCase().contains(keyword)
+                || m.getNama().toLowerCase().contains(keyword)
+                || (m.getKelas()  != null && m.getKelas().toLowerCase().contains(keyword))
+                || (m.getProdi()  != null && m.getProdi().toLowerCase().contains(keyword))
+                || (m.getAlamat() != null && m.getAlamat().toLowerCase().contains(keyword));
         });
     }
 
-    /** Listener saat baris tabel dipilih */
     private void setupTableSelectionListener() {
         tableMahasiswa.getSelectionModel().selectedItemProperty().addListener(
-                (obs, oldSel, newSel) -> {
-                    if (newSel != null) populateForm(newSel);
-                }
+                (obs, oldSel, newSel) -> { if (newSel != null) populateForm(newSel); }
         );
     }
 
@@ -238,11 +159,9 @@ public class DataMahasiswaController implements Initializable {
             AlertHelper.showWarning("Peringatan", "Pilih mahasiswa yang ingin dihapus terlebih dahulu.");
             return;
         }
-        boolean konfirmasi = AlertHelper.showConfirmation(
-                "Konfirmasi Hapus",
-                "Yakin ingin menghapus mahasiswa \"" + selected.getNama() + "\" (NIM: " + selected.getNim() + ")?"
-        );
-        if (konfirmasi) {
+        boolean ok = AlertHelper.showConfirmation("Konfirmasi Hapus",
+                "Yakin ingin menghapus \"" + selected.getNama() + "\" (NIM: " + selected.getNim() + ")?");
+        if (ok) {
             mahasiswaDAO.delete(selected.getNim());
             AlertHelper.showInfo("Berhasil", "Data mahasiswa berhasil dihapus.");
             loadData();
@@ -261,63 +180,44 @@ public class DataMahasiswaController implements Initializable {
     @FXML
     private void handleResetFilter(ActionEvent event) {
         fieldSearch.clear();
-        filterKelas.setValue(null);
     }
 
-    // ===== Helper Methods =====
+    // ===== Helpers =====
 
     private void populateForm(Mahasiswa m) {
         fieldNim.setText(m.getNim());
         fieldNama.setText(m.getNama());
-        comboJenisKelamin.setValue(m.getJenisKelamin());
+        comboGender.setValue(m.getJenisKelamin());
         fieldAlamat.setText(m.getAlamat());
-        fieldNoTelp.setText(m.getNoTelp());
-        fieldEmail.setText(m.getEmail());
+        fieldKelas.setText(m.getKelas() != null ? m.getKelas() : "");
+        fieldProdi.setText(m.getProdi() != null ? m.getProdi() : "");
         fieldPassword.clear();
-        comboKelas.getItems().stream()
-                .filter(k -> k.getIdKelas().equals(m.getIdKelas()))
-                .findFirst()
-                .ifPresent(comboKelas::setValue);
     }
 
     private Mahasiswa buildFromForm() {
-        String idKelas = comboKelas.getValue() != null ? comboKelas.getValue().getIdKelas() : "";
         return new Mahasiswa(
                 fieldNim.getText().trim(),
                 fieldNama.getText().trim(),
-                comboJenisKelamin.getValue(),
+                comboGender.getValue(),
                 fieldAlamat.getText().trim(),
-                fieldNoTelp.getText().trim(),
-                fieldEmail.getText().trim(),
-                idKelas,
+                fieldKelas.getText().trim(),
+                fieldProdi.getText().trim(),
                 fieldPassword.getText().trim()
         );
     }
 
     private boolean isFormValid(boolean cekPassword) {
         if (fieldNim.getText().trim().isEmpty()) {
-            AlertHelper.showWarning("Validasi", "NIM tidak boleh kosong.");
-            return false;
+            AlertHelper.showWarning("Validasi", "NIM tidak boleh kosong."); return false;
         }
         if (fieldNama.getText().trim().isEmpty()) {
-            AlertHelper.showWarning("Validasi", "Nama tidak boleh kosong.");
-            return false;
+            AlertHelper.showWarning("Validasi", "Nama tidak boleh kosong."); return false;
         }
-        if (comboJenisKelamin.getValue() == null) {
-            AlertHelper.showWarning("Validasi", "Jenis kelamin harus dipilih.");
-            return false;
-        }
-        if (comboKelas.getValue() == null) {
-            AlertHelper.showWarning("Validasi", "Kelas harus dipilih.");
-            return false;
-        }
-        if (fieldEmail.getText().trim().isEmpty()) {
-            AlertHelper.showWarning("Validasi", "Email tidak boleh kosong.");
-            return false;
+        if (comboGender.getValue() == null) {
+            AlertHelper.showWarning("Validasi", "Jenis kelamin harus dipilih."); return false;
         }
         if (cekPassword && fieldPassword.getText().trim().isEmpty()) {
-            AlertHelper.showWarning("Validasi", "Password tidak boleh kosong.");
-            return false;
+            AlertHelper.showWarning("Validasi", "Password tidak boleh kosong."); return false;
         }
         return true;
     }
@@ -325,23 +225,21 @@ public class DataMahasiswaController implements Initializable {
     private void clearForm() {
         fieldNim.clear();
         fieldNama.clear();
-        comboJenisKelamin.setValue(null);
+        comboGender.setValue(null);
         fieldAlamat.clear();
-        fieldNoTelp.clear();
-        fieldEmail.clear();
-        comboKelas.setValue(null);
+        fieldKelas.clear();
+        fieldProdi.clear();
         fieldPassword.clear();
     }
 
     private void setEditMode(boolean editMode) {
         this.isEditMode = editMode;
-        fieldNim.setDisable(editMode); // NIM = primary key, tidak bisa diubah
-        if (editMode) {
-            btnEdit.setText("Simpan");
-            btnTambah.setDisable(true);
-        } else {
-            btnEdit.setText("Edit");
-            btnTambah.setDisable(false);
-        }
+        fieldNim.setDisable(editMode);
+        btnEdit.setText(editMode ? "Simpan" : "Edit");
+        btnTambah.setDisable(editMode);
+    }
+
+    public void selectTab(int index) {
+        if (tabPane != null) tabPane.getSelectionModel().select(index);
     }
 }

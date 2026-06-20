@@ -44,6 +44,15 @@ public class AdminDashboardController implements Initializable {
     private Button btnMahasiswa;
 
     @FXML
+    private javafx.scene.layout.VBox submenuMahasiswa;
+
+    @FXML
+    private Button btnMahasiswaInput;
+
+    @FXML
+    private Button btnMahasiswaLihat;
+
+    @FXML
     private Button btnDosen;
 
     @FXML
@@ -76,11 +85,27 @@ public class AdminDashboardController implements Initializable {
 
     // ===== Navigasi Sidebar =====
 
-    /** Navigasi ke halaman Data Mahasiswa */
+    /** Toggle submenu Data Mahasiswa */
     @FXML
-    private void handleMenuMahasiswa(ActionEvent event) {
-        loadContent("/view/admin/DataMahasiswaView.fxml");
-        setActiveButton(btnMahasiswa);
+    private void handleMenuMahasiswaToggle(ActionEvent event) {
+        boolean isVisible = submenuMahasiswa.isVisible();
+        submenuMahasiswa.setVisible(!isVisible);
+        submenuMahasiswa.setManaged(!isVisible);
+        btnMahasiswa.setText(isVisible ? "Data Mahasiswa ▼" : "Data Mahasiswa ▲");
+    }
+
+    @FXML
+    private void handleMenuMahasiswaInput(ActionEvent event) {
+        DataMahasiswaController controller = loadContentWithController("/view/admin/DataMahasiswaView.fxml");
+        if (controller != null) controller.selectTab(1);
+        setActiveButton(btnMahasiswaInput);
+    }
+
+    @FXML
+    private void handleMenuMahasiswaLihat(ActionEvent event) {
+        DataMahasiswaController controller = loadContentWithController("/view/admin/DataMahasiswaView.fxml");
+        if (controller != null) controller.selectTab(0);
+        setActiveButton(btnMahasiswaLihat);
     }
 
     /** Navigasi ke halaman Data Dosen */
@@ -135,17 +160,24 @@ public class AdminDashboardController implements Initializable {
      * @param fxmlPath Path ke file FXML yang akan dimuat
      */
     private void loadContent(String fxmlPath) {
+        loadContentWithController(fxmlPath);
+    }
+
+    private <T> T loadContentWithController(String fxmlPath) {
         try {
             URL fxmlUrl = getClass().getResource(fxmlPath);
             if (fxmlUrl == null) {
                 AlertHelper.showError("Error", "Halaman tidak ditemukan: " + fxmlPath);
-                return;
+                return null;
             }
-            Parent content = FXMLLoader.load(fxmlUrl);
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+            Parent content = loader.load();
             contentArea.getChildren().setAll(content);
+            return loader.getController();
         } catch (IOException e) {
             AlertHelper.showError("Error", "Gagal memuat halaman: " + e.getMessage());
             e.printStackTrace();
+            return null;
         }
     }
 
@@ -154,7 +186,7 @@ public class AdminDashboardController implements Initializable {
      * @param activeButton Tombol yang ingin ditandai aktif
      */
     private void setActiveButton(Button activeButton) {
-        Button[] allButtons = {btnMahasiswa, btnDosen, btnProdiKelas, btnMataKuliah, btnJadwal};
+        Button[] allButtons = {btnMahasiswa, btnMahasiswaInput, btnMahasiswaLihat, btnDosen, btnProdiKelas, btnMataKuliah, btnJadwal};
         for (Button btn : allButtons) {
             if (btn != null) {
                 btn.getStyleClass().remove("sidebar-btn-active");
