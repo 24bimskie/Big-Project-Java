@@ -1,39 +1,115 @@
 package dao;
 
+import config.DatabaseConnection;
 import model.Kelas;
+
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * DAO untuk operasi CRUD data Kelas.
- * Mendukung use case: Input Kelas.
+ * Menggunakan skema tabel: kelas(id INT AUTO_INCREMENT, Prodi VARCHAR, kelas VARCHAR)
+ * Catatan: id adalah integer auto-increment, bukan string.
+ *          Kolom tahun_akademik tidak ada di DB saat ini.
  */
 public class KelasDAO {
 
-    // TODO: Implement method
     public void insert(Kelas kelas) {
-        // INSERT ke tabel kelas
+        String query = "INSERT INTO kelas (Prodi, kelas) VALUES (?, ?)";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, kelas.getIdProdi());    // idProdi → kolom Prodi
+            stmt.setString(2, kelas.getNamaKelas());  // namaKelas → kolom kelas
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void update(Kelas kelas) {
-        // UPDATE data kelas
+        // Update berdasarkan id integer (disimpan di idKelas sebagai string)
+        String query = "UPDATE kelas SET Prodi=?, kelas=? WHERE id=?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, kelas.getIdProdi());
+            stmt.setString(2, kelas.getNamaKelas());
+            stmt.setInt(3, parseId(kelas.getIdKelas()));
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void delete(String idKelas) {
-        // DELETE data kelas
+        String query = "DELETE FROM kelas WHERE id=?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, parseId(idKelas));
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public Kelas getById(String idKelas) {
-        // SELECT kelas berdasarkan ID
+        String query = "SELECT * FROM kelas WHERE id=?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, parseId(idKelas));
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return mapRow(rs);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
     public List<Kelas> getAll() {
-        // SELECT semua kelas
-        return null;
+        List<Kelas> list = new ArrayList<>();
+        String query = "SELECT * FROM kelas ORDER BY Prodi, kelas";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) list.add(mapRow(rs));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 
-    public List<Kelas> getByProdi(String idProdi) {
-        // SELECT kelas berdasarkan prodi
-        return null;
+    public List<Kelas> getByProdi(String namaProdi) {
+        List<Kelas> list = new ArrayList<>();
+        String query = "SELECT * FROM kelas WHERE Prodi=? ORDER BY kelas";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, namaProdi);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) list.add(mapRow(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    /** Memetakan satu baris ResultSet ke objek Kelas */
+    private Kelas mapRow(ResultSet rs) throws SQLException {
+        return new Kelas(
+                String.valueOf(rs.getInt("id")),  // id integer → string
+                rs.getString("kelas"),             // kolom kelas → namaKelas
+                rs.getString("Prodi"),             // kolom Prodi → idProdi
+                ""                                 // tahun_akademik tidak ada di DB
+        );
+    }
+
+    /** Konversi string id ke integer dengan aman */
+    private int parseId(String id) {
+        try {
+            return Integer.parseInt(id);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 }
