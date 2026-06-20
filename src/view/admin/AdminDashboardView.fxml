@@ -39,7 +39,12 @@
                 <Button fx:id="btnMahasiswaLihat" text="Lihat Data" onAction="#handleMenuMahasiswaLihat" maxWidth="Infinity" styleClass="sidebar-btn" style="-fx-font-size: 13px; -fx-padding: 8px 15px;" />
                 <Button fx:id="btnMahasiswaInput" text="Input Data" onAction="#handleMenuMahasiswaInput" maxWidth="Infinity" styleClass="sidebar-btn" style="-fx-font-size: 13px; -fx-padding: 8px 15px;" />
             </VBox>
-            <Button fx:id="btnDosen" text="Data Dosen" onAction="#handleMenuDosen" maxWidth="Infinity" styleClass="sidebar-btn" />
+            <Button fx:id="btnDosen" text="Data Dosen ▼" onAction="#handleMenuDosenToggle" maxWidth="Infinity" styleClass="sidebar-btn" />
+            <VBox fx:id="submenuDosen" visible="false" managed="false" spacing="5">
+                <padding><Insets left="15"/></padding>
+                <Button fx:id="btnDosenLihat" text="Lihat Data" onAction="#handleMenuDosenLihat" maxWidth="Infinity" styleClass="sidebar-btn" style="-fx-font-size: 13px; -fx-padding: 8px 15px;" />
+                <Button fx:id="btnDosenInput" text="Input Data" onAction="#handleMenuDosenInput" maxWidth="Infinity" styleClass="sidebar-btn" style="-fx-font-size: 13px; -fx-padding: 8px 15px;" />
+            </VBox>
             <Button fx:id="btnProdiKelas" text="Data Prodi &amp; Kelas" onAction="#handleMenuProdiKelas" maxWidth="Infinity" styleClass="sidebar-btn" />
             <Button fx:id="btnMataKuliah" text="Data Mata Kuliah" onAction="#handleMenuMataKuliah" maxWidth="Infinity" styleClass="sidebar-btn" />
             <Button fx:id="btnJadwal" text="Data Jadwal" onAction="#handleMenuJadwal" maxWidth="Infinity" styleClass="sidebar-btn" />
