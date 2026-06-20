@@ -17,90 +17,47 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 /**
- * Controller untuk use case: Input Data Dosen & Lihat Data Dosen.
- * Admin dapat menambah, mengedit, menghapus, dan melihat data dosen.
+ * Controller Data Dosen.
+ * Kolom DB: id, nip, nama, gender, alamat, password
  */
 public class DataDosenController implements Initializable {
 
-    // ===== FXML Bindings — TableView =====
+    @FXML private TabPane tabPane;
 
-    @FXML
-    private TableView<Dosen> tableDosen;
+    // ===== TableView =====
+    @FXML private TableView<Dosen>            tableDosen;
+    @FXML private TableColumn<Dosen, Integer> colNo;
+    @FXML private TableColumn<Dosen, String>  colNip;
+    @FXML private TableColumn<Dosen, String>  colNama;
+    @FXML private TableColumn<Dosen, String>  colGender;
+    @FXML private TableColumn<Dosen, String>  colAlamat;
 
-    @FXML
-    private TableColumn<Dosen, String> colNidn;
+    // ===== Form Input =====
+    @FXML private TextField     fieldNip;
+    @FXML private TextField     fieldNama;
+    @FXML private ComboBox<String> comboGender;
+    @FXML private TextField     fieldAlamat;
+    @FXML private PasswordField fieldPassword;
 
-    @FXML
-    private TableColumn<Dosen, String> colNama;
-
-    @FXML
-    private TableColumn<Dosen, String> colJenisKelamin;
-
-    @FXML
-    private TableColumn<Dosen, String> colAlamat;
-
-    @FXML
-    private TableColumn<Dosen, String> colNoTelp;
-
-    @FXML
-    private TableColumn<Dosen, String> colEmail;
-
-    // ===== FXML Bindings — Form Input =====
-
-    @FXML
-    private TextField fieldNidn;
-
-    @FXML
-    private TextField fieldNama;
-
-    @FXML
-    private ComboBox<String> comboJenisKelamin;
-
-    @FXML
-    private TextField fieldAlamat;
-
-    @FXML
-    private TextField fieldNoTelp;
-
-    @FXML
-    private TextField fieldEmail;
-
-    @FXML
-    private PasswordField fieldPassword;
-
-    // ===== FXML Bindings — Kontrol =====
-
-    @FXML
-    private TextField fieldSearch;
-
-    @FXML
-    private Button btnTambah;
-
-    @FXML
-    private Button btnEdit;
-
-    @FXML
-    private Button btnHapus;
-
-    @FXML
-    private Button btnBatal;
+    // ===== Kontrol =====
+    @FXML private TextField fieldSearch;
+    @FXML private Button    btnResetFilter;
+    @FXML private Button    btnTambah;
+    @FXML private Button    btnEdit;
+    @FXML private Button    btnHapus;
+    @FXML private Button    btnBatal;
 
     // ===== State =====
-
     private final DosenDAO dosenDAO = new DosenDAO();
     private final ObservableList<Dosen> dosenList = FXCollections.observableArrayList();
     private FilteredList<Dosen> filteredList;
-
-    /** true = mode edit, false = mode tambah */
     private boolean isEditMode = false;
-
-    // ===== Lifecycle =====
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setupTable();
         setupComboBox();
-        setupSearch();
+        setupSearchAndFilter();
         loadData();
         setupTableSelectionListener();
         setEditMode(false);
@@ -108,98 +65,85 @@ public class DataDosenController implements Initializable {
 
     // ===== Setup =====
 
-    /** Mengatur kolom-kolom TableView dan mapping ke properti model Dosen */
     private void setupTable() {
-        colNidn.setCellValueFactory(new PropertyValueFactory<>("nidn"));
-        colNama.setCellValueFactory(new PropertyValueFactory<>("nama"));
-        colJenisKelamin.setCellValueFactory(new PropertyValueFactory<>("jenisKelamin"));
-        colAlamat.setCellValueFactory(new PropertyValueFactory<>("alamat"));
-        colNoTelp.setCellValueFactory(new PropertyValueFactory<>("noTelp"));
-        colEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
-    }
-
-    /** Mengisi pilihan jenis kelamin pada ComboBox */
-    private void setupComboBox() {
-        comboJenisKelamin.setItems(FXCollections.observableArrayList("Laki-laki", "Perempuan"));
-    }
-
-    /** Menyambungkan search field dengan FilteredList untuk filter real-time */
-    private void setupSearch() {
-        filteredList = new FilteredList<>(dosenList, p -> true);
-        fieldSearch.textProperty().addListener((obs, oldVal, newVal) -> {
-            filteredList.setPredicate(dosen -> {
-                if (newVal == null || newVal.trim().isEmpty()) return true;
-                String keyword = newVal.toLowerCase().trim();
-                return dosen.getNidn().toLowerCase().contains(keyword)
-                        || dosen.getNama().toLowerCase().contains(keyword)
-                        || dosen.getEmail().toLowerCase().contains(keyword);
-            });
+        colNo.setCellFactory(col -> new TableCell<Dosen, Integer>() {
+            @Override
+            protected void updateItem(Integer item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty ? null : String.valueOf(getIndex() + 1));
+            }
         });
-        tableDosen.setItems(filteredList);
+        colNip.setCellValueFactory(new PropertyValueFactory<>("nip"));
+        colNama.setCellValueFactory(new PropertyValueFactory<>("nama"));
+        colGender.setCellValueFactory(new PropertyValueFactory<>("jenisKelamin"));
+        colAlamat.setCellValueFactory(new PropertyValueFactory<>("alamat"));
+
+        tableDosen.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
 
-    /** Listener saat baris tabel dipilih — mengisi form dengan data dosen terpilih */
+    private void setupComboBox() {
+        comboGender.setItems(FXCollections.observableArrayList("L", "P"));
+    }
+
+    private void setupSearchAndFilter() {
+        filteredList = new FilteredList<>(dosenList, p -> true);
+        tableDosen.setItems(filteredList);
+        fieldSearch.textProperty().addListener((obs, o, n) -> applyFilter());
+    }
+
+    private void applyFilter() {
+        String keyword = fieldSearch.getText() == null ? "" : fieldSearch.getText().toLowerCase().trim();
+        filteredList.setPredicate(d -> {
+            if (keyword.isEmpty()) return true;
+            return d.getNip().toLowerCase().contains(keyword)
+                || d.getNama().toLowerCase().contains(keyword)
+                || (d.getAlamat() != null && d.getAlamat().toLowerCase().contains(keyword));
+        });
+    }
+
     private void setupTableSelectionListener() {
         tableDosen.getSelectionModel().selectedItemProperty().addListener(
-                (obs, oldSel, newSel) -> {
-                    if (newSel != null) {
-                        populateForm(newSel);
-                    }
-                }
+                (obs, oldSel, newSel) -> { if (newSel != null) populateForm(newSel); }
         );
     }
 
     // ===== Load Data =====
 
-    /** Mengambil semua data dosen dari database dan menampilkannya ke tabel */
     private void loadData() {
         dosenList.clear();
         List<Dosen> data = dosenDAO.getAll();
-        if (data != null) {
-            dosenList.addAll(data);
-        }
+        if (data != null) dosenList.addAll(data);
     }
 
     // ===== CRUD Handlers =====
 
-    /** Tombol Tambah — menyimpan dosen baru ke database */
     @FXML
     private void handleTambah(ActionEvent event) {
         if (!isFormValid(true)) return;
-
-        Dosen dosen = buildDosenFromForm();
-        dosenDAO.insert(dosen);
+        dosenDAO.insert(buildFromForm());
         AlertHelper.showInfo("Berhasil", "Data dosen berhasil ditambahkan.");
         loadData();
         clearForm();
     }
 
-    /** Tombol Edit/Simpan — memperbarui data dosen yang dipilih */
     @FXML
     private void handleEdit(ActionEvent event) {
         if (!isEditMode) {
-            // Pertama kali klik Edit: aktifkan mode edit
-            Dosen selected = tableDosen.getSelectionModel().getSelectedItem();
-            if (selected == null) {
+            if (tableDosen.getSelectionModel().getSelectedItem() == null) {
                 AlertHelper.showWarning("Peringatan", "Pilih dosen yang ingin diedit terlebih dahulu.");
                 return;
             }
             setEditMode(true);
             return;
         }
-
-        // Klik Simpan saat mode edit aktif
         if (!isFormValid(false)) return;
-
-        Dosen dosen = buildDosenFromForm();
-        dosenDAO.update(dosen);
+        dosenDAO.update(buildFromForm());
         AlertHelper.showInfo("Berhasil", "Data dosen berhasil diperbarui.");
         loadData();
         clearForm();
         setEditMode(false);
     }
 
-    /** Tombol Hapus — menghapus dosen yang dipilih setelah konfirmasi */
     @FXML
     private void handleHapus(ActionEvent event) {
         Dosen selected = tableDosen.getSelectionModel().getSelectedItem();
@@ -207,14 +151,10 @@ public class DataDosenController implements Initializable {
             AlertHelper.showWarning("Peringatan", "Pilih dosen yang ingin dihapus terlebih dahulu.");
             return;
         }
-
-        boolean konfirmasi = AlertHelper.showConfirmation(
-                "Konfirmasi Hapus",
-                "Yakin ingin menghapus dosen \"" + selected.getNama() + "\" (NIDN: " + selected.getNidn() + ")?"
-        );
-
-        if (konfirmasi) {
-            dosenDAO.delete(selected.getNidn());
+        boolean ok = AlertHelper.showConfirmation("Konfirmasi Hapus",
+                "Yakin ingin menghapus \"" + selected.getNama() + "\" (NIP: " + selected.getNip() + ")?");
+        if (ok) {
+            dosenDAO.delete(selected.getNip());
             AlertHelper.showInfo("Berhasil", "Data dosen berhasil dihapus.");
             loadData();
             clearForm();
@@ -222,7 +162,6 @@ public class DataDosenController implements Initializable {
         }
     }
 
-    /** Tombol Batal — membatalkan aksi dan mereset form */
     @FXML
     private void handleBatal(ActionEvent event) {
         clearForm();
@@ -230,94 +169,63 @@ public class DataDosenController implements Initializable {
         tableDosen.getSelectionModel().clearSelection();
     }
 
-    // ===== Helper Methods =====
-
-    /**
-     * Mengisi field form dengan data dari dosen yang dipilih di tabel.
-     * @param dosen Dosen yang dipilih
-     */
-    private void populateForm(Dosen dosen) {
-        fieldNidn.setText(dosen.getNidn());
-        fieldNama.setText(dosen.getNama());
-        comboJenisKelamin.setValue(dosen.getJenisKelamin());
-        fieldAlamat.setText(dosen.getAlamat());
-        fieldNoTelp.setText(dosen.getNoTelp());
-        fieldEmail.setText(dosen.getEmail());
-        fieldPassword.clear(); // password tidak ditampilkan untuk keamanan
+    @FXML
+    private void handleResetFilter(ActionEvent event) {
+        fieldSearch.clear();
     }
 
-    /**
-     * Membuat objek Dosen dari isian form.
-     * @return Dosen baru berdasarkan input form
-     */
-    private Dosen buildDosenFromForm() {
+    // ===== Helpers =====
+
+    private void populateForm(Dosen d) {
+        fieldNip.setText(d.getNip());
+        fieldNama.setText(d.getNama());
+        comboGender.setValue(d.getJenisKelamin());
+        fieldAlamat.setText(d.getAlamat() != null ? d.getAlamat() : "");
+        fieldPassword.clear();
+    }
+
+    private Dosen buildFromForm() {
         return new Dosen(
-                fieldNidn.getText().trim(),
+                fieldNip.getText().trim(),
                 fieldNama.getText().trim(),
-                comboJenisKelamin.getValue(),
+                comboGender.getValue(),
                 fieldAlamat.getText().trim(),
-                fieldNoTelp.getText().trim(),
-                fieldEmail.getText().trim(),
                 fieldPassword.getText().trim()
         );
     }
 
-    /**
-     * Memvalidasi input form sebelum simpan/update.
-     * @param cekPassword true jika password wajib diisi (mode tambah)
-     * @return true jika semua input valid
-     */
     private boolean isFormValid(boolean cekPassword) {
-        if (fieldNidn.getText().trim().isEmpty()) {
-            AlertHelper.showWarning("Validasi", "NIDN tidak boleh kosong.");
-            return false;
+        if (fieldNip.getText().trim().isEmpty()) {
+            AlertHelper.showWarning("Validasi", "NIP tidak boleh kosong."); return false;
         }
         if (fieldNama.getText().trim().isEmpty()) {
-            AlertHelper.showWarning("Validasi", "Nama tidak boleh kosong.");
-            return false;
+            AlertHelper.showWarning("Validasi", "Nama tidak boleh kosong."); return false;
         }
-        if (comboJenisKelamin.getValue() == null) {
-            AlertHelper.showWarning("Validasi", "Jenis kelamin harus dipilih.");
-            return false;
-        }
-        if (fieldEmail.getText().trim().isEmpty()) {
-            AlertHelper.showWarning("Validasi", "Email tidak boleh kosong.");
-            return false;
+        if (comboGender.getValue() == null) {
+            AlertHelper.showWarning("Validasi", "Jenis kelamin harus dipilih."); return false;
         }
         if (cekPassword && fieldPassword.getText().trim().isEmpty()) {
-            AlertHelper.showWarning("Validasi", "Password tidak boleh kosong.");
-            return false;
+            AlertHelper.showWarning("Validasi", "Password tidak boleh kosong."); return false;
         }
         return true;
     }
 
-    /** Mengosongkan semua field form */
     private void clearForm() {
-        fieldNidn.clear();
+        fieldNip.clear();
         fieldNama.clear();
-        comboJenisKelamin.setValue(null);
+        comboGender.setValue(null);
         fieldAlamat.clear();
-        fieldNoTelp.clear();
-        fieldEmail.clear();
         fieldPassword.clear();
     }
 
-    /**
-     * Mengatur mode tampilan form (tambah vs edit).
-     * @param editMode true = mode edit aktif
-     */
     private void setEditMode(boolean editMode) {
         this.isEditMode = editMode;
+        fieldNip.setDisable(editMode);
+        btnEdit.setText(editMode ? "Simpan" : "Edit");
+        btnTambah.setDisable(editMode);
+    }
 
-        // NIDN tidak bisa diubah saat edit (primary key)
-        fieldNidn.setDisable(editMode);
-
-        if (editMode) {
-            btnEdit.setText("Simpan");
-            btnTambah.setDisable(true);
-        } else {
-            btnEdit.setText("Edit");
-            btnTambah.setDisable(false);
-        }
+    public void selectTab(int index) {
+        if (tabPane != null) tabPane.getSelectionModel().select(index);
     }
 }

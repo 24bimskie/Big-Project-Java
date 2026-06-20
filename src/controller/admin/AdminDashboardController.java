@@ -56,6 +56,15 @@ public class AdminDashboardController implements Initializable {
     private Button btnDosen;
 
     @FXML
+    private javafx.scene.layout.VBox submenuDosen;
+
+    @FXML
+    private Button btnDosenLihat;
+
+    @FXML
+    private Button btnDosenInput;
+
+    @FXML
     private Button btnProdiKelas;
 
     @FXML
@@ -108,11 +117,27 @@ public class AdminDashboardController implements Initializable {
         setActiveButton(btnMahasiswaLihat);
     }
 
-    /** Navigasi ke halaman Data Dosen */
+    /** Toggle submenu Data Dosen */
     @FXML
-    private void handleMenuDosen(ActionEvent event) {
-        loadContent("/view/admin/DataDosenView.fxml");
-        setActiveButton(btnDosen);
+    private void handleMenuDosenToggle(ActionEvent event) {
+        boolean isVisible = submenuDosen.isVisible();
+        submenuDosen.setVisible(!isVisible);
+        submenuDosen.setManaged(!isVisible);
+        btnDosen.setText(isVisible ? "Data Dosen ▼" : "Data Dosen ▲");
+    }
+
+    @FXML
+    private void handleMenuDosenInput(ActionEvent event) {
+        DataDosenController controller = loadContentWithController("/view/admin/DataDosenView.fxml");
+        if (controller != null) controller.selectTab(1);
+        setActiveButton(btnDosenInput);
+    }
+
+    @FXML
+    private void handleMenuDosenLihat(ActionEvent event) {
+        DataDosenController controller = loadContentWithController("/view/admin/DataDosenView.fxml");
+        if (controller != null) controller.selectTab(0);
+        setActiveButton(btnDosenLihat);
     }
 
     /** Navigasi ke halaman Data Prodi & Kelas */
