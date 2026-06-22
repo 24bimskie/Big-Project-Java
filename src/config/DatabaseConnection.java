@@ -10,7 +10,7 @@ import java.sql.SQLException;
  */
 public class DatabaseConnection {
 
-    private static final String URL = "jdbc:mysql://localhost:3306/sam";
+    private static final String URL = "jdbc:mysql://localhost:3306/sam?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
     private static final String USER = "root";
     private static final String PASSWORD = "";
 
@@ -22,7 +22,13 @@ public class DatabaseConnection {
                 Class.forName("com.mysql.cj.jdbc.Driver");
                 connection = DriverManager.getConnection(URL, USER, PASSWORD);
             } catch (ClassNotFoundException e) {
-                throw new SQLException("MySQL JDBC Driver tidak ditemukan.", e);
+                throw new SQLException("MySQL JDBC Driver tidak ditemukan. Pastikan driver connector MySQL tersedia.",
+                        e);
+            } catch (SQLException e) {
+                throw new SQLException(
+                        "Gagal terhubung ke database. Pastikan MySQL sedang berjalan dan konfigurasi user/password benar.\n"
+                                + e.getMessage(),
+                        e);
             }
         }
         return connection;

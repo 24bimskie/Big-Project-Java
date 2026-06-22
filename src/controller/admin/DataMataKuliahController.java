@@ -189,16 +189,29 @@ public class DataMataKuliahController implements Initializable {
             return;
 
         MataKuliah mk = buildFromForm();
+        boolean success;
         if (isEditMode) {
-            mataKuliahDAO.update(mk);
+            success = mataKuliahDAO.update(mk);
+            if (!success) {
+                String detail = mataKuliahDAO.getLastError() != null ? "\n\nDetail: " + mataKuliahDAO.getLastError()
+                        : "";
+                AlertHelper.showError("Gagal",
+                        "Data gagal diperbarui. Periksa koneksi database atau data yang dipilih." + detail);
+                return;
+            }
             AlertHelper.showInfo("Berhasil", "Data mata kuliah berhasil diperbarui.");
         } else {
-            // Cek duplikasi kode
             if (mataKuliahDAO.getByKode(mk.getKodeMk()) != null) {
                 AlertHelper.showWarning("Duplikasi", "Kode mata kuliah \"" + mk.getKodeMk() + "\" sudah ada.");
                 return;
             }
-            mataKuliahDAO.insert(mk);
+            success = mataKuliahDAO.insert(mk);
+            if (!success) {
+                String detail = mataKuliahDAO.getLastError() != null ? "\n\nDetail: " + mataKuliahDAO.getLastError()
+                        : "";
+                AlertHelper.showError("Gagal", "Data gagal disimpan. Periksa koneksi database." + detail);
+                return;
+            }
             AlertHelper.showInfo("Berhasil", "Data mata kuliah berhasil ditambahkan.");
         }
         loadData();
@@ -251,7 +264,13 @@ public class DataMataKuliahController implements Initializable {
         boolean ok = AlertHelper.showConfirmation("Konfirmasi Hapus",
                 "Yakin ingin menghapus \"" + selected.getNamaMk() + "\" (" + selected.getKodeMk() + ")?");
         if (ok) {
-            mataKuliahDAO.delete(selected.getKodeMk());
+            boolean success = mataKuliahDAO.delete(selected.getKodeMk());
+            if (!success) {
+                String detail = mataKuliahDAO.getLastError() != null ? "\n\nDetail: " + mataKuliahDAO.getLastError()
+                        : "";
+                AlertHelper.showError("Gagal", "Data gagal dihapus. Periksa koneksi database." + detail);
+                return;
+            }
             AlertHelper.showInfo("Berhasil", "Data mata kuliah berhasil dihapus.");
             loadData();
             clearForm();
@@ -267,7 +286,7 @@ public class DataMataKuliahController implements Initializable {
         txtNamaMatkul.setText(mk.getNamaMk());
         cmbSks.setValue(mk.getSks());
         cmbSemester.setValue(mk.getSemester());
-        cmbProdi.setValue(mk.getIdProdi());
+        txtProdi.setText(mk.getIdProdi());
     }
 
     /** Membangun objek MataKuliah dari input form */

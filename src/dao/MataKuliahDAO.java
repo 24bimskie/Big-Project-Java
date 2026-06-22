@@ -10,58 +10,76 @@ import java.util.List;
 /**
  * DAO untuk operasi CRUD data Mata Kuliah.
  * Menggunakan skema tabel:
- *   mata_kuliah(id INT AUTO_INCREMENT, kode_mk VARCHAR, nama_mk VARCHAR,
- *               sks INT, semester INT, id_prodi VARCHAR)
+ * mata_kuliah(id INT AUTO_INCREMENT, kode_mk VARCHAR, nama_mk VARCHAR,
+ * sks INT, semester INT, id_prodi VARCHAR)
  */
 public class MataKuliahDAO {
+
+    private String lastError;
+
+    public String getLastError() {
+        return lastError;
+    }
 
     /**
      * Menyimpan data mata kuliah baru ke database.
      */
-    public void insert(MataKuliah mk) {
+    public boolean insert(MataKuliah mk) {
+        lastError = null;
         String query = "INSERT INTO mata_kuliah (kode_mk, nama_mk, sks, semester, id_prodi) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+                PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, mk.getKodeMk());
             stmt.setString(2, mk.getNamaMk());
             stmt.setInt(3, mk.getSks());
             stmt.setInt(4, mk.getSemester());
             stmt.setString(5, mk.getIdProdi());
-            stmt.executeUpdate();
+            int affected = stmt.executeUpdate();
+            return affected > 0;
         } catch (SQLException e) {
+            lastError = e.getMessage();
             e.printStackTrace();
+            return false;
         }
     }
 
     /**
      * Memperbarui data mata kuliah berdasarkan kode_mk (primary key logis).
      */
-    public void update(MataKuliah mk) {
+    public boolean update(MataKuliah mk) {
+        lastError = null;
         String query = "UPDATE mata_kuliah SET nama_mk=?, sks=?, semester=?, id_prodi=? WHERE kode_mk=?";
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+                PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, mk.getNamaMk());
             stmt.setInt(2, mk.getSks());
             stmt.setInt(3, mk.getSemester());
             stmt.setString(4, mk.getIdProdi());
             stmt.setString(5, mk.getKodeMk());
-            stmt.executeUpdate();
+            int affected = stmt.executeUpdate();
+            return affected > 0;
         } catch (SQLException e) {
+            lastError = e.getMessage();
             e.printStackTrace();
+            return false;
         }
     }
 
     /**
      * Menghapus mata kuliah berdasarkan kode_mk.
      */
-    public void delete(String kodeMk) {
+    public boolean delete(String kodeMk) {
+        lastError = null;
         String query = "DELETE FROM mata_kuliah WHERE kode_mk=?";
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+                PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, kodeMk);
-            stmt.executeUpdate();
+            int affected = stmt.executeUpdate();
+            return affected > 0;
         } catch (SQLException e) {
+            lastError = e.getMessage();
             e.printStackTrace();
+            return false;
         }
     }
 
@@ -71,10 +89,11 @@ public class MataKuliahDAO {
     public MataKuliah getByKode(String kodeMk) {
         String query = "SELECT * FROM mata_kuliah WHERE kode_mk=?";
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+                PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, kodeMk);
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) return mapRow(rs);
+                if (rs.next())
+                    return mapRow(rs);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -89,9 +108,10 @@ public class MataKuliahDAO {
         List<MataKuliah> list = new ArrayList<>();
         String query = "SELECT * FROM mata_kuliah ORDER BY nama_mk";
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query);
-             ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) list.add(mapRow(rs));
+                PreparedStatement stmt = conn.prepareStatement(query);
+                ResultSet rs = stmt.executeQuery()) {
+            while (rs.next())
+                list.add(mapRow(rs));
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -105,10 +125,11 @@ public class MataKuliahDAO {
         List<MataKuliah> list = new ArrayList<>();
         String query = "SELECT * FROM mata_kuliah WHERE id_prodi=? ORDER BY nama_mk";
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+                PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, idProdi);
             try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) list.add(mapRow(rs));
+                while (rs.next())
+                    list.add(mapRow(rs));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -125,7 +146,6 @@ public class MataKuliahDAO {
                 rs.getString("nama_mk"),
                 rs.getInt("sks"),
                 rs.getInt("semester"),
-                rs.getString("id_prodi")
-        );
+                rs.getString("id_prodi"));
     }
 }
