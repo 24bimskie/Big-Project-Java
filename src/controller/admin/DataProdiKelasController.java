@@ -437,4 +437,8 @@ public class DataProdiKelasController implements Initializable {
         btnHapusKelas.setDisable(!enabled);
         btnBatalKelas.setDisable(!enabled);
     }
+
+    public void selectTab(int index) {
+        // Placeholder for future tab integration
+    }
 }

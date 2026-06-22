@@ -236,6 +236,7 @@
 .table-view .column-header,
 .custom-table .column-header {
     -fx-background-color: transparent;
+    -fx-border-color: transparent #e2e8f0 transparent transparent;
     -fx-padding: 10px;
 }
 
@@ -247,7 +248,7 @@
 
 .table-view .table-cell,
 .custom-table .table-cell {
-    -fx-border-color: transparent transparent #f1f5f9 transparent;
+    -fx-border-color: transparent #e2e8f0 #f1f5f9 transparent;
     -fx-padding: 12px 10px;
     -fx-text-fill: #334155;
     -fx-font-size: 14px;

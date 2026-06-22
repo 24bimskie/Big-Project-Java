@@ -68,10 +68,37 @@ public class AdminDashboardController implements Initializable {
     private Button btnProdiKelas;
 
     @FXML
+    private javafx.scene.layout.VBox submenuProdiKelas;
+
+    @FXML
+    private Button btnProdiKelasLihat;
+
+    @FXML
+    private Button btnProdiKelasInput;
+
+    @FXML
     private Button btnMataKuliah;
 
     @FXML
+    private javafx.scene.layout.VBox submenuMataKuliah;
+
+    @FXML
+    private Button btnMataKuliahLihat;
+
+    @FXML
+    private Button btnMataKuliahInput;
+
+    @FXML
     private Button btnJadwal;
+
+    @FXML
+    private javafx.scene.layout.VBox submenuJadwal;
+
+    @FXML
+    private Button btnJadwalLihat;
+
+    @FXML
+    private Button btnJadwalInput;
 
     @FXML
     private Button btnLogout;
@@ -140,25 +167,73 @@ public class AdminDashboardController implements Initializable {
         setActiveButton(btnDosenLihat);
     }
 
-    /** Navigasi ke halaman Data Prodi & Kelas */
+    /** Toggle submenu Data Prodi & Kelas */
     @FXML
-    private void handleMenuProdiKelas(ActionEvent event) {
-        loadContent("/view/admin/DataProdiKelasView.fxml");
-        setActiveButton(btnProdiKelas);
+    private void handleMenuProdiKelasToggle(ActionEvent event) {
+        boolean isVisible = submenuProdiKelas.isVisible();
+        submenuProdiKelas.setVisible(!isVisible);
+        submenuProdiKelas.setManaged(!isVisible);
+        btnProdiKelas.setText(isVisible ? "Data Prodi & Kelas ▼" : "Data Prodi & Kelas ▲");
     }
 
-    /** Navigasi ke halaman Data Mata Kuliah */
     @FXML
-    private void handleMenuMataKuliah(ActionEvent event) {
-        loadContent("/view/admin/DataMataKuliahView.fxml");
-        setActiveButton(btnMataKuliah);
+    private void handleMenuProdiKelasInput(ActionEvent event) {
+        DataProdiKelasController controller = loadContentWithController("/view/admin/DataProdiKelasView.fxml");
+        if (controller != null) controller.selectTab(1);
+        setActiveButton(btnProdiKelasInput);
     }
 
-    /** Navigasi ke halaman Data Jadwal */
     @FXML
-    private void handleMenuJadwal(ActionEvent event) {
-        loadContent("/view/admin/DataJadwalView.fxml");
-        setActiveButton(btnJadwal);
+    private void handleMenuProdiKelasLihat(ActionEvent event) {
+        DataProdiKelasController controller = loadContentWithController("/view/admin/DataProdiKelasView.fxml");
+        if (controller != null) controller.selectTab(0);
+        setActiveButton(btnProdiKelasLihat);
+    }
+
+    /** Toggle submenu Data Mata Kuliah */
+    @FXML
+    private void handleMenuMataKuliahToggle(ActionEvent event) {
+        boolean isVisible = submenuMataKuliah.isVisible();
+        submenuMataKuliah.setVisible(!isVisible);
+        submenuMataKuliah.setManaged(!isVisible);
+        btnMataKuliah.setText(isVisible ? "Data Mata Kuliah ▼" : "Data Mata Kuliah ▲");
+    }
+
+    @FXML
+    private void handleMenuMataKuliahInput(ActionEvent event) {
+        DataMataKuliahController controller = loadContentWithController("/view/admin/DataMataKuliahView.fxml");
+        if (controller != null) controller.selectTab(1);
+        setActiveButton(btnMataKuliahInput);
+    }
+
+    @FXML
+    private void handleMenuMataKuliahLihat(ActionEvent event) {
+        DataMataKuliahController controller = loadContentWithController("/view/admin/DataMataKuliahView.fxml");
+        if (controller != null) controller.selectTab(0);
+        setActiveButton(btnMataKuliahLihat);
+    }
+
+    /** Toggle submenu Data Jadwal */
+    @FXML
+    private void handleMenuJadwalToggle(ActionEvent event) {
+        boolean isVisible = submenuJadwal.isVisible();
+        submenuJadwal.setVisible(!isVisible);
+        submenuJadwal.setManaged(!isVisible);
+        btnJadwal.setText(isVisible ? "Data Jadwal ▼" : "Data Jadwal ▲");
+    }
+
+    @FXML
+    private void handleMenuJadwalInput(ActionEvent event) {
+        DataJadwalController controller = loadContentWithController("/view/admin/DataJadwalView.fxml");
+        if (controller != null) controller.selectTab(1);
+        setActiveButton(btnJadwalInput);
+    }
+
+    @FXML
+    private void handleMenuJadwalLihat(ActionEvent event) {
+        DataJadwalController controller = loadContentWithController("/view/admin/DataJadwalView.fxml");
+        if (controller != null) controller.selectTab(0);
+        setActiveButton(btnJadwalLihat);
     }
 
     // ===== Logout =====
@@ -211,7 +286,13 @@ public class AdminDashboardController implements Initializable {
      * @param activeButton Tombol yang ingin ditandai aktif
      */
     private void setActiveButton(Button activeButton) {
-        Button[] allButtons = {btnMahasiswa, btnMahasiswaInput, btnMahasiswaLihat, btnDosen, btnProdiKelas, btnMataKuliah, btnJadwal};
+        Button[] allButtons = {
+            btnMahasiswa, btnMahasiswaInput, btnMahasiswaLihat, 
+            btnDosen, btnDosenInput, btnDosenLihat,
+            btnProdiKelas, btnProdiKelasInput, btnProdiKelasLihat, 
+            btnMataKuliah, btnMataKuliahInput, btnMataKuliahLihat, 
+            btnJadwal, btnJadwalInput, btnJadwalLihat
+        };
         for (Button btn : allButtons) {
             if (btn != null) {
                 btn.getStyleClass().remove("sidebar-btn-active");

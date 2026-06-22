@@ -2,44 +2,40 @@ package model;
 
 /**
  * Model untuk entitas Dosen.
- * Kolom DB: id, nip, nama, gender, alamat, password
+ * Kolom DB: id, nidn, nama_lengkap, email, fakultas, foto_profil
  */
 public class Dosen {
 
-    private String nip;       // primary key di DB
-    private String nama;
-    private String jenisKelamin; // kolom: gender
-    private String alamat;
-    private String password;
+    private String nidn;
+    private String namaLengkap;
+    private String email;
+    private String fakultas;
 
     public Dosen() {}
 
-    public Dosen(String nip, String nama, String jenisKelamin,
-                 String alamat, String password) {
-        this.nip = nip;
-        this.nama = nama;
-        this.jenisKelamin = jenisKelamin;
-        this.alamat = alamat;
-        this.password = password;
+    public Dosen(String nidn, String namaLengkap, String email, String fakultas) {
+        this.nidn = nidn;
+        this.namaLengkap = namaLengkap;
+        this.email = email;
+        this.fakultas = fakultas;
     }
 
-    // Getter & Setter
-    public String getNip() { return nip; }
-    public void setNip(String nip) { this.nip = nip; }
+    public String getNidn() { return nidn; }
+    public void setNidn(String nidn) { this.nidn = nidn; }
 
-    // alias getNidn() agar backward-compatible dengan controller lama
-    public String getNidn() { return nip; }
-    public void setNidn(String nip) { this.nip = nip; }
+    // backward compatibility
+    public String getNip() { return nidn; }
+    public void setNip(String nidn) { this.nidn = nidn; }
 
-    public String getNama() { return nama; }
-    public void setNama(String nama) { this.nama = nama; }
+    public String getNama() { return namaLengkap; }
+    public void setNama(String namaLengkap) { this.namaLengkap = namaLengkap; }
 
-    public String getJenisKelamin() { return jenisKelamin; }
-    public void setJenisKelamin(String jenisKelamin) { this.jenisKelamin = jenisKelamin; }
+    public String getNamaLengkap() { return namaLengkap; }
+    public void setNamaLengkap(String namaLengkap) { this.namaLengkap = namaLengkap; }
 
-    public String getAlamat() { return alamat; }
-    public void setAlamat(String alamat) { this.alamat = alamat; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
+    public String getFakultas() { return fakultas; }
+    public void setFakultas(String fakultas) { this.fakultas = fakultas; }
 }

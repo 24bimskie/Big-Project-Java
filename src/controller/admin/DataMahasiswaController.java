@@ -1,6 +1,7 @@
 package controller.admin;
 
 import dao.MahasiswaDAO;
+import dao.UserDAO;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -18,7 +19,8 @@ import java.util.ResourceBundle;
 
 /**
  * Controller Data Mahasiswa.
- * Kolom DB: nim, nama, gender, alamat, password, kelas, prodi
+ * Kolom DB: nim, nama, gender, alamat, kelas, prodi
+ * Password disimpan di tabel user (bukan di tabel mahasiswa).
  */
 public class DataMahasiswaController implements Initializable {
 
@@ -33,15 +35,20 @@ public class DataMahasiswaController implements Initializable {
     @FXML private TableColumn<Mahasiswa, String>  colAlamat;
     @FXML private TableColumn<Mahasiswa, String>  colKelas;
     @FXML private TableColumn<Mahasiswa, String>  colProdi;
+    @FXML private TableColumn<Mahasiswa, Void>    colAksi;
 
     // ===== Form Input =====
     @FXML private TextField     fieldNim;
     @FXML private TextField     fieldNama;
-    @FXML private ComboBox<String> comboGender;
+    @FXML private RadioButton   radioL;
+    @FXML private RadioButton   radioP;
+    @FXML private ToggleGroup   genderGroup;
     @FXML private TextField     fieldAlamat;
-    @FXML private TextField     fieldKelas;
-    @FXML private TextField     fieldProdi;
+    @FXML private ComboBox<String> comboKelas;
+    @FXML private ComboBox<String> comboProdi;
     @FXML private PasswordField fieldPassword;
+    @FXML private TextField     fieldPasswordVisible;
+    @FXML private ToggleButton  btnTogglePassword;
 
     // ===== Kontrol =====
     @FXML private TextField fieldSearch;
@@ -53,6 +60,7 @@ public class DataMahasiswaController implements Initializable {
 
     // ===== State =====
     private final MahasiswaDAO mahasiswaDAO = new MahasiswaDAO();
+    private final UserDAO userDAO = new UserDAO();
     private final ObservableList<Mahasiswa> mahasiswaList = FXCollections.observableArrayList();
     private FilteredList<Mahasiswa> filteredList;
     private boolean isEditMode = false;
@@ -60,7 +68,7 @@ public class DataMahasiswaController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setupTable();
-        setupComboBoxes();
+        setupPasswordToggle();
         setupSearchAndFilter();
         loadData();
         setupTableSelectionListener();
@@ -70,6 +78,7 @@ public class DataMahasiswaController implements Initializable {
     // ===== Setup =====
 
     private void setupTable() {
+        colNo.setCellValueFactory(param -> new javafx.beans.property.ReadOnlyObjectWrapper<>(0));
         colNo.setCellFactory(col -> new TableCell<Mahasiswa, Integer>() {
             @Override
             protected void updateItem(Integer item, boolean empty) {
@@ -84,11 +93,81 @@ public class DataMahasiswaController implements Initializable {
         colKelas.setCellValueFactory(new PropertyValueFactory<>("kelas"));
         colProdi.setCellValueFactory(new PropertyValueFactory<>("prodi"));
 
+        setDashCellFactory(colNim);
+        setDashCellFactory(colNama);
+        setDashCellFactory(colGender);
+        setDashCellFactory(colAlamat);
+        setDashCellFactory(colKelas);
+        setDashCellFactory(colProdi);
+
+        colAksi.setCellValueFactory(param -> new javafx.beans.property.ReadOnlyObjectWrapper<>(null));
+        colAksi.setCellFactory(param -> new TableCell<Mahasiswa, Void>() {
+            private final Button btnEditRow = new Button("Edit");
+            private final Button btnHapusRow = new Button("Hapus");
+            private final javafx.scene.layout.HBox pane = new javafx.scene.layout.HBox(10, btnEditRow, btnHapusRow);
+
+            {
+                btnEditRow.getStyleClass().addAll("btn-primary");
+                btnEditRow.setStyle("-fx-background-color: #f59e0b; -fx-padding: 5 10; -fx-font-size: 12px; -fx-pref-height: 25px;");
+                btnHapusRow.getStyleClass().addAll("btn-danger");
+                btnHapusRow.setStyle("-fx-padding: 5 10; -fx-font-size: 12px; -fx-pref-height: 25px;");
+
+                btnEditRow.setOnAction(event -> {
+                    Mahasiswa m = getTableView().getItems().get(getIndex());
+                    populateForm(m);
+                    setEditMode(true);
+                    selectTab(1); // Pindah ke tab Input Data
+                });
+
+                btnHapusRow.setOnAction(event -> {
+                    Mahasiswa m = getTableView().getItems().get(getIndex());
+                    boolean ok = AlertHelper.showConfirmation("Konfirmasi Hapus",
+                            "Yakin ingin menghapus \"" + m.getNama() + "\" (NIM: " + m.getNim() + ")?");
+                    if (ok) {
+                        mahasiswaDAO.delete(m.getNim());
+                        AlertHelper.showInfo("Berhasil", "Data mahasiswa berhasil dihapus.");
+                        loadData();
+                        clearForm();
+                        setEditMode(false);
+                    }
+                });
+                pane.setAlignment(javafx.geometry.Pos.CENTER);
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                setGraphic(empty ? null : pane);
+            }
+        });
+
         tableMahasiswa.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
 
-    private void setupComboBoxes() {
-        comboGender.setItems(FXCollections.observableArrayList("L", "P"));
+    private void setDashCellFactory(TableColumn<Mahasiswa, String> column) {
+        column.setCellFactory(col -> new TableCell<Mahasiswa, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setText(null);
+                } else {
+                    setText((item == null || item.trim().isEmpty()) ? "-" : item);
+                }
+            }
+        });
+    }
+
+    private void setupPasswordToggle() {
+        fieldPasswordVisible.textProperty().bindBidirectional(fieldPassword.textProperty());
+        btnTogglePassword.setOnAction(e -> {
+            boolean show = btnTogglePassword.isSelected();
+            fieldPasswordVisible.setVisible(show);
+            fieldPasswordVisible.setManaged(show);
+            fieldPassword.setVisible(!show);
+            fieldPassword.setManaged(!show);
+            btnTogglePassword.setText(show ? "🙈" : "👁");
+        });
     }
 
     private void setupSearchAndFilter() {
@@ -128,7 +207,20 @@ public class DataMahasiswaController implements Initializable {
     @FXML
     private void handleTambah(ActionEvent event) {
         if (!isFormValid(true)) return;
-        mahasiswaDAO.insert(buildFromForm());
+
+        Mahasiswa mhs = buildFromForm();
+        String password = fieldPassword.getText().trim();
+
+        // Simpan profil mahasiswa ke tabel mahasiswa (tanpa password)
+        mahasiswaDAO.insert(mhs);
+
+        // Simpan akun ke tabel user (dengan password)
+        try {
+            userDAO.insertUserOnly(mhs.getNim(), password, "Mahasiswa");
+        } catch (Exception e) {
+            System.out.println("⚠️ Gagal membuat akun user: " + e.getMessage());
+        }
+
         AlertHelper.showInfo("Berhasil", "Data mahasiswa berhasil ditambahkan.");
         loadData();
         clearForm();
@@ -144,7 +236,10 @@ public class DataMahasiswaController implements Initializable {
             setEditMode(true);
             return;
         }
+        // Saat edit, tidak perlu validasi password
         if (!isFormValid(false)) return;
+
+        // Update hanya data profil (tanpa password)
         mahasiswaDAO.update(buildFromForm());
         AlertHelper.showInfo("Berhasil", "Data mahasiswa berhasil diperbarui.");
         loadData();
@@ -187,10 +282,12 @@ public class DataMahasiswaController implements Initializable {
     private void populateForm(Mahasiswa m) {
         fieldNim.setText(m.getNim());
         fieldNama.setText(m.getNama());
-        comboGender.setValue(m.getJenisKelamin());
+        if ("L".equals(m.getJenisKelamin())) radioL.setSelected(true);
+        else if ("P".equals(m.getJenisKelamin())) radioP.setSelected(true);
+        else if (genderGroup != null) genderGroup.selectToggle(null);
         fieldAlamat.setText(m.getAlamat());
-        fieldKelas.setText(m.getKelas() != null ? m.getKelas() : "");
-        fieldProdi.setText(m.getProdi() != null ? m.getProdi() : "");
+        comboKelas.setValue(m.getKelas() != null ? m.getKelas() : null);
+        comboProdi.setValue(m.getProdi() != null ? m.getProdi() : null);
         fieldPassword.clear();
     }
 
@@ -198,22 +295,25 @@ public class DataMahasiswaController implements Initializable {
         return new Mahasiswa(
                 fieldNim.getText().trim(),
                 fieldNama.getText().trim(),
-                comboGender.getValue(),
+                radioL.isSelected() ? "L" : (radioP.isSelected() ? "P" : null),
                 fieldAlamat.getText().trim(),
-                fieldKelas.getText().trim(),
-                fieldProdi.getText().trim(),
-                fieldPassword.getText().trim()
+                comboKelas.getValue(),
+                comboProdi.getValue()
         );
     }
 
     private boolean isFormValid(boolean cekPassword) {
-        if (fieldNim.getText().trim().isEmpty()) {
+        String nimStr = fieldNim.getText().trim();
+        if (nimStr.isEmpty()) {
             AlertHelper.showWarning("Validasi", "NIM tidak boleh kosong."); return false;
+        }
+        if (!nimStr.matches("\\d+")) {
+            AlertHelper.showWarning("Validasi", "NIM harus berupa angka."); return false;
         }
         if (fieldNama.getText().trim().isEmpty()) {
             AlertHelper.showWarning("Validasi", "Nama tidak boleh kosong."); return false;
         }
-        if (comboGender.getValue() == null) {
+        if (!radioL.isSelected() && !radioP.isSelected()) {
             AlertHelper.showWarning("Validasi", "Jenis kelamin harus dipilih."); return false;
         }
         if (cekPassword && fieldPassword.getText().trim().isEmpty()) {
@@ -225,10 +325,10 @@ public class DataMahasiswaController implements Initializable {
     private void clearForm() {
         fieldNim.clear();
         fieldNama.clear();
-        comboGender.setValue(null);
+        if (genderGroup != null) genderGroup.selectToggle(null);
         fieldAlamat.clear();
-        fieldKelas.clear();
-        fieldProdi.clear();
+        comboKelas.setValue(null);
+        comboProdi.setValue(null);
         fieldPassword.clear();
     }
 
@@ -236,7 +336,16 @@ public class DataMahasiswaController implements Initializable {
         this.isEditMode = editMode;
         fieldNim.setDisable(editMode);
         btnEdit.setText(editMode ? "Simpan" : "Edit");
-        btnTambah.setDisable(editMode);
+        btnTambah.setVisible(!editMode);
+        btnTambah.setManaged(!editMode);
+
+        // Sembunyikan password field saat mode edit (password tidak diubah dari sini)
+        fieldPassword.setVisible(!editMode);
+        fieldPassword.setManaged(!editMode);
+        fieldPasswordVisible.setVisible(false);
+        fieldPasswordVisible.setManaged(false);
+        btnTogglePassword.setVisible(!editMode);
+        btnTogglePassword.setManaged(!editMode);
     }
 
     public void selectTab(int index) {

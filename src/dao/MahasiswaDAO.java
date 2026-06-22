@@ -12,12 +12,13 @@ import java.util.List;
 
 /**
  * DAO untuk operasi CRUD data Mahasiswa.
- * Kolom DB: id, nim, nama, gender, alamat, password, kelas, prodi
+ * Kolom DB: id, nim, nama, gender, alamat, kelas, prodi
+ * Password disimpan di tabel user, bukan di tabel mahasiswa.
  */
 public class MahasiswaDAO {
 
     public void insert(Mahasiswa m) {
-        String sql = "INSERT INTO mahasiswa (nim, nama, gender, alamat, password, kelas, prodi) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO mahasiswa (nim, nama, gender, alamat, kelas, prodi) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -26,9 +27,8 @@ public class MahasiswaDAO {
             stmt.setString(2, m.getNama());
             stmt.setString(3, toGenderEnum(m.getJenisKelamin()));
             stmt.setString(4, m.getAlamat());
-            stmt.setString(5, m.getPassword());
-            stmt.setString(6, m.getKelas());
-            stmt.setString(7, m.getProdi());
+            stmt.setString(5, m.getKelas());
+            stmt.setString(6, m.getProdi());
 
             stmt.executeUpdate();
 
@@ -38,7 +38,7 @@ public class MahasiswaDAO {
     }
 
     public void update(Mahasiswa m) {
-        String sql = "UPDATE mahasiswa SET nama=?, gender=?, alamat=?, password=?, kelas=?, prodi=? WHERE nim=?";
+        String sql = "UPDATE mahasiswa SET nama=?, gender=?, alamat=?, kelas=?, prodi=? WHERE nim=?";
 
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -46,10 +46,9 @@ public class MahasiswaDAO {
             stmt.setString(1, m.getNama());
             stmt.setString(2, toGenderEnum(m.getJenisKelamin()));
             stmt.setString(3, m.getAlamat());
-            stmt.setString(4, m.getPassword());
-            stmt.setString(5, m.getKelas());
-            stmt.setString(6, m.getProdi());
-            stmt.setString(7, m.getNim());
+            stmt.setString(4, m.getKelas());
+            stmt.setString(5, m.getProdi());
+            stmt.setString(6, m.getNim());
 
             stmt.executeUpdate();
 
@@ -142,7 +141,6 @@ public class MahasiswaDAO {
                 fromGenderEnum(rs.getString("gender")),
                 rs.getString("alamat"),
                 rs.getString("kelas"),
-                rs.getString("prodi"),
-                rs.getString("password"));
+                rs.getString("prodi"));
     }
 }
