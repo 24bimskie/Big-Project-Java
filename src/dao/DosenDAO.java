@@ -10,22 +10,18 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * DAO untuk operasi CRUD data Dosen.
- * Kolom DB: id, nip, nama, gender, alamat, password
- */
 public class DosenDAO {
 
     public void insert(Dosen d) {
-        String sql = "INSERT INTO dosen (nip, nama, gender, alamat, password) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO dosen (nidn, nama_lengkap, email, fakultas) VALUES (?, ?, ?, ?)";
+
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, d.getNip());
-            stmt.setString(2, d.getNama());
-            stmt.setString(3, toGenderEnum(d.getJenisKelamin()));
-            stmt.setString(4, d.getAlamat());
-            stmt.setString(5, d.getPassword());
+            stmt.setString(1, d.getNidn());
+            stmt.setString(2, d.getNamaLengkap());
+            stmt.setString(3, d.getEmail());
+            stmt.setString(4, d.getFakultas());
 
             stmt.executeUpdate();
 
@@ -35,15 +31,15 @@ public class DosenDAO {
     }
 
     public void update(Dosen d) {
-        String sql = "UPDATE dosen SET nama=?, gender=?, alamat=?, password=? WHERE nip=?";
+        String sql = "UPDATE dosen SET nama_lengkap=?, email=?, fakultas=? WHERE nidn=?";
+
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, d.getNama());
-            stmt.setString(2, toGenderEnum(d.getJenisKelamin()));
-            stmt.setString(3, d.getAlamat());
-            stmt.setString(4, d.getPassword());
-            stmt.setString(5, d.getNip());
+            stmt.setString(1, d.getNamaLengkap());
+            stmt.setString(2, d.getEmail());
+            stmt.setString(3, d.getFakultas());
+            stmt.setString(4, d.getNidn());
 
             stmt.executeUpdate();
 
@@ -52,12 +48,13 @@ public class DosenDAO {
         }
     }
 
-    public void delete(String nip) {
-        String sql = "DELETE FROM dosen WHERE nip=?";
+    public void delete(String nidn) {
+        String sql = "DELETE FROM dosen WHERE nidn=?";
+
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, nip);
+            stmt.setString(1, nidn);
             stmt.executeUpdate();
 
         } catch (SQLException e) {
@@ -65,13 +62,15 @@ public class DosenDAO {
         }
     }
 
-    public Dosen getByNip(String nip) {
-        String sql = "SELECT * FROM dosen WHERE nip=?";
+    public Dosen getByNidn(String nidn) {
+        String sql = "SELECT * FROM dosen WHERE nidn=?";
+
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, nip);
+            stmt.setString(1, nidn);
 
+            // ResultSet dimasukkan ke try-with-resources agar auto-close
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     return map(rs);
@@ -81,17 +80,19 @@ public class DosenDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
         return null;
     }
 
-    // Supaya controller lama yang masih memakai getByNidn() tidak error
-    public Dosen getByNidn(String nip) {
-        return getByNip(nip);
+    // Backward compatibility untuk controller lama yang masih mencari berdasarkan
+    // NIP
+    public Dosen getByNip(String nip) {
+        return getByNidn(nip);
     }
 
     public List<Dosen> getAll() {
         List<Dosen> list = new ArrayList<>();
-        String sql = "SELECT * FROM dosen ORDER BY nama";
+        String sql = "SELECT * FROM dosen ORDER BY nama_lengkap";
 
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql);
@@ -108,28 +109,11 @@ public class DosenDAO {
         return list;
     }
 
-    private String toGenderEnum(String jenisKelamin) {
-        if (jenisKelamin == null)
-            return "L";
-
-        if (jenisKelamin.equalsIgnoreCase("Perempuan")
-                || jenisKelamin.equalsIgnoreCase("P")) {
-            return "P";
-        }
-
-        return "L";
-    }
-
-    private String fromGenderEnum(String gender) {
-        return "P".equalsIgnoreCase(gender) ? "Perempuan" : "Laki-laki";
-    }
-
     private Dosen map(ResultSet rs) throws SQLException {
         return new Dosen(
-                rs.getString("nip"),
-                rs.getString("nama"),
-                fromGenderEnum(rs.getString("gender")),
-                rs.getString("alamat"),
-                rs.getString("password"));
+                rs.getString("nidn"),
+                rs.getString("nama_lengkap"),
+                rs.getString("email"),
+                rs.getString("fakultas"));
     }
 }

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jun 18, 2026 at 03:43 PM
+-- Generation Time: Jun 21, 2026 at 02:43 PM
 -- Server version: 8.0.30
 -- PHP Version: 8.4.20
 
@@ -29,19 +29,20 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `dosen` (
   `id` int NOT NULL,
-  `nip` varchar(20) NOT NULL,
-  `nama` varchar(100) NOT NULL,
-  `gender` enum('L','P') NOT NULL,
-  `alamat` text,
-  `password` varchar(255) NOT NULL
+  `nidn` varchar(30) DEFAULT NULL,
+  `nama_lengkap` varchar(100) DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `fakultas` varchar(100) DEFAULT NULL,
+  `foto_profil` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `dosen`
 --
 
-INSERT INTO `dosen` (`id`, `nip`, `nama`, `gender`, `alamat`, `password`) VALUES
-(1, 'Yanto', 'Yanto', 'L', NULL, 'yanto123');
+INSERT INTO `dosen` (`id`, `nidn`, `nama_lengkap`, `email`, `fakultas`, `foto_profil`) VALUES
+(4, '232444142', 'Boy', 'boy@gmail.com', 'ekonomi', NULL),
+(5, '37890485758', 'Maman', 'maman@gmail.com', 'FIS', NULL);
 
 -- --------------------------------------------------------
 
@@ -82,7 +83,6 @@ CREATE TABLE `mahasiswa` (
   `nama` varchar(100) NOT NULL,
   `gender` enum('L','P') NOT NULL,
   `alamat` text,
-  `password` varchar(255) NOT NULL,
   `kelas` varchar(10) DEFAULT NULL,
   `prodi` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -91,8 +91,10 @@ CREATE TABLE `mahasiswa` (
 -- Dumping data for table `mahasiswa`
 --
 
-INSERT INTO `mahasiswa` (`id`, `nim`, `nama`, `gender`, `alamat`, `password`, `kelas`, `prodi`) VALUES
-(1, 'Andi', 'Andi', 'L', NULL, 'andi321', NULL, NULL);
+INSERT INTO `mahasiswa` (`id`, `nim`, `nama`, `gender`, `alamat`, `kelas`, `prodi`) VALUES
+(2, '24252324', 'Alex', 'L', 'Lampung', 'C', 'TI'),
+(3, '21212121', 'Waluyo', 'P', 'Tanjung Verde', '3B', 'Psikologi'),
+(4, '230492852', 'Boboiboy', 'L', 'Jombang', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -101,8 +103,14 @@ INSERT INTO `mahasiswa` (`id`, `nim`, `nama`, `gender`, `alamat`, `password`, `k
 --
 
 CREATE TABLE `mata_kuliah` (
-  `id` int NOT NULL,
-  `Mata_Kuliah` varchar(100) NOT NULL
+  `id`        int          NOT NULL AUTO_INCREMENT,
+  `kode_mk`   varchar(20)  NOT NULL,
+  `nama_mk`   varchar(100) NOT NULL,
+  `sks`       int          NOT NULL DEFAULT 2,
+  `semester`  int          NOT NULL DEFAULT 1,
+  `id_prodi`  varchar(100) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `kode_mk` (`kode_mk`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -137,7 +145,7 @@ INSERT INTO `user` (`id`, `username`, `password`, `level`) VALUES
 --
 ALTER TABLE `dosen`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `nip` (`nip`);
+  ADD UNIQUE KEY `nip` (`nidn`);
 
 --
 -- Indexes for table `jadwal`
@@ -184,7 +192,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT for table `dosen`
 --
 ALTER TABLE `dosen`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `jadwal`
@@ -202,7 +210,7 @@ ALTER TABLE `kelas`
 -- AUTO_INCREMENT for table `mahasiswa`
 --
 ALTER TABLE `mahasiswa`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `mata_kuliah`

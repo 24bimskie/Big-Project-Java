@@ -1,6 +1,7 @@
 package controller.admin;
 
 import dao.DosenDAO;
+import dao.UserDAO;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -17,7 +18,8 @@ import java.util.ResourceBundle;
 
 /**
  * Controller Data Dosen.
- * Kolom DB: id, nip, nama, gender, alamat, password
+ * Kolom DB: id, nidn, nama_lengkap, email, fakultas, foto_profil
+ * Password disimpan di tabel user (bukan di tabel dosen).
  */
 public class DataDosenController implements Initializable {
 
@@ -30,25 +32,31 @@ public class DataDosenController implements Initializable {
     @FXML
     private TableColumn<Dosen, Integer> colNo;
     @FXML
-    private TableColumn<Dosen, String> colNip;
+    private TableColumn<Dosen, String> colNidn;
     @FXML
-    private TableColumn<Dosen, String> colNama;
+    private TableColumn<Dosen, String> colNamaLengkap;
     @FXML
-    private TableColumn<Dosen, String> colGender;
+    private TableColumn<Dosen, String> colEmail;
     @FXML
-    private TableColumn<Dosen, String> colAlamat;
+    private TableColumn<Dosen, String> colFakultas;
+    @FXML
+    private TableColumn<Dosen, Void> colAksi;
 
     // ===== Form Input =====
     @FXML
-    private TextField fieldNip;
+    private TextField fieldNidn;
     @FXML
-    private TextField fieldNama;
+    private TextField fieldNamaLengkap;
     @FXML
-    private ComboBox<String> comboGender;
+    private TextField fieldEmail;
     @FXML
-    private TextField fieldAlamat;
+    private TextField fieldFakultas;
     @FXML
     private PasswordField fieldPassword;
+    @FXML
+    private TextField fieldPasswordVisible;
+    @FXML
+    private ToggleButton btnTogglePassword;
 
     // ===== Kontrol =====
     @FXML
@@ -66,6 +74,7 @@ public class DataDosenController implements Initializable {
 
     // ===== State =====
     private final DosenDAO dosenDAO = new DosenDAO();
+    private final UserDAO userDAO = new UserDAO();
     private final ObservableList<Dosen> dosenList = FXCollections.observableArrayList();
     private FilteredList<Dosen> filteredList;
     private boolean isEditMode = false;
@@ -73,7 +82,7 @@ public class DataDosenController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setupTable();
-        setupComboBox();
+        setupPasswordToggle();
         setupSearchAndFilter();
         loadData();
         setupTableSelectionListener();
@@ -83,6 +92,7 @@ public class DataDosenController implements Initializable {
     // ===== Setup =====
 
     private void setupTable() {
+        colNo.setCellValueFactory(param -> new javafx.beans.property.ReadOnlyObjectWrapper<>(0));
         colNo.setCellFactory(col -> new TableCell<Dosen, Integer>() {
             @Override
             protected void updateItem(Integer item, boolean empty) {
@@ -90,16 +100,85 @@ public class DataDosenController implements Initializable {
                 setText(empty ? null : String.valueOf(getIndex() + 1));
             }
         });
-        colNip.setCellValueFactory(new PropertyValueFactory<>("nip"));
-        colNama.setCellValueFactory(new PropertyValueFactory<>("nama"));
-        colGender.setCellValueFactory(new PropertyValueFactory<>("jenisKelamin"));
-        colAlamat.setCellValueFactory(new PropertyValueFactory<>("alamat"));
+        colNidn.setCellValueFactory(new PropertyValueFactory<>("nidn"));
+        colNamaLengkap.setCellValueFactory(new PropertyValueFactory<>("namaLengkap"));
+        colEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
+        colFakultas.setCellValueFactory(new PropertyValueFactory<>("fakultas"));
+
+        setDashCellFactory(colNidn);
+        setDashCellFactory(colNamaLengkap);
+        setDashCellFactory(colEmail);
+        setDashCellFactory(colFakultas);
+
+        colAksi.setCellValueFactory(param -> new javafx.beans.property.ReadOnlyObjectWrapper<>(null));
+        colAksi.setCellFactory(param -> new TableCell<Dosen, Void>() {
+            private final Button btnEditRow = new Button("Edit");
+            private final Button btnHapusRow = new Button("Hapus");
+            private final javafx.scene.layout.HBox pane = new javafx.scene.layout.HBox(10, btnEditRow, btnHapusRow);
+
+            {
+                btnEditRow.getStyleClass().addAll("btn-primary");
+                btnEditRow.setStyle(
+                        "-fx-background-color: #f59e0b; -fx-padding: 5 10; -fx-font-size: 12px; -fx-pref-height: 25px;");
+                btnHapusRow.getStyleClass().addAll("btn-danger");
+                btnHapusRow.setStyle("-fx-padding: 5 10; -fx-font-size: 12px; -fx-pref-height: 25px;");
+
+                btnEditRow.setOnAction(event -> {
+                    Dosen d = getTableView().getItems().get(getIndex());
+                    populateForm(d);
+                    setEditMode(true);
+                    selectTab(1); // Pindah ke tab Input Data
+                });
+
+                btnHapusRow.setOnAction(event -> {
+                    Dosen d = getTableView().getItems().get(getIndex());
+                    boolean ok = AlertHelper.showConfirmation("Konfirmasi Hapus",
+                            "Yakin ingin menghapus \"" + d.getNamaLengkap() + "\" (NIDN: " + d.getNidn() + ")?");
+                    if (ok) {
+                        dosenDAO.delete(d.getNidn());
+                        AlertHelper.showInfo("Berhasil", "Data dosen berhasil dihapus.");
+                        loadData();
+                        clearForm();
+                        setEditMode(false);
+                    }
+                });
+                pane.setAlignment(javafx.geometry.Pos.CENTER);
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                setGraphic(empty ? null : pane);
+            }
+        });
 
         tableDosen.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
 
-    private void setupComboBox() {
-        comboGender.setItems(FXCollections.observableArrayList("L", "P"));
+    private void setDashCellFactory(TableColumn<Dosen, String> column) {
+        column.setCellFactory(col -> new TableCell<Dosen, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setText(null);
+                } else {
+                    setText((item == null || item.trim().isEmpty()) ? "-" : item);
+                }
+            }
+        });
+    }
+
+    private void setupPasswordToggle() {
+        fieldPasswordVisible.textProperty().bindBidirectional(fieldPassword.textProperty());
+        btnTogglePassword.setOnAction(e -> {
+            boolean show = btnTogglePassword.isSelected();
+            fieldPasswordVisible.setVisible(show);
+            fieldPasswordVisible.setManaged(show);
+            fieldPassword.setVisible(!show);
+            fieldPassword.setManaged(!show);
+            btnTogglePassword.setText(show ? "🙈" : "👁");
+        });
     }
 
     private void setupSearchAndFilter() {
@@ -113,9 +192,10 @@ public class DataDosenController implements Initializable {
         filteredList.setPredicate(d -> {
             if (keyword.isEmpty())
                 return true;
-            return d.getNip().toLowerCase().contains(keyword)
-                    || d.getNama().toLowerCase().contains(keyword)
-                    || (d.getAlamat() != null && d.getAlamat().toLowerCase().contains(keyword));
+            return d.getNidn().toLowerCase().contains(keyword)
+                    || d.getNamaLengkap().toLowerCase().contains(keyword)
+                    || (d.getFakultas() != null && d.getFakultas().toLowerCase().contains(keyword))
+                    || (d.getEmail() != null && d.getEmail().toLowerCase().contains(keyword));
         });
     }
 
@@ -142,7 +222,20 @@ public class DataDosenController implements Initializable {
     private void handleTambah(ActionEvent event) {
         if (!isFormValid(true))
             return;
-        dosenDAO.insert(buildFromForm());
+
+        Dosen dosen = buildFromForm();
+        String password = fieldPassword.getText().trim();
+
+        // Simpan profil dosen ke tabel dosen (tanpa password)
+        dosenDAO.insert(dosen);
+
+        // Simpan akun ke tabel user (dengan password)
+        try {
+            userDAO.insertUserOnly(dosen.getNidn(), password, "Dosen");
+        } catch (Exception e) {
+            System.out.println("⚠️ Gagal membuat akun user: " + e.getMessage());
+        }
+
         AlertHelper.showInfo("Berhasil", "Data dosen berhasil ditambahkan.");
         loadData();
         clearForm();
@@ -158,8 +251,12 @@ public class DataDosenController implements Initializable {
             setEditMode(true);
             return;
         }
+
+        // Saat edit, tidak perlu validasi password
         if (!isFormValid(false))
             return;
+
+        // Update hanya data profil (tanpa password)
         dosenDAO.update(buildFromForm());
         AlertHelper.showInfo("Berhasil", "Data dosen berhasil diperbarui.");
         loadData();
@@ -175,9 +272,9 @@ public class DataDosenController implements Initializable {
             return;
         }
         boolean ok = AlertHelper.showConfirmation("Konfirmasi Hapus",
-                "Yakin ingin menghapus \"" + selected.getNama() + "\" (NIP: " + selected.getNip() + ")?");
+                "Yakin ingin menghapus \"" + selected.getNamaLengkap() + "\" (NIDN: " + selected.getNidn() + ")?");
         if (ok) {
-            dosenDAO.delete(selected.getNip());
+            dosenDAO.delete(selected.getNidn());
             AlertHelper.showInfo("Berhasil", "Data dosen berhasil dihapus.");
             loadData();
             clearForm();
@@ -200,33 +297,33 @@ public class DataDosenController implements Initializable {
     // ===== Helpers =====
 
     private void populateForm(Dosen d) {
-        fieldNip.setText(d.getNip());
-        fieldNama.setText(d.getNama());
-        comboGender.setValue(d.getJenisKelamin());
-        fieldAlamat.setText(d.getAlamat() != null ? d.getAlamat() : "");
+        fieldNidn.setText(d.getNidn());
+        fieldNamaLengkap.setText(d.getNamaLengkap());
+        fieldEmail.setText(d.getEmail() != null ? d.getEmail() : "");
+        fieldFakultas.setText(d.getFakultas() != null ? d.getFakultas() : "");
         fieldPassword.clear();
     }
 
     private Dosen buildFromForm() {
         return new Dosen(
-                fieldNip.getText().trim(),
-                fieldNama.getText().trim(),
-                comboGender.getValue(),
-                fieldAlamat.getText().trim(),
-                fieldPassword.getText().trim());
+                fieldNidn.getText().trim(),
+                fieldNamaLengkap.getText().trim(),
+                fieldEmail.getText().trim(),
+                fieldFakultas.getText().trim());
     }
 
     private boolean isFormValid(boolean cekPassword) {
-        if (fieldNip.getText().trim().isEmpty()) {
-            AlertHelper.showWarning("Validasi", "NIP tidak boleh kosong.");
+        String nidnStr = fieldNidn.getText().trim();
+        if (nidnStr.isEmpty()) {
+            AlertHelper.showWarning("Validasi", "NIDN tidak boleh kosong.");
             return false;
         }
-        if (fieldNama.getText().trim().isEmpty()) {
-            AlertHelper.showWarning("Validasi", "Nama tidak boleh kosong.");
+        if (!nidnStr.matches("\\d+")) {
+            AlertHelper.showWarning("Validasi", "NIDN harus berupa angka.");
             return false;
         }
-        if (comboGender.getValue() == null) {
-            AlertHelper.showWarning("Validasi", "Jenis kelamin harus dipilih.");
+        if (fieldNamaLengkap.getText().trim().isEmpty()) {
+            AlertHelper.showWarning("Validasi", "Nama Lengkap tidak boleh kosong.");
             return false;
         }
         if (cekPassword && fieldPassword.getText().trim().isEmpty()) {
@@ -237,18 +334,27 @@ public class DataDosenController implements Initializable {
     }
 
     private void clearForm() {
-        fieldNip.clear();
-        fieldNama.clear();
-        comboGender.setValue(null);
-        fieldAlamat.clear();
+        fieldNidn.clear();
+        fieldNamaLengkap.clear();
+        fieldEmail.clear();
+        fieldFakultas.clear();
         fieldPassword.clear();
     }
 
     private void setEditMode(boolean editMode) {
         this.isEditMode = editMode;
-        fieldNip.setDisable(editMode);
+        fieldNidn.setDisable(editMode);
         btnEdit.setText(editMode ? "Simpan" : "Edit");
-        btnTambah.setDisable(editMode);
+        btnTambah.setVisible(!editMode);
+        btnTambah.setManaged(!editMode);
+
+        // Sembunyikan password field saat mode edit (password tidak diubah dari sini)
+        fieldPassword.setVisible(!editMode);
+        fieldPassword.setManaged(!editMode);
+        fieldPasswordVisible.setVisible(false);
+        fieldPasswordVisible.setManaged(false);
+        btnTogglePassword.setVisible(!editMode);
+        btnTogglePassword.setManaged(!editMode);
     }
 
     public void selectTab(int index) {

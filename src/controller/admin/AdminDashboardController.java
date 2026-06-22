@@ -9,6 +9,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.User;
 import util.AlertHelper;
@@ -21,57 +22,69 @@ import java.util.ResourceBundle;
 
 /**
  * Controller untuk Dashboard Admin.
- * Navigasi ke semua fitur admin: data mahasiswa, dosen, prodi, kelas, matkul, jadwal.
+ * Navigasi ke semua fitur admin: data mahasiswa, dosen, prodi, kelas, matkul,
+ * jadwal.
  */
 public class AdminDashboardController implements Initializable {
 
     // ===== FXML Bindings =====
 
-    /** Label untuk menampilkan nama user yang sedang login */
     @FXML
     private Label labelNamaUser;
-
-    /** Label untuk menampilkan role user */
     @FXML
     private Label labelRole;
-
-    /** Area utama tempat konten sub-halaman ditampilkan */
     @FXML
     private StackPane contentArea;
 
-    // Tombol-tombol menu sidebar
+    // Tombol & submenu Mahasiswa
     @FXML
     private Button btnMahasiswa;
-
     @FXML
-    private javafx.scene.layout.VBox submenuMahasiswa;
-
+    private VBox submenuMahasiswa;
     @FXML
     private Button btnMahasiswaInput;
-
     @FXML
     private Button btnMahasiswaLihat;
 
+    // Tombol & submenu Dosen
     @FXML
     private Button btnDosen;
-
     @FXML
-    private javafx.scene.layout.VBox submenuDosen;
-
+    private VBox submenuDosen;
     @FXML
     private Button btnDosenLihat;
-
     @FXML
     private Button btnDosenInput;
 
+    // Tombol & submenu Prodi & Kelas
     @FXML
     private Button btnProdiKelas;
+    @FXML
+    private VBox submenuProdiKelas;
+    @FXML
+    private Button btnProdiKelasLihat;
+    @FXML
+    private Button btnProdiKelasInput;
 
+    // Tombol & submenu Mata Kuliah
     @FXML
     private Button btnMataKuliah;
+    @FXML
+    private VBox submenuMataKuliah;
+    @FXML
+    private Button btnMataKuliahLihat;
+    @FXML
+    private Button btnMataKuliahInput;
 
+    // Tombol & submenu Jadwal
     @FXML
     private Button btnJadwal;
+    @FXML
+    private VBox submenuJadwal;
+    @FXML
+    private Button btnJadwalLihat;
+    @FXML
+    private Button btnJadwalInput;
 
     @FXML
     private Button btnLogout;
@@ -80,97 +93,137 @@ public class AdminDashboardController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Tampilkan info user yang sedang login
         User currentUser = UserSession.getCurrentUser();
         if (currentUser != null) {
             labelNamaUser.setText(currentUser.getUsername());
             labelRole.setText("Role: " + currentUser.getRole());
         }
-
-        // Tampilkan halaman Data Mahasiswa sebagai default saat pertama masuk
+        // Default: tampilkan halaman Data Mahasiswa saat pertama masuk
         loadContent("/view/admin/DataMahasiswaView.fxml");
         setActiveButton(btnMahasiswa);
     }
 
-    // ===== Navigasi Sidebar =====
+    // ===== Navigasi Sidebar — Mahasiswa =====
 
-    /** Toggle submenu Data Mahasiswa */
     @FXML
     private void handleMenuMahasiswaToggle(ActionEvent event) {
-        boolean isVisible = submenuMahasiswa.isVisible();
-        submenuMahasiswa.setVisible(!isVisible);
-        submenuMahasiswa.setManaged(!isVisible);
-        btnMahasiswa.setText(isVisible ? "Data Mahasiswa ▼" : "Data Mahasiswa ▲");
+        toggleSubmenu(submenuMahasiswa, btnMahasiswa, "Data Mahasiswa");
     }
 
     @FXML
     private void handleMenuMahasiswaInput(ActionEvent event) {
-        DataMahasiswaController controller = loadContentWithController("/view/admin/DataMahasiswaView.fxml");
-        if (controller != null) controller.selectTab(1);
+        DataMahasiswaController ctrl = loadContentWithController("/view/admin/DataMahasiswaView.fxml");
+        if (ctrl != null)
+            ctrl.selectTab(1);
         setActiveButton(btnMahasiswaInput);
     }
 
     @FXML
     private void handleMenuMahasiswaLihat(ActionEvent event) {
-        DataMahasiswaController controller = loadContentWithController("/view/admin/DataMahasiswaView.fxml");
-        if (controller != null) controller.selectTab(0);
+        DataMahasiswaController ctrl = loadContentWithController("/view/admin/DataMahasiswaView.fxml");
+        if (ctrl != null)
+            ctrl.selectTab(0);
         setActiveButton(btnMahasiswaLihat);
     }
 
-    /** Toggle submenu Data Dosen */
-    @FXML
-    private void handleMenuDosenToggle(ActionEvent event) {
-        boolean isVisible = submenuDosen.isVisible();
-        submenuDosen.setVisible(!isVisible);
-        submenuDosen.setManaged(!isVisible);
-        btnDosen.setText(isVisible ? "Data Dosen ▼" : "Data Dosen ▲");
-    }
+    // ===== Navigasi Sidebar — Dosen =====
 
     @FXML
-    private void handleMenuDosenInput(ActionEvent event) {
-        DataDosenController controller = loadContentWithController("/view/admin/DataDosenView.fxml");
-        if (controller != null) controller.selectTab(1);
-        setActiveButton(btnDosenInput);
+    private void handleMenuDosenToggle(ActionEvent event) {
+        toggleSubmenu(submenuDosen, btnDosen, "Data Dosen");
     }
 
     @FXML
     private void handleMenuDosenLihat(ActionEvent event) {
-        DataDosenController controller = loadContentWithController("/view/admin/DataDosenView.fxml");
-        if (controller != null) controller.selectTab(0);
+        DataDosenController ctrl = loadContentWithController("/view/admin/DataDosenView.fxml");
+        if (ctrl != null)
+            ctrl.selectTab(0);
         setActiveButton(btnDosenLihat);
     }
 
-    /** Navigasi ke halaman Data Prodi & Kelas */
     @FXML
-    private void handleMenuProdiKelas(ActionEvent event) {
-        loadContent("/view/admin/DataProdiKelasView.fxml");
-        setActiveButton(btnProdiKelas);
+    private void handleMenuDosenInput(ActionEvent event) {
+        DataDosenController ctrl = loadContentWithController("/view/admin/DataDosenView.fxml");
+        if (ctrl != null)
+            ctrl.selectTab(1);
+        setActiveButton(btnDosenInput);
     }
 
-    /** Navigasi ke halaman Data Mata Kuliah */
+    // ===== Navigasi Sidebar — Prodi & Kelas =====
+
     @FXML
-    private void handleMenuMataKuliah(ActionEvent event) {
-        loadContent("/view/admin/DataMataKuliahView.fxml");
-        setActiveButton(btnMataKuliah);
+    private void handleMenuProdiKelasToggle(ActionEvent event) {
+        toggleSubmenu(submenuProdiKelas, btnProdiKelas, "Data Prodi & Kelas");
     }
 
-    /** Navigasi ke halaman Data Jadwal */
     @FXML
-    private void handleMenuJadwal(ActionEvent event) {
-        loadContent("/view/admin/DataJadwalView.fxml");
-        setActiveButton(btnJadwal);
+    private void handleMenuProdiKelasLihat(ActionEvent event) {
+        DataProdiKelasController ctrl = loadContentWithController("/view/admin/DataProdiKelasView.fxml");
+        if (ctrl != null)
+            ctrl.selectTab(0);
+        setActiveButton(btnProdiKelasLihat);
+    }
+
+    @FXML
+    private void handleMenuProdiKelasInput(ActionEvent event) {
+        DataProdiKelasController ctrl = loadContentWithController("/view/admin/DataProdiKelasView.fxml");
+        if (ctrl != null)
+            ctrl.selectTab(1);
+        setActiveButton(btnProdiKelasInput);
+    }
+
+    // ===== Navigasi Sidebar — Mata Kuliah =====
+
+    @FXML
+    private void handleMenuMataKuliahToggle(ActionEvent event) {
+        toggleSubmenu(submenuMataKuliah, btnMataKuliah, "Data Mata Kuliah");
+    }
+
+    @FXML
+    private void handleMenuMataKuliahLihat(ActionEvent event) {
+        DataMataKuliahController ctrl = loadContentWithController("/view/admin/DataMataKuliahView.fxml");
+        if (ctrl != null)
+            ctrl.selectTab(0);
+        setActiveButton(btnMataKuliahLihat);
+    }
+
+    @FXML
+    private void handleMenuMataKuliahInput(ActionEvent event) {
+        DataMataKuliahController ctrl = loadContentWithController("/view/admin/DataMataKuliahView.fxml");
+        if (ctrl != null)
+            ctrl.selectTab(1);
+        setActiveButton(btnMataKuliahInput);
+    }
+
+    // ===== Navigasi Sidebar — Jadwal =====
+
+    @FXML
+    private void handleMenuJadwalToggle(ActionEvent event) {
+        toggleSubmenu(submenuJadwal, btnJadwal, "Data Jadwal");
+    }
+
+    @FXML
+    private void handleMenuJadwalLihat(ActionEvent event) {
+        DataJadwalController ctrl = loadContentWithController("/view/admin/DataJadwalView.fxml");
+        if (ctrl != null)
+            ctrl.selectTab(0);
+        setActiveButton(btnJadwalLihat);
+    }
+
+    @FXML
+    private void handleMenuJadwalInput(ActionEvent event) {
+        DataJadwalController ctrl = loadContentWithController("/view/admin/DataJadwalView.fxml");
+        if (ctrl != null)
+            ctrl.selectTab(1);
+        setActiveButton(btnJadwalInput);
     }
 
     // ===== Logout =====
 
-    /** Logout dari sistem dan kembali ke halaman Login */
     @FXML
     private void handleLogout(ActionEvent event) {
         boolean konfirmasi = AlertHelper.showConfirmation(
-                "Konfirmasi Logout",
-                "Apakah Anda yakin ingin keluar?"
-        );
-
+                "Konfirmasi Logout", "Apakah Anda yakin ingin keluar?");
         if (konfirmasi) {
             UserSession.clearSession();
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
@@ -181,13 +234,27 @@ public class AdminDashboardController implements Initializable {
     // ===== Helper Methods =====
 
     /**
+     * Toggle visibilitas submenu sidebar.
+     */
+    private void toggleSubmenu(VBox submenu, Button parentBtn, String label) {
+        if (submenu == null)
+            return;
+        boolean isVisible = submenu.isVisible();
+        submenu.setVisible(!isVisible);
+        submenu.setManaged(!isVisible);
+        parentBtn.setText(isVisible ? label + " ▼" : label + " ▲");
+    }
+
+    /**
      * Memuat konten FXML ke dalam contentArea (StackPane).
-     * @param fxmlPath Path ke file FXML yang akan dimuat
      */
     private void loadContent(String fxmlPath) {
         loadContentWithController(fxmlPath);
     }
 
+    /**
+     * Memuat konten FXML dan mengembalikan controller-nya.
+     */
     private <T> T loadContentWithController(String fxmlPath) {
         try {
             URL fxmlUrl = getClass().getResource(fxmlPath);
@@ -207,18 +274,21 @@ public class AdminDashboardController implements Initializable {
     }
 
     /**
-     * Menandai tombol sidebar yang sedang aktif dengan style CSS "active".
-     * @param activeButton Tombol yang ingin ditandai aktif
+     * Menandai tombol sidebar yang sedang aktif dengan style CSS.
      */
     private void setActiveButton(Button activeButton) {
-        Button[] allButtons = {btnMahasiswa, btnMahasiswaInput, btnMahasiswaLihat, btnDosen, btnProdiKelas, btnMataKuliah, btnJadwal};
+        Button[] allButtons = {
+                btnMahasiswa, btnMahasiswaInput, btnMahasiswaLihat,
+                btnDosen, btnDosenLihat, btnDosenInput,
+                btnProdiKelas, btnProdiKelasLihat, btnProdiKelasInput,
+                btnMataKuliah, btnMataKuliahLihat, btnMataKuliahInput,
+                btnJadwal, btnJadwalLihat, btnJadwalInput
+        };
         for (Button btn : allButtons) {
-            if (btn != null) {
+            if (btn != null)
                 btn.getStyleClass().remove("sidebar-btn-active");
-            }
         }
-        if (activeButton != null) {
+        if (activeButton != null)
             activeButton.getStyleClass().add("sidebar-btn-active");
-        }
     }
 }
