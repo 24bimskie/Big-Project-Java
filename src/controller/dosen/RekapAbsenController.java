@@ -17,27 +17,37 @@ import java.util.ResourceBundle;
 
 public class RekapAbsenController implements Initializable {
 
-    @FXML private ComboBox<String> comboMataKuliahRekap;
-    @FXML private DatePicker datePickerRekap;
-    @FXML private Button btnFilter;
-    @FXML private Button btnExportPdf;
+    @FXML
+    private ComboBox<String> comboMataKuliahRekap;
+    @FXML
+    private DatePicker datePickerRekap;
+    @FXML
+    private Button btnFilter;
+    @FXML
+    private Button btnExportPdf;
 
-    @FXML private TableView<?> tableRekap;
-    @FXML private TableColumn<?, ?> colRekapNim;
-    @FXML private TableColumn<?, ?> colRekapNama;
-    @FXML private TableColumn<?, ?> colRekapHadir;
-    @FXML private TableColumn<?, ?> colRekapIzin;
-    @FXML private TableColumn<?, ?> colRekapSakit;
-    @FXML private TableColumn<?, ?> colRekapAlpha;
+    @FXML
+    private TableView<?> tableRekap;
+    @FXML
+    private TableColumn<?, ?> colRekapNim;
+    @FXML
+    private TableColumn<?, ?> colRekapNama;
+    @FXML
+    private TableColumn<?, ?> colRekapHadir;
+    @FXML
+    private TableColumn<?, ?> colRekapIzin;
+    @FXML
+    private TableColumn<?, ?> colRekapSakit;
+    @FXML
+    private TableColumn<?, ?> colRekapAlpha;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         if (comboMataKuliahRekap != null) {
             comboMataKuliahRekap.getItems().addAll(
-                "Pemrograman Berorientasi Objek - Kelas A", 
-                "Struktur Data - Kelas B", 
-                "Basis Data - Kelas C"
-            );
+                    "Pemrograman Berorientasi Objek - Kelas A",
+                    "Struktur Data - Kelas B",
+                    "Basis Data - Kelas C");
         }
 
         if (btnFilter != null) {
