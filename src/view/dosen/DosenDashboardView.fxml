@@ -42,10 +42,8 @@
             
             <Label text="Menu Utama" styleClass="sidebar-title" />
             
-            <Button fx:id="btnDashboard" text="Dashboard" styleClass="sidebar-btn" maxWidth="Infinity" />
-            <Button fx:id="btnMulaiAbsen" text="Mulai Absen" styleClass="sidebar-btn" maxWidth="Infinity" />
-            <Button fx:id="btnRekapAbsen" text="Rekap Absen" styleClass="sidebar-btn" maxWidth="Infinity" />
-            <Button fx:id="btnProfil" text="Profil" styleClass="sidebar-btn" maxWidth="Infinity" />
+            <Button fx:id="btnJadwalMengajar" text="Jadwal Mengajar" styleClass="sidebar-btn" maxWidth="Infinity" />
+            <Button fx:id="btnDataDosen" text="Data Dosen" styleClass="sidebar-btn" maxWidth="Infinity" />
             
             <Region VBox.vgrow="ALWAYS" />
             

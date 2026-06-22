@@ -1,21 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- View Data Dosen (Admin) — Kolom DB: nip, nama, gender, alamat, password -->
+<!-- View Data Dosen (Admin) — Kolom DB: nidn, nama_lengkap, email, fakultas | Password di tabel user -->
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
 <VBox xmlns:fx="http://javafx.com/fxml" fx:controller="controller.admin.DataDosenController"
-      spacing="15" styleClass="content-pane" prefWidth="900" prefHeight="600">
+      spacing="10" prefWidth="1100" prefHeight="700">
 
     <padding>
-        <Insets top="20" right="20" bottom="20" left="20"/>
+        <Insets top="0" right="0" bottom="0" left="0"/>
     </padding>
-
-    <!-- Search Bar -->
-    <HBox spacing="10" alignment="CENTER_LEFT">
-        <TextField fx:id="fieldSearch" promptText="Cari NIP / Nama / Alamat..." prefWidth="280"/>
-        <Button fx:id="btnResetFilter" text="Reset" onAction="#handleResetFilter"/>
-    </HBox>
 
     <!-- Content Tabs (header disembunyikan via CSS .hide-tab-header) -->
     <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS"
@@ -23,24 +17,36 @@
 
         <!-- ====== Tab 1: Lihat Data ====== -->
         <Tab text="Lihat Data">
-            <VBox VBox.vgrow="ALWAYS">
-                <TableView fx:id="tableDosen" VBox.vgrow="ALWAYS"
-                           style="-fx-background-color: white; -fx-background-radius: 8;
-                                  -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.06), 8, 0, 0, 2);">
-                    <columns>
-                        <TableColumn fx:id="colNo"     text="No"    prefWidth="55"
-                                     style="-fx-alignment: CENTER;"/>
-                        <TableColumn fx:id="colNip"    text="NIP"   prefWidth="150"/>
-                        <TableColumn fx:id="colNama"   text="Nama"  prefWidth="220"/>
-                        <TableColumn fx:id="colGender" text="L/P"   prefWidth="70"
-                                     style="-fx-alignment: CENTER;"/>
-                        <TableColumn fx:id="colAlamat" text="Alamat" prefWidth="350"/>
-                    </columns>
-                    <placeholder>
-                        <Label text="Tidak ada data dosen."
-                               style="-fx-text-fill: #94a3b8; -fx-font-size: 14px;"/>
-                    </placeholder>
-                </TableView>
+            <VBox VBox.vgrow="ALWAYS" spacing="10">
+                <padding><Insets top="0" right="0" bottom="0" left="0"/></padding>
+                
+                <VBox VBox.vgrow="ALWAYS" spacing="10" styleClass="card" style="-fx-padding: 10;">
+                    <!-- Search Bar -->
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <TextField fx:id="fieldSearch" promptText="Cari NIDN / Nama / Fakultas..." prefWidth="280"/>
+                        <Button fx:id="btnResetFilter" text="Reset" onAction="#handleResetFilter"/>
+                    </HBox>
+
+                    <TableView fx:id="tableDosen" VBox.vgrow="ALWAYS"
+                               style="-fx-background-color: white; -fx-background-radius: 8;
+                                      -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
+                        <columns>
+                            <TableColumn fx:id="colNo"          text="No"          prefWidth="50"  minWidth="50"
+                                         style="-fx-alignment: CENTER;"/>
+                            <TableColumn fx:id="colNidn"        text="NIDN"        prefWidth="120" minWidth="100" 
+                                         style="-fx-alignment: CENTER;"/>
+                            <TableColumn fx:id="colNamaLengkap" text="Nama Lengkap" prefWidth="220" minWidth="150"/>
+                            <TableColumn fx:id="colEmail"       text="Email"       prefWidth="200" minWidth="150"/>
+                            <TableColumn fx:id="colFakultas"    text="Fakultas"    prefWidth="200" minWidth="150"/>
+                            <TableColumn fx:id="colAksi"        text="Aksi"        prefWidth="160" minWidth="150"
+                                         style="-fx-alignment: CENTER;"/>
+                        </columns>
+                        <placeholder>
+                            <Label text="Tidak ada data dosen."
+                                   style="-fx-text-fill: #94a3b8; -fx-font-size: 14px;"/>
+                        </placeholder>
+                    </TableView>
+                </VBox>
             </VBox>
         </Tab>
 
@@ -49,7 +55,7 @@
             <VBox spacing="15" alignment="TOP_LEFT">
                 <padding><Insets top="15" right="15" bottom="15" left="15"/></padding>
 
-                <VBox spacing="12" maxWidth="520"
+                <VBox spacing="12" maxWidth="560"
                       style="-fx-background-color: white; -fx-padding: 25;
                              -fx-background-radius: 10;
                              -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 10, 0, 0, 2);">
@@ -60,23 +66,26 @@
                             <ColumnConstraints hgrow="ALWAYS"/>
                         </columnConstraints>
 
-                        <Label text="NIP:"             GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                        <TextField fx:id="fieldNip"    GridPane.columnIndex="1" GridPane.rowIndex="0"
-                                   promptText="Nomor Induk Pegawai"/>
+                        <Label text="NIDN:"             GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                        <TextField fx:id="fieldNidn"    GridPane.columnIndex="1" GridPane.rowIndex="0"/>
 
-                        <Label text="Nama:"            GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                        <TextField fx:id="fieldNama"   GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                        <Label text="Nama Lengkap:"     GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                        <TextField fx:id="fieldNamaLengkap" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
 
-                        <Label text="Jenis Kelamin:"   GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-                        <ComboBox fx:id="comboGender" maxWidth="Infinity"
-                                  GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                        <Label text="Email:"            GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                        <TextField fx:id="fieldEmail"   GridPane.columnIndex="1" GridPane.rowIndex="2"/>
 
-                        <Label text="Alamat:"          GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-                        <TextField fx:id="fieldAlamat" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                        <Label text="Fakultas:"         GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                        <TextField fx:id="fieldFakultas" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
 
-                        <Label text="Password:"            GridPane.columnIndex="0" GridPane.rowIndex="4"/>
-                        <PasswordField fx:id="fieldPassword"
-                                       GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+                        <Label text="Password:"        GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+                        <HBox spacing="10" alignment="CENTER_LEFT" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                            <StackPane HBox.hgrow="ALWAYS">
+                                <PasswordField fx:id="fieldPassword" />
+                                <TextField fx:id="fieldPasswordVisible" visible="false" managed="false"/>
+                            </StackPane>
+                            <ToggleButton fx:id="btnTogglePassword" text="👁" style="-fx-font-size: 14px; -fx-padding: 4 8; -fx-cursor: hand;"/>
+                        </HBox>
                     </GridPane>
 
                     <!-- Action Buttons -->

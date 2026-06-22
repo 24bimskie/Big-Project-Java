@@ -3,6 +3,7 @@ package model;
 /**
  * Model untuk entitas Mahasiswa.
  * Digunakan pada use case: Input Data Mahasiswa, Lihat Data Mahasiswa, Data Absen.
+ * Kolom DB: id, nim, nama, gender, alamat, kelas, prodi
  */
 public class Mahasiswa {
 
@@ -10,21 +11,19 @@ public class Mahasiswa {
     private String nama;
     private String jenisKelamin; // kolom: gender
     private String alamat;
-    private String kelas;        // kolom: kelas (baru)
-    private String prodi;        // kolom: prodi (baru)
-    private String password;
+    private String kelas;
+    private String prodi;
 
     public Mahasiswa() {}
 
     public Mahasiswa(String nim, String nama, String jenisKelamin, String alamat,
-                     String kelas, String prodi, String password) {
+                     String kelas, String prodi) {
         this.nim = nim;
         this.nama = nama;
         this.jenisKelamin = jenisKelamin;
         this.alamat = alamat;
         this.kelas = kelas;
         this.prodi = prodi;
-        this.password = password;
     }
 
     // Getter dan Setter
@@ -45,7 +44,4 @@ public class Mahasiswa {
 
     public String getProdi() { return prodi; }
     public void setProdi(String prodi) { this.prodi = prodi; }
-
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
 }

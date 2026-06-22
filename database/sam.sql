@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jun 20, 2026 at 08:43 AM
--- Server version: 5.7.39
--- PHP Version: 8.1.10
+-- Generation Time: Jun 21, 2026 at 02:43 PM
+-- Server version: 8.0.30
+-- PHP Version: 8.4.20
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -44,24 +44,22 @@ CREATE TABLE `absensi` (
 --
 
 CREATE TABLE `dosen` (
-  `id` int(11) NOT NULL,
-  `nidn` varchar(20) NOT NULL,
+  `id` int NOT NULL,
+  `nidn` varchar(30) DEFAULT NULL,
   `nama_lengkap` varchar(100) DEFAULT NULL,
   `email` varchar(100) DEFAULT NULL,
   `fakultas` varchar(100) DEFAULT NULL,
-  `foto_profil` varchar(255) DEFAULT 'default.jpg',
-  `password` varchar(255) NOT NULL
+  `foto_profil` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `dosen`
 --
 
-INSERT INTO `dosen` (`id`, `nidn`, `nama_lengkap`, `email`, `fakultas`, `foto_profil`, `password`) VALUES
-(1, '12345', 'joko', 'Laki-laki', 'pwr', 'default.jpg', '123'),
-(2, 'qq', 'qq', 'L', NULL, 'default.jpg', '11'),
-(3, 'jokowidodo', 'jokowidodo', 'L', NULL, 'default.jpg', '111'),
-(4, 'gibran', 'gibran', 'L', NULL, 'default.jpg', '321');
+INSERT INTO `dosen` (`id`, `nidn`, `nama_lengkap`, `email`, `fakultas`, `foto_profil`) VALUES
+(2, '11223344', 'Yanto', 'yanto@gmail.com', 'Teknik', NULL),
+(4, '232444142', 'Boy', 'boy@gmail.com', 'ekonomi', NULL),
+(5, '37890485758', 'Maman', 'maman@gmail.com', 'FIS', NULL);
 
 -- --------------------------------------------------------
 
@@ -70,13 +68,21 @@ INSERT INTO `dosen` (`id`, `nidn`, `nama_lengkap`, `email`, `fakultas`, `foto_pr
 --
 
 CREATE TABLE `jadwal` (
-  `id` int(11) NOT NULL,
+  `id` int NOT NULL,
   `hari` varchar(20) NOT NULL,
   `jam` time NOT NULL,
-  `kelas_id` int(11) NOT NULL,
-  `dosen_id` int(11) NOT NULL,
-  `matkul_id` int(11) NOT NULL
+  `kelas_id` int NOT NULL,
+  `dosen_id` int NOT NULL,
+  `matkul_id` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `jadwal`
+--
+
+INSERT INTO `jadwal` (`id`, `hari`, `jam`, `kelas_id`, `dosen_id`, `matkul_id`) VALUES
+(1, 'Senin', '08:00:00', 1, 2, 1),
+(2, 'Rabu', '10:00:00', 2, 2, 2);
 
 -- --------------------------------------------------------
 
@@ -85,10 +91,18 @@ CREATE TABLE `jadwal` (
 --
 
 CREATE TABLE `kelas` (
-  `id` int(11) NOT NULL,
+  `id` int NOT NULL,
   `Prodi` varchar(100) NOT NULL,
   `kelas` varchar(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `kelas`
+--
+
+INSERT INTO `kelas` (`id`, `Prodi`, `kelas`) VALUES
+(1, 'Teknik Informatika', 'A'),
+(2, 'Sistem Informasi', 'B');
 
 -- --------------------------------------------------------
 
@@ -102,9 +116,18 @@ CREATE TABLE `mahasiswa` (
   `nama` varchar(100) NOT NULL,
   `gender` enum('L','P') NOT NULL,
   `alamat` text,
-  `password` varchar(255) NOT NULL
+  `kelas` varchar(10) DEFAULT NULL,
+  `prodi` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Dumping data for table `mahasiswa`
+--
+
+INSERT INTO `mahasiswa` (`id`, `nim`, `nama`, `gender`, `alamat`, `kelas`, `prodi`) VALUES
+(2, '24252324', 'Alex', 'L', 'Lampung', 'C', 'TI'),
+(3, '21212121', 'Waluyo', 'P', 'Tanjung Verde', '3B', 'Psikologi'),
+(4, '230492852', 'Boboiboy', 'L', 'Jombang', NULL, NULL);
 -- --------------------------------------------------------
 
 --
@@ -112,9 +135,17 @@ CREATE TABLE `mahasiswa` (
 --
 
 CREATE TABLE `mata_kuliah` (
-  `id` int(11) NOT NULL,
+  `id` int NOT NULL,
   `Mata_Kuliah` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `mata_kuliah`
+--
+
+INSERT INTO `mata_kuliah` (`id`, `Mata_Kuliah`) VALUES
+(1, 'Pemrograman Berorientasi Objek'),
+(2, 'Basis Data Lanjut');
 
 -- --------------------------------------------------------
 
@@ -211,7 +242,7 @@ ALTER TABLE `absensi`
 -- AUTO_INCREMENT for table `dosen`
 --
 ALTER TABLE `dosen`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `jadwal`
@@ -229,7 +260,7 @@ ALTER TABLE `kelas`
 -- AUTO_INCREMENT for table `mahasiswa`
 --
 ALTER TABLE `mahasiswa`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `mata_kuliah`

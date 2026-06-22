@@ -487,4 +487,8 @@ public class DataJadwalController implements Initializable {
             btnTambah.setDisable(false);
         }
     }
+
+    public void selectTab(int index) {
+        // Placeholder for future tab integration
+    }
 }

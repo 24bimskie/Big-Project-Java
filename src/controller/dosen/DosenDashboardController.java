@@ -20,10 +20,8 @@ import java.util.ResourceBundle;
 
 public class DosenDashboardController implements Initializable {
 
-    @FXML private Button btnDashboard;
-    @FXML private Button btnMulaiAbsen;
-    @FXML private Button btnRekapAbsen;
-    @FXML private Button btnProfil;
+    @FXML private Button btnJadwalMengajar;
+    @FXML private Button btnDataDosen;
     @FXML private Button btnLogout;
     @FXML private Button btnToggleSidebar;
 
@@ -42,10 +40,8 @@ public class DosenDashboardController implements Initializable {
         }
 
         // Klik tombol asli sidebar langsung ganti isi wadah tengah!
-        if (btnDashboard != null) btnDashboard.setOnAction(e -> gantiPanelTengah("DashboardUtamaView.fxml", btnDashboard));
-        if (btnMulaiAbsen != null) btnMulaiAbsen.setOnAction(e -> gantiPanelTengah("MulaiAbsenView.fxml", btnMulaiAbsen));
-        if (btnRekapAbsen != null) btnRekapAbsen.setOnAction(e -> gantiPanelTengah("RekapAbsenView.fxml", btnRekapAbsen));
-        if (btnProfil != null) btnProfil.setOnAction(e -> gantiPanelTengah("ProfilDosenView.fxml", btnProfil));
+        if (btnJadwalMengajar != null) btnJadwalMengajar.setOnAction(e -> gantiPanelTengah("JadwalMengajarView.fxml", btnJadwalMengajar));
+        if (btnDataDosen != null) btnDataDosen.setOnAction(e -> gantiPanelTengah("DataDosenView.fxml", btnDataDosen));
         
         if (btnLogout != null) {
             btnLogout.setOnAction(this::handleLogout);
@@ -60,7 +56,7 @@ public class DosenDashboardController implements Initializable {
         }
         
         // Default halaman pertama pas dibuka
-        gantiPanelTengah("DashboardUtamaView.fxml", btnDashboard);
+        gantiPanelTengah("JadwalMengajarView.fxml", btnJadwalMengajar);
     }
 
     private void gantiPanelTengah(String namaFile, Button activeButton) {
@@ -83,7 +79,7 @@ public class DosenDashboardController implements Initializable {
     }
     
     private void setActiveButton(Button activeButton) {
-        Button[] allButtons = {btnDashboard, btnMulaiAbsen, btnRekapAbsen, btnProfil};
+        Button[] allButtons = {btnJadwalMengajar, btnDataDosen};
         for (Button btn : allButtons) {
             if (btn != null) {
                 btn.getStyleClass().remove("sidebar-btn-active");

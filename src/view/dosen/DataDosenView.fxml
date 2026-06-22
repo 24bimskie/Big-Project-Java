@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.shape.Circle?>
+
+<ScrollPane xmlns:fx="http://javafx.com/fxml" fx:controller="controller.dosen.DataDosenController"
+            fitToWidth="true" fitToHeight="true" style="-fx-background-color: transparent;"
+            stylesheets="@../../style/style.css">
+    <content>
+        <VBox styleClass="content-pane" spacing="20" alignment="TOP_CENTER">
+            <padding>
+                <Insets top="25" right="25" bottom="25" left="25"/>
+            </padding>
+
+            <!-- Header -->
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label text="📋 Data Dosen" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #0f172a;" />
+            </HBox>
+
+            <!-- Kartu Profil Dosen -->
+            <VBox styleClass="card" spacing="20" maxWidth="650" alignment="CENTER"
+                  style="-fx-background-color: #ffffff; -fx-background-radius: 16; -fx-padding: 30;
+                         -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 15, 0, 0, 4);">
+                <VBox.margin>
+                    <Insets top="10" />
+                </VBox.margin>
+
+                <!-- Foto Profil -->
+                <Circle fx:id="fotoProfil" radius="55" fill="#cbd5e1" />
+
+                <!-- Nama Dosen -->
+                <Label fx:id="lblNamaDosen" text="Nama Dosen"
+                       style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" />
+                <Label fx:id="lblFakultasBadge" text="Fakultas"
+                       style="-fx-font-size: 13px; -fx-text-fill: #ffffff; -fx-background-color: #3b82f6;
+                              -fx-background-radius: 12; -fx-padding: 4 14; -fx-font-weight: bold;" />
+
+                <!-- Separator -->
+                <Separator style="-fx-padding: 5 0;" />
+
+                <!-- Detail Info Grid -->
+                <GridPane hgap="15" vgap="15" alignment="CENTER">
+                    <columnConstraints>
+                        <ColumnConstraints halignment="RIGHT" minWidth="130" />
+                        <ColumnConstraints hgrow="ALWAYS" minWidth="300" />
+                    </columnConstraints>
+
+                    <Label text="NIDN :" GridPane.columnIndex="0" GridPane.rowIndex="0"
+                           style="-fx-font-weight: bold; -fx-text-fill: #475569; -fx-font-size: 14px;" />
+                    <Label fx:id="lblNidn" text="-" GridPane.columnIndex="1" GridPane.rowIndex="0"
+                           style="-fx-font-size: 14px; -fx-text-fill: #1e293b; -fx-background-color: #f8fafc;
+                                  -fx-padding: 8 12; -fx-background-radius: 8;" />
+
+                    <Label text="Nama Lengkap :" GridPane.columnIndex="0" GridPane.rowIndex="1"
+                           style="-fx-font-weight: bold; -fx-text-fill: #475569; -fx-font-size: 14px;" />
+                    <Label fx:id="lblNama" text="-" GridPane.columnIndex="1" GridPane.rowIndex="1"
+                           style="-fx-font-size: 14px; -fx-text-fill: #1e293b; -fx-background-color: #f8fafc;
+                                  -fx-padding: 8 12; -fx-background-radius: 8;" />
+
+                    <Label text="Email :" GridPane.columnIndex="0" GridPane.rowIndex="2"
+                           style="-fx-font-weight: bold; -fx-text-fill: #475569; -fx-font-size: 14px;" />
+                    <Label fx:id="lblEmail" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2"
+                           style="-fx-font-size: 14px; -fx-text-fill: #1e293b; -fx-background-color: #f8fafc;
+                                  -fx-padding: 8 12; -fx-background-radius: 8;" />
+
+                    <Label text="Fakultas :" GridPane.columnIndex="0" GridPane.rowIndex="3"
+                           style="-fx-font-weight: bold; -fx-text-fill: #475569; -fx-font-size: 14px;" />
+                    <Label fx:id="lblFakultas" text="-" GridPane.columnIndex="1" GridPane.rowIndex="3"
+                           style="-fx-font-size: 14px; -fx-text-fill: #1e293b; -fx-background-color: #f8fafc;
+                                  -fx-padding: 8 12; -fx-background-radius: 8;" />
+
+                    <Label text="Username :" GridPane.columnIndex="0" GridPane.rowIndex="4"
+                           style="-fx-font-weight: bold; -fx-text-fill: #475569; -fx-font-size: 14px;" />
+                    <Label fx:id="lblUsername" text="-" GridPane.columnIndex="1" GridPane.rowIndex="4"
+                           style="-fx-font-size: 14px; -fx-text-fill: #1e293b; -fx-background-color: #f8fafc;
+                                  -fx-padding: 8 12; -fx-background-radius: 8;" />
+
+                    <Label text="Role :" GridPane.columnIndex="0" GridPane.rowIndex="5"
+                           style="-fx-font-weight: bold; -fx-text-fill: #475569; -fx-font-size: 14px;" />
+                    <Label fx:id="lblRole" text="Dosen" GridPane.columnIndex="1" GridPane.rowIndex="5"
+                           style="-fx-font-size: 14px; -fx-text-fill: #1e293b; -fx-background-color: #f8fafc;
+                                  -fx-padding: 8 12; -fx-background-radius: 8;" />
+                </GridPane>
+
+                <!-- Status -->
+                <HBox alignment="CENTER" spacing="8" style="-fx-padding: 10 0 0 0;">
+                    <Label fx:id="lblStatus" text=""
+                           style="-fx-font-size: 12px; -fx-text-fill: #94a3b8;" />
+                </HBox>
+            </VBox>
+        </VBox>
+    </content>
+</ScrollPane>

@@ -45,9 +45,24 @@
                 <Button fx:id="btnDosenLihat" text="Lihat Data" onAction="#handleMenuDosenLihat" maxWidth="Infinity" styleClass="sidebar-btn" style="-fx-font-size: 13px; -fx-padding: 8px 15px;" />
                 <Button fx:id="btnDosenInput" text="Input Data" onAction="#handleMenuDosenInput" maxWidth="Infinity" styleClass="sidebar-btn" style="-fx-font-size: 13px; -fx-padding: 8px 15px;" />
             </VBox>
-            <Button fx:id="btnProdiKelas" text="Data Prodi &amp; Kelas" onAction="#handleMenuProdiKelas" maxWidth="Infinity" styleClass="sidebar-btn" />
-            <Button fx:id="btnMataKuliah" text="Data Mata Kuliah" onAction="#handleMenuMataKuliah" maxWidth="Infinity" styleClass="sidebar-btn" />
-            <Button fx:id="btnJadwal" text="Data Jadwal" onAction="#handleMenuJadwal" maxWidth="Infinity" styleClass="sidebar-btn" />
+            <Button fx:id="btnProdiKelas" text="Data Prodi &amp; Kelas ▼" onAction="#handleMenuProdiKelasToggle" maxWidth="Infinity" styleClass="sidebar-btn" />
+            <VBox fx:id="submenuProdiKelas" visible="false" managed="false" spacing="5">
+                <padding><Insets left="15"/></padding>
+                <Button fx:id="btnProdiKelasLihat" text="Lihat Data" onAction="#handleMenuProdiKelasLihat" maxWidth="Infinity" styleClass="sidebar-btn" style="-fx-font-size: 13px; -fx-padding: 8px 15px;" />
+                <Button fx:id="btnProdiKelasInput" text="Input Data" onAction="#handleMenuProdiKelasInput" maxWidth="Infinity" styleClass="sidebar-btn" style="-fx-font-size: 13px; -fx-padding: 8px 15px;" />
+            </VBox>
+            <Button fx:id="btnMataKuliah" text="Data Mata Kuliah ▼" onAction="#handleMenuMataKuliahToggle" maxWidth="Infinity" styleClass="sidebar-btn" />
+            <VBox fx:id="submenuMataKuliah" visible="false" managed="false" spacing="5">
+                <padding><Insets left="15"/></padding>
+                <Button fx:id="btnMataKuliahLihat" text="Lihat Data" onAction="#handleMenuMataKuliahLihat" maxWidth="Infinity" styleClass="sidebar-btn" style="-fx-font-size: 13px; -fx-padding: 8px 15px;" />
+                <Button fx:id="btnMataKuliahInput" text="Input Data" onAction="#handleMenuMataKuliahInput" maxWidth="Infinity" styleClass="sidebar-btn" style="-fx-font-size: 13px; -fx-padding: 8px 15px;" />
+            </VBox>
+            <Button fx:id="btnJadwal" text="Data Jadwal ▼" onAction="#handleMenuJadwalToggle" maxWidth="Infinity" styleClass="sidebar-btn" />
+            <VBox fx:id="submenuJadwal" visible="false" managed="false" spacing="5">
+                <padding><Insets left="15"/></padding>
+                <Button fx:id="btnJadwalLihat" text="Lihat Data" onAction="#handleMenuJadwalLihat" maxWidth="Infinity" styleClass="sidebar-btn" style="-fx-font-size: 13px; -fx-padding: 8px 15px;" />
+                <Button fx:id="btnJadwalInput" text="Input Data" onAction="#handleMenuJadwalInput" maxWidth="Infinity" styleClass="sidebar-btn" style="-fx-font-size: 13px; -fx-padding: 8px 15px;" />
+            </VBox>
             
             <Region VBox.vgrow="ALWAYS" />
         </VBox>
@@ -55,9 +70,9 @@
 
     <!-- CENTER: Content area (berubah sesuai menu yang dipilih) -->
     <center>
-        <StackPane fx:id="contentArea" styleClass="content-pane">
+        <StackPane fx:id="contentArea">
             <padding>
-                <Insets top="20" right="20" bottom="20" left="20"/>
+                <Insets top="0" right="0" bottom="0" left="0"/>
             </padding>
             <!-- Konten dari FXML lain akan dimuat di sini oleh Controller -->
         </StackPane>
