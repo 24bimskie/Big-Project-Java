@@ -135,8 +135,14 @@ INSERT INTO `mahasiswa` (`id`, `nim`, `nama`, `gender`, `alamat`, `kelas`, `prod
 --
 
 CREATE TABLE `mata_kuliah` (
-  `id` int NOT NULL,
-  `Mata_Kuliah` varchar(100) NOT NULL
+  `id`        int          NOT NULL AUTO_INCREMENT,
+  `kode_mk`   varchar(20)  NOT NULL,
+  `nama_mk`   varchar(100) NOT NULL,
+  `sks`       int          NOT NULL DEFAULT 2,
+  `semester`  int          NOT NULL DEFAULT 1,
+  `id_prodi`  varchar(100) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `kode_mk` (`kode_mk`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --

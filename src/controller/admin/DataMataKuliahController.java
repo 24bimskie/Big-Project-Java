@@ -19,22 +19,27 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 /**
- * Controller untuk use case: Input Mata Kuliah.
- * Admin dapat menambah, mengedit, menghapus data mata kuliah,
- * dengan filter berdasarkan program studi.
+ * Controller untuk use case: Data Mata Kuliah.
+ * Admin dapat menambah, mengedit, menghapus, dan mencari data mata kuliah.
+ * Setiap mata kuliah memiliki: kode, nama, SKS, semester, dan program studi.
  */
 public class DataMataKuliahController implements Initializable {
+
+    // ===== FXML Bindings — Tab Pane =====
+
+    @FXML
+    private TabPane tabPane;
 
     // ===== FXML Bindings — TableView =====
 
     @FXML
-    private TableView<MataKuliah> tableMataKuliah;
+    private TableView<MataKuliah> tblMataKuliah;
 
     @FXML
-    private TableColumn<MataKuliah, String> colKodeMk;
+    private TableColumn<MataKuliah, String> colKodeMatkul;
 
     @FXML
-    private TableColumn<MataKuliah, String> colNamaMk;
+    private TableColumn<MataKuliah, String> colNamaMatkul;
 
     @FXML
     private TableColumn<MataKuliah, Integer> colSks;
@@ -43,52 +48,49 @@ public class DataMataKuliahController implements Initializable {
     private TableColumn<MataKuliah, Integer> colSemester;
 
     @FXML
-    private TableColumn<MataKuliah, String> colIdProdi;
+    private TableColumn<MataKuliah, String> colProdi;
 
     // ===== FXML Bindings — Form Input =====
 
     @FXML
-    private TextField fieldKodeMk;
+    private TextField txtKodeMatkul;
 
     @FXML
-    private TextField fieldNamaMk;
+    private TextField txtNamaMatkul;
 
     @FXML
-    private Spinner<Integer> spinnerSks;
+    private ComboBox<Integer> cmbSks;
 
     @FXML
-    private Spinner<Integer> spinnerSemester;
+    private ComboBox<Integer> cmbSemester;
 
     @FXML
-    private ComboBox<Prodi> comboProdi;
+    private TextField txtProdi;
 
-    // ===== FXML Bindings — Kontrol =====
-
-    @FXML
-    private TextField fieldSearch;
+    // ===== FXML Bindings — Filter & Kontrol =====
 
     @FXML
-    private ComboBox<Prodi> filterProdi;
+    private TextField txtSearch;
+
+    @FXML
+    private ComboBox<String> cmbFilterProdi;
+
+    @FXML
+    private ComboBox<Integer> cmbFilterSemester;
 
     @FXML
     private Button btnResetFilter;
 
     @FXML
-    private Button btnTambah;
-
-    @FXML
-    private Button btnEdit;
-
-    @FXML
-    private Button btnHapus;
-
-    @FXML
     private Button btnBatal;
+
+    @FXML
+    private Button btnSimpan;
 
     // ===== State =====
 
     private final MataKuliahDAO mataKuliahDAO = new MataKuliahDAO();
-    private final ProdiDAO prodiDAO           = new ProdiDAO();
+    private final ProdiDAO prodiDAO = new ProdiDAO();
 
     private final ObservableList<MataKuliah> mkList = FXCollections.observableArrayList();
     private FilteredList<MataKuliah> filteredList;
@@ -101,7 +103,6 @@ public class DataMataKuliahController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         setupTable();
         setupComboBoxes();
-        setupSpinners();
         setupSearchAndFilter();
         loadData();
         setupTableSelectionListener();
@@ -112,74 +113,62 @@ public class DataMataKuliahController implements Initializable {
 
     /** Mapping kolom TableView ke properti model MataKuliah */
     private void setupTable() {
-        colKodeMk.setCellValueFactory(new PropertyValueFactory<>("kodeMk"));
-        colNamaMk.setCellValueFactory(new PropertyValueFactory<>("namaMk"));
+        colKodeMatkul.setCellValueFactory(new PropertyValueFactory<>("kodeMk"));
+        colNamaMatkul.setCellValueFactory(new PropertyValueFactory<>("namaMk"));
         colSks.setCellValueFactory(new PropertyValueFactory<>("sks"));
         colSemester.setCellValueFactory(new PropertyValueFactory<>("semester"));
-        colIdProdi.setCellValueFactory(new PropertyValueFactory<>("idProdi"));
+        colProdi.setCellValueFactory(new PropertyValueFactory<>("idProdi"));
+        tblMataKuliah.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
 
-    /** Mengisi ComboBox prodi dari database */
+    /** Mengisi ComboBox dengan data SKS, Semester, dan Prodi */
     private void setupComboBoxes() {
-        List<Prodi> prodiList = prodiDAO.getAll();
-        ObservableList<Prodi> prodiObs = prodiList != null
-                ? FXCollections.observableArrayList(prodiList)
-                : FXCollections.observableArrayList();
+        // SKS: hanya 2 dan 3
+        ObservableList<Integer> sksList = FXCollections.observableArrayList(2, 3);
+        cmbSks.setItems(sksList);
 
-        javafx.util.StringConverter<Prodi> converter = new javafx.util.StringConverter<Prodi>() {
-            @Override public String toString(Prodi p) {
-                return p == null ? "Semua Prodi" : p.getIdProdi() + " - " + p.getNamaProdi();
-            }
-            @Override public Prodi fromString(String s) { return null; }
-        };
+        // Semester: 1–8
+        ObservableList<Integer> semesterList = FXCollections.observableArrayList(1, 2, 3, 4, 5, 6, 7, 8);
+        cmbSemester.setItems(semesterList);
+        cmbFilterSemester.setItems(semesterList);
 
-        comboProdi.setItems(prodiObs);
-        comboProdi.setConverter(converter);
-
-        filterProdi.setItems(prodiObs);
-        filterProdi.setConverter(converter);
+        // Tidak perlu lagi load ComboBox untuk prodi, karena user akan mengetik
+        // langsung.
     }
 
-    /** Inisialisasi Spinner SKS (1–6) dan Semester (1–8) */
-    private void setupSpinners() {
-        spinnerSks.setValueFactory(
-                new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 6, 2)
-        );
-        spinnerSemester.setValueFactory(
-                new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 8, 1)
-        );
-    }
-
-    /** Search real-time (kode/nama MK) + filter prodi */
+    /**
+     * Filter real-time berdasarkan pencarian teks + filter prodi + filter semester
+     */
     private void setupSearchAndFilter() {
         filteredList = new FilteredList<>(mkList, p -> true);
-        tableMataKuliah.setItems(filteredList);
+        tblMataKuliah.setItems(filteredList);
 
-        fieldSearch.textProperty().addListener((obs, o, n) -> applyFilter());
-        filterProdi.valueProperty().addListener((obs, o, n) -> applyFilter());
+        txtSearch.textProperty().addListener((obs, o, n) -> applyFilter());
+        cmbFilterSemester.valueProperty().addListener((obs, o, n) -> applyFilter());
     }
 
+    /** Menerapkan predicate filter ke FilteredList */
     private void applyFilter() {
-        String keyword    = fieldSearch.getText() == null ? "" : fieldSearch.getText().toLowerCase().trim();
-        Prodi prodiFilter = filterProdi.getValue();
+        String keyword = txtSearch.getText() == null ? "" : txtSearch.getText().toLowerCase().trim();
+        Integer semesterFilter = cmbFilterSemester.getValue();
 
         filteredList.setPredicate(mk -> {
             boolean matchSearch = keyword.isEmpty()
                     || mk.getKodeMk().toLowerCase().contains(keyword)
-                    || mk.getNamaMk().toLowerCase().contains(keyword);
-            boolean matchProdi = prodiFilter == null
-                    || mk.getIdProdi().equals(prodiFilter.getIdProdi());
-            return matchSearch && matchProdi;
+                    || mk.getNamaMk().toLowerCase().contains(keyword)
+                    || mk.getIdProdi().toLowerCase().contains(keyword);
+            boolean matchSemester = semesterFilter == null || semesterFilter == mk.getSemester();
+            return matchSearch && matchSemester;
         });
     }
 
-    /** Listener saat baris tabel dipilih */
+    /** Listener saat baris tabel dipilih → isi form */
     private void setupTableSelectionListener() {
-        tableMataKuliah.getSelectionModel().selectedItemProperty().addListener(
+        tblMataKuliah.getSelectionModel().selectedItemProperty().addListener(
                 (obs, oldSel, newSel) -> {
-                    if (newSel != null) populateForm(newSel);
-                }
-        );
+                    if (newSel != null)
+                        populateForm(newSel);
+                });
     }
 
     // ===== Load Data =====
@@ -187,52 +176,101 @@ public class DataMataKuliahController implements Initializable {
     private void loadData() {
         mkList.clear();
         List<MataKuliah> data = mataKuliahDAO.getAll();
-        if (data != null) mkList.addAll(data);
+        if (data != null)
+            mkList.addAll(data);
     }
 
     // ===== CRUD Handlers =====
 
+    /** Tombol Simpan: mode Tambah atau mode Edit */
     @FXML
-    private void handleTambah(ActionEvent event) {
-        if (!isFormValid()) return;
-        mataKuliahDAO.insert(buildFromForm());
-        AlertHelper.showInfo("Berhasil", "Data mata kuliah berhasil ditambahkan.");
-        loadData();
-        clearForm();
-    }
+    private void handleSimpan(ActionEvent event) {
+        if (!isFormValid())
+            return;
 
-    @FXML
-    private void handleEdit(ActionEvent event) {
-        if (!isEditMode) {
-            if (tableMataKuliah.getSelectionModel().getSelectedItem() == null) {
-                AlertHelper.showWarning("Peringatan", "Pilih mata kuliah yang ingin diedit terlebih dahulu.");
+        MataKuliah mk = buildFromForm();
+        boolean success;
+        if (isEditMode) {
+            success = mataKuliahDAO.update(mk);
+            if (!success) {
+                String detail = mataKuliahDAO.getLastError() != null ? "\n\nDetail: " + mataKuliahDAO.getLastError()
+                        : "";
+                AlertHelper.showError("Gagal",
+                        "Data gagal diperbarui. Periksa koneksi database atau data yang dipilih." + detail);
                 return;
             }
-            setEditMode(true);
-            return;
+            AlertHelper.showInfo("Berhasil", "Data mata kuliah berhasil diperbarui.");
+        } else {
+            if (mataKuliahDAO.getByKode(mk.getKodeMk()) != null) {
+                AlertHelper.showWarning("Duplikasi", "Kode mata kuliah \"" + mk.getKodeMk() + "\" sudah ada.");
+                return;
+            }
+            success = mataKuliahDAO.insert(mk);
+            if (!success) {
+                String detail = mataKuliahDAO.getLastError() != null ? "\n\nDetail: " + mataKuliahDAO.getLastError()
+                        : "";
+                AlertHelper.showError("Gagal", "Data gagal disimpan. Periksa koneksi database." + detail);
+                return;
+            }
+            AlertHelper.showInfo("Berhasil", "Data mata kuliah berhasil ditambahkan.");
         }
-        if (!isFormValid()) return;
-        mataKuliahDAO.update(buildFromForm());
-        AlertHelper.showInfo("Berhasil", "Data mata kuliah berhasil diperbarui.");
         loadData();
         clearForm();
         setEditMode(false);
     }
 
+    /** Tombol Batal: bersihkan form dan keluar dari edit mode */
     @FXML
-    private void handleHapus(ActionEvent event) {
-        MataKuliah selected = tableMataKuliah.getSelectionModel().getSelectedItem();
+    private void handleBatal(ActionEvent event) {
+        clearForm();
+        setEditMode(false);
+        tblMataKuliah.getSelectionModel().clearSelection();
+    }
+
+    /** Tombol Cari (opsional trigger manual) */
+    @FXML
+    private void handleCari(ActionEvent event) {
+        applyFilter();
+    }
+
+    /** Tombol Reset Filter */
+    @FXML
+    private void handleResetFilter(ActionEvent event) {
+        txtSearch.clear();
+        cmbFilterProdi.setValue(null);
+        cmbFilterSemester.setValue(null);
+    }
+
+    /** Klik kanan / tombol Edit dari luar (opsional) */
+    @FXML
+    private void handleEdit(ActionEvent event) {
+        MataKuliah selected = tblMataKuliah.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            AlertHelper.showWarning("Peringatan", "Pilih mata kuliah yang ingin dihapus terlebih dahulu.");
+            AlertHelper.showWarning("Peringatan", "Pilih mata kuliah yang ingin diedit terlebih dahulu.");
             return;
         }
-        boolean konfirmasi = AlertHelper.showConfirmation(
-                "Konfirmasi Hapus",
-                "Yakin ingin menghapus mata kuliah \"" + selected.getNamaMk()
-                        + "\" (" + selected.getKodeMk() + ")?"
-        );
-        if (konfirmasi) {
-            mataKuliahDAO.delete(selected.getKodeMk());
+        populateForm(selected);
+        setEditMode(true);
+    }
+
+    /** Tombol Hapus */
+    @FXML
+    private void handleHapus(ActionEvent event) {
+        MataKuliah selected = tblMataKuliah.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            AlertHelper.showWarning("Peringatan", "Pilih mata kuliah yang ingin dihapus.");
+            return;
+        }
+        boolean ok = AlertHelper.showConfirmation("Konfirmasi Hapus",
+                "Yakin ingin menghapus \"" + selected.getNamaMk() + "\" (" + selected.getKodeMk() + ")?");
+        if (ok) {
+            boolean success = mataKuliahDAO.delete(selected.getKodeMk());
+            if (!success) {
+                String detail = mataKuliahDAO.getLastError() != null ? "\n\nDetail: " + mataKuliahDAO.getLastError()
+                        : "";
+                AlertHelper.showError("Gagal", "Data gagal dihapus. Periksa koneksi database." + detail);
+                return;
+            }
             AlertHelper.showInfo("Berhasil", "Data mata kuliah berhasil dihapus.");
             loadData();
             clearForm();
@@ -240,80 +278,71 @@ public class DataMataKuliahController implements Initializable {
         }
     }
 
-    @FXML
-    private void handleBatal(ActionEvent event) {
-        clearForm();
-        setEditMode(false);
-        tableMataKuliah.getSelectionModel().clearSelection();
-    }
-
-    @FXML
-    private void handleResetFilter(ActionEvent event) {
-        fieldSearch.clear();
-        filterProdi.setValue(null);
-    }
-
     // ===== Helper Methods =====
 
+    /** Mengisi form input dari data yang dipilih di tabel */
     private void populateForm(MataKuliah mk) {
-        fieldKodeMk.setText(mk.getKodeMk());
-        fieldNamaMk.setText(mk.getNamaMk());
-        spinnerSks.getValueFactory().setValue(mk.getSks());
-        spinnerSemester.getValueFactory().setValue(mk.getSemester());
-        comboProdi.getItems().stream()
-                .filter(p -> p.getIdProdi().equals(mk.getIdProdi()))
-                .findFirst()
-                .ifPresent(comboProdi::setValue);
+        txtKodeMatkul.setText(mk.getKodeMk());
+        txtNamaMatkul.setText(mk.getNamaMk());
+        cmbSks.setValue(mk.getSks());
+        cmbSemester.setValue(mk.getSemester());
+        txtProdi.setText(mk.getIdProdi());
     }
 
+    /** Membangun objek MataKuliah dari input form */
     private MataKuliah buildFromForm() {
-        String idProdi = comboProdi.getValue() != null ? comboProdi.getValue().getIdProdi() : "";
         return new MataKuliah(
-                fieldKodeMk.getText().trim(),
-                fieldNamaMk.getText().trim(),
-                spinnerSks.getValue(),
-                spinnerSemester.getValue(),
-                idProdi
-        );
+                txtKodeMatkul.getText().trim().toUpperCase(),
+                txtNamaMatkul.getText().trim(),
+                cmbSks.getValue() != null ? cmbSks.getValue() : 0,
+                cmbSemester.getValue() != null ? cmbSemester.getValue() : 0,
+                txtProdi.getText().trim());
     }
 
+    /** Validasi form sebelum simpan */
     private boolean isFormValid() {
-        if (fieldKodeMk.getText().trim().isEmpty()) {
+        if (txtKodeMatkul.getText().trim().isEmpty()) {
             AlertHelper.showWarning("Validasi", "Kode mata kuliah tidak boleh kosong.");
             return false;
         }
-        if (fieldNamaMk.getText().trim().isEmpty()) {
+        if (txtNamaMatkul.getText().trim().isEmpty()) {
             AlertHelper.showWarning("Validasi", "Nama mata kuliah tidak boleh kosong.");
             return false;
         }
-        if (comboProdi.getValue() == null) {
-            AlertHelper.showWarning("Validasi", "Program studi harus dipilih.");
+        if (cmbSks.getValue() == null) {
+            AlertHelper.showWarning("Validasi", "SKS harus dipilih.");
+            return false;
+        }
+        if (cmbSemester.getValue() == null) {
+            AlertHelper.showWarning("Validasi", "Semester harus dipilih.");
+            return false;
+        }
+        if (txtProdi.getText().trim().isEmpty()) {
+            AlertHelper.showWarning("Validasi", "Program studi harus diisi.");
             return false;
         }
         return true;
     }
 
+    /** Mengosongkan semua field form */
     private void clearForm() {
-        fieldKodeMk.clear();
-        fieldNamaMk.clear();
-        spinnerSks.getValueFactory().setValue(2);
-        spinnerSemester.getValueFactory().setValue(1);
-        comboProdi.setValue(null);
+        txtKodeMatkul.clear();
+        txtNamaMatkul.clear();
+        cmbSks.setValue(null);
+        cmbSemester.setValue(null);
+        txtProdi.clear();
     }
 
+    /** Mengatur mode Edit/Tambah pada form */
     private void setEditMode(boolean editMode) {
         this.isEditMode = editMode;
-        fieldKodeMk.setDisable(editMode); // kode MK = primary key
-        if (editMode) {
-            btnEdit.setText("Simpan");
-            btnTambah.setDisable(true);
-        } else {
-            btnEdit.setText("Edit");
-            btnTambah.setDisable(false);
-        }
+        txtKodeMatkul.setDisable(editMode); // kode MK = primary key, tidak bisa diubah
+        btnSimpan.setText(editMode ? "Update" : "Simpan");
     }
 
     public void selectTab(int index) {
-        // Placeholder for future tab integration
+        if (tabPane != null && index >= 0 && index < tabPane.getTabs().size()) {
+            tabPane.getSelectionModel().select(index);
+        }
     }
 }

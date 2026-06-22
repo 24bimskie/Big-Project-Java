@@ -70,10 +70,11 @@ public class DosenDAO {
 
             stmt.setString(1, nidn);
 
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                return map(rs);
+            // ResultSet dimasukkan ke try-with-resources agar auto-close
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return map(rs);
+                }
             }
 
         } catch (SQLException e) {
@@ -83,7 +84,8 @@ public class DosenDAO {
         return null;
     }
 
-    // Backward compatibility
+    // Backward compatibility untuk controller lama yang masih mencari berdasarkan
+    // NIP
     public Dosen getByNip(String nip) {
         return getByNidn(nip);
     }
@@ -115,8 +117,7 @@ public class DosenDAO {
 
     public List<Dosen> getAll() {
         List<Dosen> list = new ArrayList<>();
-
-        String sql = "SELECT * FROM dosen";
+        String sql = "SELECT * FROM dosen ORDER BY nama_lengkap";
 
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql);
