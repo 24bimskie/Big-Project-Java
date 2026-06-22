@@ -301,11 +301,17 @@ public class DataJadwalController implements Initializable {
             return;
 
         Jadwal jadwal = buildJadwalFromForm();
-        // Generate ID unik jika belum diisi
         if (jadwal.getIdJadwal().isEmpty()) {
-            jadwal.setIdJadwal("JDW-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
+            jadwal.setIdJadwal(String.valueOf(Math.abs(UUID.randomUUID().hashCode())));
         }
-        jadwalDAO.insert(jadwal);
+
+        boolean success = jadwalDAO.insert(jadwal);
+        if (!success) {
+            String detail = jadwalDAO.getLastError() != null ? "\n\nDetail: " + jadwalDAO.getLastError() : "";
+            AlertHelper.showError("Gagal", "Data jadwal gagal disimpan." + detail);
+            return;
+        }
+
         AlertHelper.showInfo("Berhasil", "Data jadwal berhasil ditambahkan.");
         loadData();
         clearForm();
@@ -329,7 +335,13 @@ public class DataJadwalController implements Initializable {
             return;
 
         Jadwal jadwal = buildJadwalFromForm();
-        jadwalDAO.update(jadwal);
+        boolean success = jadwalDAO.update(jadwal);
+        if (!success) {
+            String detail = jadwalDAO.getLastError() != null ? "\n\nDetail: " + jadwalDAO.getLastError() : "";
+            AlertHelper.showError("Gagal", "Data jadwal gagal diperbarui." + detail);
+            return;
+        }
+
         AlertHelper.showInfo("Berhasil", "Data jadwal berhasil diperbarui.");
         loadData();
         clearForm();
@@ -351,7 +363,12 @@ public class DataJadwalController implements Initializable {
                         selected.getHari() + ", " + selected.getJamMulai() + " - " + selected.getJamSelesai() + ")?");
 
         if (konfirmasi) {
-            jadwalDAO.delete(selected.getIdJadwal());
+            boolean success = jadwalDAO.delete(selected.getIdJadwal());
+            if (!success) {
+                String detail = jadwalDAO.getLastError() != null ? "\n\nDetail: " + jadwalDAO.getLastError() : "";
+                AlertHelper.showError("Gagal", "Data jadwal gagal dihapus." + detail);
+                return;
+            }
             AlertHelper.showInfo("Berhasil", "Data jadwal berhasil dihapus.");
             loadData();
             clearForm();

@@ -33,10 +33,13 @@
                                     <TableColumn fx:id="colHari" text="Hari" prefWidth="90.0" />
                                     <TableColumn fx:id="colJamMulai" text="Jam Mulai" prefWidth="90.0" />
                                     <TableColumn fx:id="colJamSelesai" text="Jam Selesai" prefWidth="110.0" />
-                                    <TableColumn fx:id="colKodeMk" text="Matkul" prefWidth="180.0" />
-                                    <TableColumn fx:id="colNidn" text="Dosen" prefWidth="180.0" />
-                                    <TableColumn fx:id="colIdKelas" text="Kelas" prefWidth="100.0" />
-                                    <TableColumn fx:id="colRuangan" text="Ruangan" prefWidth="120.0" />
+                                    <TableColumn fx:id="colKodeMk" text="Matkul" prefWidth="150.0" />
+                                    <TableColumn fx:id="colNidn" text="Dosen" prefWidth="150.0" />
+                                    <TableColumn fx:id="colIdKelas" text="Kelas" prefWidth="80.0" />
+                                    <TableColumn fx:id="colRuangan" text="Ruangan" prefWidth="110.0" />
+                                    <!-- TAMBAHAN: dua kolom yang ada di Controller tapi hilang di FXML -->
+                                    <TableColumn fx:id="colTahunAkademik" text="Tahun Akademik" prefWidth="120.0" />
+                                    <TableColumn fx:id="colSemester" text="Semester" prefWidth="80.0" />
                                 </columns>
                                 <columnResizePolicy>
                                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -44,7 +47,8 @@
                             </TableView>
                             <HBox spacing="10.0" alignment="CENTER_RIGHT">
                                 <Button text="Edit" onAction="#handleEdit" />
-                                <Button text="Hapus" onAction="#handleHapus" />
+                                <!-- PERBAIKAN: tambah fx:id="btnHapus" -->
+                                <Button fx:id="btnHapus" text="Hapus" onAction="#handleHapus" />
                             </HBox>
                         </children>
                     </VBox>
