@@ -47,11 +47,11 @@ public class LoginController {
         
         // Jika gagal dari database, kita buat fallback dummy (untuk testing jika DB belum siap)
         if (loggedInUser == null) {
-            String role = "Admin"; // Default
+            String role = "Mahasiswa"; // Default
             if (username.toLowerCase().contains("dosen")) {
                 role = "Dosen";
-            } else if (username.toLowerCase().contains("mahasiswa") || username.toLowerCase().contains("mhs")) {
-                role = "Mahasiswa";
+            } else if (username.toLowerCase().contains("admin") || username.toLowerCase().contains("adm")) {
+                role = "Admin";
             }
             loggedInUser = new User("dummy-id", username, password, role);
             System.out.println("⚠️ Menggunakan Dummy Login karena user tidak ditemukan di DB. Role: " + role);

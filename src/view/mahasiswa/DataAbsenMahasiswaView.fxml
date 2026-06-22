@@ -1,15 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- View Data Absen (Mahasiswa) -->
-<!-- Use case: Data Absen -->
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.control.*?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="controller.mahasiswa.DataAbsenMahasiswaController"
-            styleClass="content-pane">
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-    <!-- TODO: Layout halaman data absen mahasiswa -->
-    <!-- - Daftar mata kuliah yang diikuti -->
-    <!-- - Riwayat absensi per mata kuliah -->
-    <!-- - Statistik kehadiran pribadi -->
+<AnchorPane prefHeight="550.0" prefWidth="740.0" style="-fx-background-color: #f8fafc;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.mahasiswa.MahasiswaAbsenController">
+   <children>
+      <VBox layoutX="40.0" layoutY="35.0" spacing="6.0">
+         <children>
+            <Label text="Jadwal &amp; Presensi Kuliah" textFill="#0f172a">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label text="Daftar mata kuliah aktif dan rekap log kehadiran Anda minggu ini." textFill="#64748b">
+               <font>
+                  <Font size="13.0" />
+               </font>
+            </Label>
+         </children>
+      </VBox>
 
-</AnchorPane>
+      <VBox layoutX="40.0" layoutY="120.0" prefWidth="660.0" spacing="12.0">
+         <children>
+            
+            <HBox prefHeight="40.0" prefWidth="660.0" style="-fx-background-color: #e2e8f0; -fx-background-radius: 6px; -fx-padding: 10px 20px;">
+               <children>
+                  <Label prefWidth="120.0" style="-fx-font-weight: bold;" text="HARI / JAM" textFill="#334155" />
+                  <Label prefWidth="240.0" style="-fx-font-weight: bold;" text="MATA KULIAH" textFill="#334155" />
+                  <Label prefWidth="180.0" style="-fx-font-weight: bold;" text="DOSEN PENGAMPU" textFill="#334155" />
+                  <Label prefWidth="80.0" style="-fx-font-weight: bold; -fx-alignment: CENTER;" text="STATUS" textFill="#334155" />
+               </children>
+            </HBox>
+
+            <HBox prefHeight="50.0" prefWidth="660.0" style="-fx-background-color: #ffffff; -fx-background-radius: 8px; -fx-padding: 15px 20px; -fx-border-color: #f1f5f9; -fx-border-radius: 8px;">
+               <children>
+                  <Label prefWidth="120.0" style="-fx-font-weight: bold;" text="Senin, 08:00" textFill="#0f172a" />
+                  <Label prefWidth="240.0" text="Pemrograman Berorientasi Objek" textFill="#334155" />
+                  <Label prefWidth="180.0" text="Aris Tri Jaka, M.Kom." textFill="#64748b" />
+                  <Label prefWidth="80.0" style="-fx-background-color: #dcfce7; -fx-text-fill: #16a34a; -fx-background-radius: 12px; -fx-alignment: CENTER; -fx-font-weight: bold; -fx-font-size: 11px; -fx-padding: 2px 0;" text="HADIR" />
+               </children>
+            </HBox>
+
+            <HBox prefHeight="50.0" prefWidth="660.0" style="-fx-background-color: #ffffff; -fx-background-radius: 8px; -fx-padding: 15px 20px; -fx-border-color: #f1f5f9; -fx-border-radius: 8px;">
+               <children>
+                  <Label prefWidth="120.0" style="-fx-font
