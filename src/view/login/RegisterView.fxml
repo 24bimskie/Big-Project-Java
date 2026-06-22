@@ -47,11 +47,11 @@
                     <RadioButton fx:id="radioP" text="Perempuan" toggleGroup="$genderGroup"/>
                 </HBox>
 
-                <Label text="Kelas:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-                <ComboBox fx:id="kelasComboBox" promptText="Pilih Kelas" maxWidth="Infinity" styleClass="combo-box" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                <Label text="Program Studi:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                <ComboBox fx:id="prodiComboBox" promptText="Pilih Prodi" maxWidth="Infinity" styleClass="combo-box" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
 
-                <Label text="Program Studi:" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
-                <ComboBox fx:id="prodiComboBox" promptText="Pilih Prodi" maxWidth="Infinity" styleClass="combo-box" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+                <Label text="Kelas:" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+                <ComboBox fx:id="kelasComboBox" promptText="Pilih Kelas" maxWidth="Infinity" styleClass="combo-box" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
 
                 <Label text="Alamat:" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
                 <TextField fx:id="alamatField" promptText="Masukkan Alamat" styleClass="text-field" GridPane.columnIndex="1" GridPane.rowIndex="5"/>

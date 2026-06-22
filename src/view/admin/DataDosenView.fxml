@@ -30,28 +30,18 @@
                                style="-fx-background-color: white; -fx-background-radius: 8;
                                       -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
                         <columns>
-                            <TableColumn fx:id="colNo"     text="No"     prefWidth="50"  minWidth="50"
-                                         style="-fx-alignment: CENTER;"/>
-                            <TableColumn fx:id="colNip"    text="NIP"    prefWidth="140" minWidth="100"
-                                         style="-fx-alignment: CENTER;"/>
-                            <TableColumn fx:id="colNama"   text="Nama"   prefWidth="220" minWidth="150"/>
-                            <TableColumn fx:id="colGender" text="Gender" prefWidth="90"  minWidth="80"
-                                         style="-fx-alignment: CENTER;"/>
-                            <TableColumn fx:id="colAlamat" text="Alamat" prefWidth="300" minWidth="150"/>
+                            <TableColumn fx:id="colNo"          text="No"          prefWidth="50"  minWidth="50" style="-fx-alignment: CENTER;"/>
+                            <TableColumn fx:id="colNidn"        text="NIDN"        prefWidth="140" minWidth="100" style="-fx-alignment: CENTER;"/>
+                            <TableColumn fx:id="colNamaLengkap" text="Nama"        prefWidth="220" minWidth="150"/>
+                            <TableColumn fx:id="colEmail"       text="Email"       prefWidth="180" minWidth="150"/>
+                            <TableColumn fx:id="colFakultas"    text="Fakultas"    prefWidth="150" minWidth="100"/>
+                            <TableColumn fx:id="colAksi"        text="Aksi"        prefWidth="150" minWidth="100" style="-fx-alignment: CENTER;"/>
                         </columns>
                         <placeholder>
                             <Label text="Tidak ada data dosen."
                                    style="-fx-text-fill: #94a3b8; -fx-font-size: 14px;"/>
                         </placeholder>
                     </TableView>
-
-                    <!-- Tombol Edit dan Hapus di tab Lihat Data -->
-                    <HBox spacing="10" alignment="CENTER_RIGHT" style="-fx-padding: 5 0 0 0;">
-                        <Button fx:id="btnEdit"  text="Edit"  onAction="#handleEdit"
-                                style="-fx-background-color: #f59e0b; -fx-text-fill: white;"/>
-                        <Button fx:id="btnHapus" text="Hapus" onAction="#handleHapus"
-                                style="-fx-background-color: #ef4444; -fx-text-fill: white;"/>
-                    </HBox>
                 </VBox>
             </VBox>
         </Tab>
@@ -75,33 +65,42 @@
                             <ColumnConstraints hgrow="ALWAYS"/>
                         </columnConstraints>
 
-                        <Label text="NIP:"      GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                        <TextField fx:id="fieldNip" promptText="Masukkan NIP"
+                        <Label text="NIDN:"      GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                        <TextField fx:id="fieldNidn" promptText="Masukkan NIDN"
                                    GridPane.columnIndex="1" GridPane.rowIndex="0"/>
 
                         <Label text="Nama:"     GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                        <TextField fx:id="fieldNama" promptText="Nama Lengkap Dosen"
+                        <TextField fx:id="fieldNamaLengkap" promptText="Nama Lengkap Dosen"
                                    GridPane.columnIndex="1" GridPane.rowIndex="1"/>
 
-                        <Label text="Gender:"   GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-                        <ComboBox fx:id="comboGender" promptText="Pilih Gender" maxWidth="Infinity"
-                                  GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                        <Label text="Email:"    GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                        <TextField fx:id="fieldEmail" promptText="Email Dosen"
+                                   GridPane.columnIndex="1" GridPane.rowIndex="2"/>
 
-                        <Label text="Alamat:"   GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-                        <TextField fx:id="fieldAlamat" promptText="Alamat Dosen"
+                        <Label text="Fakultas:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                        <TextField fx:id="fieldFakultas" promptText="Fakultas"
                                    GridPane.columnIndex="1" GridPane.rowIndex="3"/>
 
                         <Label text="Password:" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
-                        <PasswordField fx:id="fieldPassword" promptText="Password"
-                                       GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+                        <HBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                            <StackPane HBox.hgrow="ALWAYS">
+                                <PasswordField fx:id="fieldPassword" promptText="Password" />
+                                <TextField fx:id="fieldPasswordVisible" promptText="Password" visible="false" managed="false"/>
+                            </StackPane>
+                            <ToggleButton fx:id="btnTogglePassword" text="👁" />
+                        </HBox>
                     </GridPane>
 
                     <!-- Action Buttons -->
                     <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 10 0 0 0;">
                         <Button fx:id="btnTambah" text="Tambah" onAction="#handleTambah"
-                                style="-fx-background-color: #3b82f6; -fx-text-fill: white;"/>
+                                styleClass="btn-primary" style="-fx-background-color: #3b82f6;"/>
+                        <Button fx:id="btnEdit"   text="Edit"   onAction="#handleEdit"
+                                styleClass="btn-primary" style="-fx-background-color: #f59e0b;"/>
+                        <Button fx:id="btnHapus"  text="Hapus"  onAction="#handleHapus"
+                                styleClass="btn-primary" style="-fx-background-color: #ef4444;"/>
                         <Button fx:id="btnBatal"  text="Batal"  onAction="#handleBatal"
-                                style="-fx-background-color: #94a3b8; -fx-text-fill: white;"/>
+                                styleClass="btn-primary" style="-fx-background-color: #94a3b8;"/>
                     </HBox>
                 </VBox>
             </VBox>
