@@ -7,67 +7,104 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * DAO untuk operasi CRUD data Jadwal.
- * Menggunakan skema tabel:
- *   jadwal(id INT AUTO_INCREMENT, hari VARCHAR, jam TIME, kelas_id INT FK, dosen_id INT FK, matkul_id INT FK)
- *
- * Catatan penting:
- * - FK menggunakan id integer dari tabel dosen/kelas/mata_kuliah (bukan string NIP/nama)
- * - Hanya ada satu kolom jam (TIME), bukan jam_mulai + jam_selesai
- * - Tidak ada kolom ruangan, tahun_akademik, semester di DB saat ini
- */
 public class JadwalDAO {
 
-    public void insert(Jadwal jadwal) {
-        String query = "INSERT INTO jadwal (hari, jam, kelas_id, dosen_id, matkul_id) VALUES (?, ?, ?, ?, ?)";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, jadwal.getHari());
-            stmt.setString(2, jadwal.getJamMulai());       // jam_mulai → kolom jam
-            stmt.setInt(3, parseId(jadwal.getIdKelas()));  // idKelas (string) → kelas_id (int FK)
-            stmt.setInt(4, parseId(jadwal.getNidn()));     // nidn/nip (string) → dosen_id (int FK)
-            stmt.setInt(5, parseId(jadwal.getKodeMk()));   // kodeMk (string) → matkul_id (int FK)
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    private String lastError;
+
+    public String getLastError() {
+        return lastError;
     }
 
-    public void update(Jadwal jadwal) {
-        String query = "UPDATE jadwal SET hari=?, jam=?, kelas_id=?, dosen_id=?, matkul_id=? WHERE id=?";
+    public boolean insert(Jadwal jadwal) {
+        lastError = null;
+        String query = """
+                INSERT INTO jadwal (hari, jam_mulai, jam_selesai, ruangan, tahun_akademik, semester, kelas_id, dosen_id, matkul_id)
+                VALUES (?, ?, ?, ?, ?, ?,
+                        ?,
+                        (SELECT id FROM dosen WHERE nidn = ?),
+                        (SELECT id FROM mata_kuliah WHERE kode_mk = ?))
+                """;
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+                PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, jadwal.getHari());
             stmt.setString(2, jadwal.getJamMulai());
-            stmt.setInt(3, parseId(jadwal.getIdKelas()));
-            stmt.setInt(4, parseId(jadwal.getNidn()));
-            stmt.setInt(5, parseId(jadwal.getKodeMk()));
-            stmt.setInt(6, parseId(jadwal.getIdJadwal()));
-            stmt.executeUpdate();
+            stmt.setString(3, jadwal.getJamSelesai());
+            stmt.setString(4, jadwal.getRuangan());
+            stmt.setString(5, jadwal.getTahunAkademik());
+            stmt.setString(6, jadwal.getSemester());
+            stmt.setInt(7, parseId(jadwal.getIdKelas()));
+            stmt.setString(8, jadwal.getNidn());
+            stmt.setString(9, jadwal.getKodeMk());
+            return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
+            lastError = e.getMessage();
             e.printStackTrace();
+            return false;
         }
     }
 
-    public void delete(String idJadwal) {
-        String query = "DELETE FROM jadwal WHERE id=?";
+    public boolean update(Jadwal jadwal) {
+        lastError = null;
+        String query = """
+                UPDATE jadwal SET
+                    hari = ?, jam_mulai = ?, jam_selesai = ?, ruangan = ?, tahun_akademik = ?, semester = ?,
+                    kelas_id = ?,
+                    dosen_id = (SELECT id FROM dosen WHERE nidn = ?),
+                    matkul_id = (SELECT id FROM mata_kuliah WHERE kode_mk = ?)
+                WHERE id = ?
+                """;
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setInt(1, parseId(idJadwal));
-            stmt.executeUpdate();
+                PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, jadwal.getHari());
+            stmt.setString(2, jadwal.getJamMulai());
+            stmt.setString(3, jadwal.getJamSelesai());
+            stmt.setString(4, jadwal.getRuangan());
+            stmt.setString(5, jadwal.getTahunAkademik());
+            stmt.setString(6, jadwal.getSemester());
+            stmt.setInt(7, parseId(jadwal.getIdKelas()));
+            stmt.setString(8, jadwal.getNidn());
+            stmt.setString(9, jadwal.getKodeMk());
+            stmt.setInt(10, parseId(jadwal.getIdJadwal()));
+            return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
+            lastError = e.getMessage();
             e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean delete(String idJadwal) {
+        lastError = null;
+        String query = "DELETE FROM jadwal WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, parseId(idJadwal));
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            lastError = e.getMessage();
+            e.printStackTrace();
+            return false;
         }
     }
 
     public Jadwal getById(String idJadwal) {
-        String query = "SELECT * FROM jadwal WHERE id=?";
+        String query = """
+                SELECT j.id, j.hari, j.jam_mulai, j.jam_selesai, j.ruangan, j.tahun_akademik, j.semester,
+                       d.nidn, d.nama_lengkap,
+                       k.id AS kelas_id, k.kelas AS nama_kelas,
+                       m.kode_mk, m.nama_mk
+                FROM jadwal j
+                LEFT JOIN dosen d ON j.dosen_id = d.id
+                LEFT JOIN kelas k ON j.kelas_id = k.id
+                LEFT JOIN mata_kuliah m ON j.matkul_id = m.id
+                WHERE j.id = ?
+                """;
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+                PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, parseId(idJadwal));
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) return mapRow(rs);
+                if (rs.next())
+                    return mapRow(rs);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -77,25 +114,49 @@ public class JadwalDAO {
 
     public List<Jadwal> getAll() {
         List<Jadwal> list = new ArrayList<>();
-        String query = "SELECT * FROM jadwal ORDER BY hari, jam";
+        String query = """
+                SELECT j.id, j.hari, j.jam_mulai, j.jam_selesai, j.ruangan, j.tahun_akademik, j.semester,
+                       d.nidn, d.nama_lengkap,
+                       k.id AS kelas_id, k.kelas AS nama_kelas,
+                       m.kode_mk, m.nama_mk
+                FROM jadwal j
+                LEFT JOIN dosen d ON j.dosen_id = d.id
+                LEFT JOIN kelas k ON j.kelas_id = k.id
+                LEFT JOIN mata_kuliah m ON j.matkul_id = m.id
+                ORDER BY j.hari, j.jam_mulai
+                """;
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query);
-             ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) list.add(mapRow(rs));
+                PreparedStatement stmt = conn.prepareStatement(query);
+                ResultSet rs = stmt.executeQuery()) {
+            while (rs.next())
+                list.add(mapRow(rs));
         } catch (SQLException e) {
+            lastError = e.getMessage();
             e.printStackTrace();
         }
         return list;
     }
 
-    public List<Jadwal> getByDosen(String dosenId) {
+    public List<Jadwal> getByDosen(String nidn) {
         List<Jadwal> list = new ArrayList<>();
-        String query = "SELECT * FROM jadwal WHERE dosen_id=? ORDER BY hari, jam";
+        String query = """
+                SELECT j.id, j.hari, j.jam_mulai, j.jam_selesai, j.ruangan, j.tahun_akademik, j.semester,
+                       d.nidn, d.nama_lengkap,
+                       k.id AS kelas_id, k.kelas AS nama_kelas,
+                       m.kode_mk, m.nama_mk
+                FROM jadwal j
+                LEFT JOIN dosen d ON j.dosen_id = d.id
+                LEFT JOIN kelas k ON j.kelas_id = k.id
+                LEFT JOIN mata_kuliah m ON j.matkul_id = m.id
+                WHERE d.nidn = ?
+                ORDER BY j.hari, j.jam_mulai
+                """;
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setInt(1, parseId(dosenId));
+                PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, nidn);
             try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) list.add(mapRow(rs));
+                while (rs.next())
+                    list.add(mapRow(rs));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -105,12 +166,24 @@ public class JadwalDAO {
 
     public List<Jadwal> getByKelas(String kelasId) {
         List<Jadwal> list = new ArrayList<>();
-        String query = "SELECT * FROM jadwal WHERE kelas_id=? ORDER BY hari, jam";
+        String query = """
+                SELECT j.id, j.hari, j.jam_mulai, j.jam_selesai, j.ruangan, j.tahun_akademik, j.semester,
+                       d.nidn, d.nama_lengkap,
+                       k.id AS kelas_id, k.kelas AS nama_kelas,
+                       m.kode_mk, m.nama_mk
+                FROM jadwal j
+                LEFT JOIN dosen d ON j.dosen_id = d.id
+                LEFT JOIN kelas k ON j.kelas_id = k.id
+                LEFT JOIN mata_kuliah m ON j.matkul_id = m.id
+                WHERE j.kelas_id = ?
+                ORDER BY j.hari, j.jam_mulai
+                """;
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+                PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, parseId(kelasId));
             try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) list.add(mapRow(rs));
+                while (rs.next())
+                    list.add(mapRow(rs));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -118,23 +191,20 @@ public class JadwalDAO {
         return list;
     }
 
-    /** Memetakan satu baris ResultSet ke objek Jadwal */
     private Jadwal mapRow(ResultSet rs) throws SQLException {
         return new Jadwal(
-                String.valueOf(rs.getInt("id")),          // id → idJadwal
-                String.valueOf(rs.getInt("matkul_id")),   // matkul_id → kodeMk
-                String.valueOf(rs.getInt("dosen_id")),    // dosen_id → nidn
-                String.valueOf(rs.getInt("kelas_id")),    // kelas_id → idKelas
+                String.valueOf(rs.getInt("id")),
+                rs.getString("kode_mk"),
+                rs.getString("nidn"),
+                String.valueOf(rs.getInt("kelas_id")),
                 rs.getString("hari"),
-                rs.getString("jam"),                       // jam → jamMulai
-                "",                                        // jamSelesai tidak ada di DB
-                "",                                        // ruangan tidak ada di DB
-                "",                                        // tahunAkademik tidak ada di DB
-                ""                                         // semester tidak ada di DB
-        );
+                rs.getString("jam_mulai"),
+                rs.getString("jam_selesai"),
+                rs.getString("ruangan"),
+                rs.getString("tahun_akademik"),
+                rs.getString("semester"));
     }
 
-    /** Konversi string id ke integer dengan aman */
     private int parseId(String id) {
         try {
             return Integer.parseInt(id);

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="controller.dosen.JadwalMengajarController" spacing="15" style="-fx-padding: 20; -fx-background-color: white;">
+    <Label text="Jadwal Mengajar" styleClass="header-title" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+    
+    <TableView fx:id="tabelJadwal" VBox.vgrow="ALWAYS" style="-fx-font-size: 14px;">
+        <columns>
+            <TableColumn fx:id="colNo" text="No" prefWidth="50" style="-fx-alignment: CENTER;"/>
+            <TableColumn fx:id="colHari" text="Hari" prefWidth="120" />
+            <TableColumn fx:id="colJam" text="Jam" prefWidth="120" style="-fx-alignment: CENTER;"/>
+            <TableColumn fx:id="colKelas" text="Kelas" prefWidth="150" />
+            <TableColumn fx:id="colMataKuliah" text="Mata Kuliah" prefWidth="300" />
+            <TableColumn fx:id="colAksi" text="Aksi" prefWidth="250" style="-fx-alignment: CENTER;"/>
+        </columns>
+        <placeholder>
+            <Label text="Belum ada jadwal mengajar untuk dosen ini."/>
+        </placeholder>
+    </TableView>
+</VBox>

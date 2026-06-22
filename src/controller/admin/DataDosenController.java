@@ -12,7 +12,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import model.Dosen;
 import util.AlertHelper;
-
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -24,33 +23,54 @@ import java.util.ResourceBundle;
  */
 public class DataDosenController implements Initializable {
 
-    @FXML private TabPane tabPane;
+    @FXML
+    private TabPane tabPane;
 
     // ===== TableView =====
-    @FXML private TableView<Dosen>            tableDosen;
-    @FXML private TableColumn<Dosen, Integer> colNo;
-    @FXML private TableColumn<Dosen, String>  colNidn;
-    @FXML private TableColumn<Dosen, String>  colNamaLengkap;
-    @FXML private TableColumn<Dosen, String>  colEmail;
-    @FXML private TableColumn<Dosen, String>  colFakultas;
-    @FXML private TableColumn<Dosen, Void>    colAksi;
+    @FXML
+    private TableView<Dosen> tableDosen;
+    @FXML
+    private TableColumn<Dosen, Integer> colNo;
+    @FXML
+    private TableColumn<Dosen, String> colNidn;
+    @FXML
+    private TableColumn<Dosen, String> colNamaLengkap;
+    @FXML
+    private TableColumn<Dosen, String> colEmail;
+    @FXML
+    private TableColumn<Dosen, String> colFakultas;
+    @FXML
+    private TableColumn<Dosen, Void> colAksi;
 
     // ===== Form Input =====
-    @FXML private TextField     fieldNidn;
-    @FXML private TextField     fieldNamaLengkap;
-    @FXML private TextField     fieldEmail;
-    @FXML private TextField     fieldFakultas;
-    @FXML private PasswordField fieldPassword;
-    @FXML private TextField     fieldPasswordVisible;
-    @FXML private ToggleButton  btnTogglePassword;
+    @FXML
+    private TextField fieldNidn;
+    @FXML
+    private TextField fieldNamaLengkap;
+    @FXML
+    private TextField fieldEmail;
+    @FXML
+    private TextField fieldFakultas;
+    @FXML
+    private PasswordField fieldPassword;
+    @FXML
+    private TextField fieldPasswordVisible;
+    @FXML
+    private ToggleButton btnTogglePassword;
 
     // ===== Kontrol =====
-    @FXML private TextField fieldSearch;
-    @FXML private Button    btnResetFilter;
-    @FXML private Button    btnTambah;
-    @FXML private Button    btnEdit;
-    @FXML private Button    btnHapus;
-    @FXML private Button    btnBatal;
+    @FXML
+    private TextField fieldSearch;
+    @FXML
+    private Button btnResetFilter;
+    @FXML
+    private Button btnTambah;
+    @FXML
+    private Button btnEdit;
+    @FXML
+    private Button btnHapus;
+    @FXML
+    private Button btnBatal;
 
     // ===== State =====
     private final DosenDAO dosenDAO = new DosenDAO();
@@ -98,7 +118,8 @@ public class DataDosenController implements Initializable {
 
             {
                 btnEditRow.getStyleClass().addAll("btn-primary");
-                btnEditRow.setStyle("-fx-background-color: #f59e0b; -fx-padding: 5 10; -fx-font-size: 12px; -fx-pref-height: 25px;");
+                btnEditRow.setStyle(
+                        "-fx-background-color: #f59e0b; -fx-padding: 5 10; -fx-font-size: 12px; -fx-pref-height: 25px;");
                 btnHapusRow.getStyleClass().addAll("btn-danger");
                 btnHapusRow.setStyle("-fx-padding: 5 10; -fx-font-size: 12px; -fx-pref-height: 25px;");
 
@@ -169,18 +190,21 @@ public class DataDosenController implements Initializable {
     private void applyFilter() {
         String keyword = fieldSearch.getText() == null ? "" : fieldSearch.getText().toLowerCase().trim();
         filteredList.setPredicate(d -> {
-            if (keyword.isEmpty()) return true;
+            if (keyword.isEmpty())
+                return true;
             return d.getNidn().toLowerCase().contains(keyword)
-                || d.getNamaLengkap().toLowerCase().contains(keyword)
-                || (d.getFakultas() != null && d.getFakultas().toLowerCase().contains(keyword))
-                || (d.getEmail() != null && d.getEmail().toLowerCase().contains(keyword));
+                    || d.getNamaLengkap().toLowerCase().contains(keyword)
+                    || (d.getFakultas() != null && d.getFakultas().toLowerCase().contains(keyword))
+                    || (d.getEmail() != null && d.getEmail().toLowerCase().contains(keyword));
         });
     }
 
     private void setupTableSelectionListener() {
         tableDosen.getSelectionModel().selectedItemProperty().addListener(
-                (obs, oldSel, newSel) -> { if (newSel != null) populateForm(newSel); }
-        );
+                (obs, oldSel, newSel) -> {
+                    if (newSel != null)
+                        populateForm(newSel);
+                });
     }
 
     // ===== Load Data =====
@@ -188,14 +212,16 @@ public class DataDosenController implements Initializable {
     private void loadData() {
         dosenList.clear();
         List<Dosen> data = dosenDAO.getAll();
-        if (data != null) dosenList.addAll(data);
+        if (data != null)
+            dosenList.addAll(data);
     }
 
     // ===== CRUD Handlers =====
 
     @FXML
     private void handleTambah(ActionEvent event) {
-        if (!isFormValid(true)) return;
+        if (!isFormValid(true))
+            return;
 
         Dosen dosen = buildFromForm();
         String password = fieldPassword.getText().trim();
@@ -225,8 +251,10 @@ public class DataDosenController implements Initializable {
             setEditMode(true);
             return;
         }
+
         // Saat edit, tidak perlu validasi password
-        if (!isFormValid(false)) return;
+        if (!isFormValid(false))
+            return;
 
         // Update hanya data profil (tanpa password)
         dosenDAO.update(buildFromForm());
@@ -281,23 +309,26 @@ public class DataDosenController implements Initializable {
                 fieldNidn.getText().trim(),
                 fieldNamaLengkap.getText().trim(),
                 fieldEmail.getText().trim(),
-                fieldFakultas.getText().trim()
-        );
+                fieldFakultas.getText().trim());
     }
 
     private boolean isFormValid(boolean cekPassword) {
         String nidnStr = fieldNidn.getText().trim();
         if (nidnStr.isEmpty()) {
-            AlertHelper.showWarning("Validasi", "NIDN tidak boleh kosong."); return false;
+            AlertHelper.showWarning("Validasi", "NIDN tidak boleh kosong.");
+            return false;
         }
         if (!nidnStr.matches("\\d+")) {
-            AlertHelper.showWarning("Validasi", "NIDN harus berupa angka."); return false;
+            AlertHelper.showWarning("Validasi", "NIDN harus berupa angka.");
+            return false;
         }
         if (fieldNamaLengkap.getText().trim().isEmpty()) {
-            AlertHelper.showWarning("Validasi", "Nama Lengkap tidak boleh kosong."); return false;
+            AlertHelper.showWarning("Validasi", "Nama Lengkap tidak boleh kosong.");
+            return false;
         }
         if (cekPassword && fieldPassword.getText().trim().isEmpty()) {
-            AlertHelper.showWarning("Validasi", "Password tidak boleh kosong."); return false;
+            AlertHelper.showWarning("Validasi", "Password tidak boleh kosong.");
+            return false;
         }
         return true;
     }
@@ -327,6 +358,7 @@ public class DataDosenController implements Initializable {
     }
 
     public void selectTab(int index) {
-        if (tabPane != null) tabPane.getSelectionModel().select(index);
+        if (tabPane != null)
+            tabPane.getSelectionModel().select(index);
     }
 }

@@ -10,11 +10,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * DAO untuk operasi CRUD data Dosen.
- * Kolom DB: id, nidn, nama_lengkap, email, fakultas, foto_profil
- * Password disimpan di tabel user, bukan di tabel dosen.
- */
 public class DosenDAO {
 
     public void insert(Dosen d) {
@@ -75,6 +70,38 @@ public class DosenDAO {
 
             stmt.setString(1, nidn);
 
+            // ResultSet dimasukkan ke try-with-resources agar auto-close
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return map(rs);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    // Backward compatibility untuk controller lama yang masih mencari berdasarkan
+    // NIP
+    public Dosen getByNip(String nip) {
+        return getByNidn(nip);
+    }
+
+    /**
+     * Cari dosen berdasarkan nama_lengkap.
+     * Digunakan untuk mencocokkan username login dengan data profil dosen.
+     */
+    public Dosen getByNamaLengkap(String namaLengkap) {
+        String sql = "SELECT * FROM dosen WHERE nama_lengkap=?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, namaLengkap);
+
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
@@ -88,15 +115,9 @@ public class DosenDAO {
         return null;
     }
 
-    // Backward compatibility
-    public Dosen getByNip(String nip) {
-        return getByNidn(nip);
-    }
-
     public List<Dosen> getAll() {
         List<Dosen> list = new ArrayList<>();
-
-        String sql = "SELECT * FROM dosen";
+        String sql = "SELECT * FROM dosen ORDER BY nama_lengkap";
 
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql);

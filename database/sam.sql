@@ -1,5 +1,5 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.3
+-- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
@@ -24,6 +24,22 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `absensi`
+--
+
+CREATE TABLE `absensi` (
+  `id` int(11) NOT NULL,
+  `tanggal` date NOT NULL,
+  `jadwal_id` int(11) NOT NULL,
+  `peran` enum('Dosen','Mahasiswa') NOT NULL,
+  `aktor_id` int(11) NOT NULL,
+  `status` enum('Hadir','Izin','Sakit','Alpha') NOT NULL,
+  `keterangan` text
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `dosen`
 --
 
@@ -41,6 +57,7 @@ CREATE TABLE `dosen` (
 --
 
 INSERT INTO `dosen` (`id`, `nidn`, `nama_lengkap`, `email`, `fakultas`, `foto_profil`) VALUES
+(2, '11223344', 'Yanto', 'yanto@gmail.com', 'Teknik', NULL),
 (4, '232444142', 'Boy', 'boy@gmail.com', 'ekonomi', NULL),
 (5, '37890485758', 'Maman', 'maman@gmail.com', 'FIS', NULL);
 
@@ -59,6 +76,14 @@ CREATE TABLE `jadwal` (
   `matkul_id` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Dumping data for table `jadwal`
+--
+
+INSERT INTO `jadwal` (`id`, `hari`, `jam`, `kelas_id`, `dosen_id`, `matkul_id`) VALUES
+(1, 'Senin', '08:00:00', 1, 2, 1),
+(2, 'Rabu', '10:00:00', 2, 2, 2);
+
 -- --------------------------------------------------------
 
 --
@@ -71,6 +96,14 @@ CREATE TABLE `kelas` (
   `kelas` varchar(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Dumping data for table `kelas`
+--
+
+INSERT INTO `kelas` (`id`, `Prodi`, `kelas`) VALUES
+(1, 'Teknik Informatika', 'A'),
+(2, 'Sistem Informasi', 'B');
+
 -- --------------------------------------------------------
 
 --
@@ -78,7 +111,7 @@ CREATE TABLE `kelas` (
 --
 
 CREATE TABLE `mahasiswa` (
-  `id` int NOT NULL,
+  `id` int(11) NOT NULL,
   `nim` varchar(15) NOT NULL,
   `nama` varchar(100) NOT NULL,
   `gender` enum('L','P') NOT NULL,
@@ -95,7 +128,6 @@ INSERT INTO `mahasiswa` (`id`, `nim`, `nama`, `gender`, `alamat`, `kelas`, `prod
 (2, '24252324', 'Alex', 'L', 'Lampung', 'C', 'TI'),
 (3, '21212121', 'Waluyo', 'P', 'Tanjung Verde', '3B', 'Psikologi'),
 (4, '230492852', 'Boboiboy', 'L', 'Jombang', NULL, NULL);
-
 -- --------------------------------------------------------
 
 --
@@ -103,9 +135,23 @@ INSERT INTO `mahasiswa` (`id`, `nim`, `nama`, `gender`, `alamat`, `kelas`, `prod
 --
 
 CREATE TABLE `mata_kuliah` (
-  `id` int NOT NULL,
-  `Mata_Kuliah` varchar(100) NOT NULL
+  `id`        int          NOT NULL AUTO_INCREMENT,
+  `kode_mk`   varchar(20)  NOT NULL,
+  `nama_mk`   varchar(100) NOT NULL,
+  `sks`       int          NOT NULL DEFAULT 2,
+  `semester`  int          NOT NULL DEFAULT 1,
+  `id_prodi`  varchar(100) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `kode_mk` (`kode_mk`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `mata_kuliah`
+--
+
+INSERT INTO `mata_kuliah` (`id`, `Mata_Kuliah`) VALUES
+(1, 'Pemrograman Berorientasi Objek'),
+(2, 'Basis Data Lanjut');
 
 -- --------------------------------------------------------
 
@@ -114,25 +160,35 @@ CREATE TABLE `mata_kuliah` (
 --
 
 CREATE TABLE `user` (
-  `id` int NOT NULL,
+  `id` int(11) NOT NULL,
   `username` varchar(50) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `level` varchar(20) NOT NULL
+  `level` varchar(20) NOT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `alamat` text
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `user`
 --
 
-INSERT INTO `user` (`id`, `username`, `password`, `level`) VALUES
-(1, 'alex', 'alex123', 'Admin'),
-(2, 'Yanto', 'yanto123', 'Dosen'),
-(3, 'Andi', 'andi321', 'Mahasiswa'),
-(4, 'admin', 'admin321', 'Admin');
+INSERT INTO `user` (`id`, `username`, `password`, `level`, `email`, `alamat`) VALUES
+(1, 'joko', '123', 'admin', 'jokotingkir@gmail.com', 'purworejo'),
+(31, 'jokooo', '123', 'admin', 'joko@gmail.com', 'per'),
+(32, 'qq', '11', 'Dosen', NULL, NULL),
+(33, 'jokowidodo', '111', 'Dosen', NULL, NULL),
+(34, 'gibran', '321', 'Dosen', NULL, NULL);
 
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `absensi`
+--
+ALTER TABLE `absensi`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `jadwal_id` (`jadwal_id`);
 
 --
 -- Indexes for table `dosen`
@@ -183,6 +239,12 @@ ALTER TABLE `user`
 --
 
 --
+-- AUTO_INCREMENT for table `absensi`
+--
+ALTER TABLE `absensi`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `dosen`
 --
 ALTER TABLE `dosen`
@@ -192,13 +254,13 @@ ALTER TABLE `dosen`
 -- AUTO_INCREMENT for table `jadwal`
 --
 ALTER TABLE `jadwal`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `kelas`
 --
 ALTER TABLE `kelas`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `mahasiswa`
@@ -210,17 +272,23 @@ ALTER TABLE `mahasiswa`
 -- AUTO_INCREMENT for table `mata_kuliah`
 --
 ALTER TABLE `mata_kuliah`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `absensi`
+--
+ALTER TABLE `absensi`
+  ADD CONSTRAINT `absensi_ibfk_jadwal` FOREIGN KEY (`jadwal_id`) REFERENCES `jadwal` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `jadwal`

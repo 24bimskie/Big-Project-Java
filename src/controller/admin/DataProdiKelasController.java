@@ -26,6 +26,11 @@ import java.util.ResourceBundle;
  */
 public class DataProdiKelasController implements Initializable {
 
+    // ===== FXML Bindings — Tab Pane =====
+
+    @FXML
+    private TabPane tabPane;
+
     // ===== FXML Bindings — Tabel Prodi =====
 
     @FXML
@@ -109,15 +114,15 @@ public class DataProdiKelasController implements Initializable {
     private final ProdiDAO prodiDAO = new ProdiDAO();
     private final KelasDAO kelasDAO = new KelasDAO();
 
-    private final ObservableList<Prodi> prodiList   = FXCollections.observableArrayList();
-    private final ObservableList<Kelas> kelasList   = FXCollections.observableArrayList();
+    private final ObservableList<Prodi> prodiList = FXCollections.observableArrayList();
+    private final ObservableList<Kelas> kelasList = FXCollections.observableArrayList();
     private FilteredList<Kelas> filteredKelasList;
 
     /** Prodi yang sedang aktif/dipilih di tabel */
     private Prodi selectedProdi = null;
 
-    private boolean isEditModeProdi  = false;
-    private boolean isEditModeKelas  = false;
+    private boolean isEditModeProdi = false;
+    private boolean isEditModeKelas = false;
 
     // ===== Lifecycle =====
 
@@ -175,15 +180,14 @@ public class DataProdiKelasController implements Initializable {
                             labelProdiKelas.setText("Kelas untuk Prodi: " + newSel.getNamaProdi());
                         }
                     }
-                }
-        );
+                });
 
         // Saat kelas dipilih → isi form kelas
         tableKelas.getSelectionModel().selectedItemProperty().addListener(
                 (obs, oldSel, newSel) -> {
-                    if (newSel != null) populateFormKelas(newSel);
-                }
-        );
+                    if (newSel != null)
+                        populateFormKelas(newSel);
+                });
     }
 
     // ===== Load Data =====
@@ -191,13 +195,15 @@ public class DataProdiKelasController implements Initializable {
     private void loadProdi() {
         prodiList.clear();
         List<Prodi> data = prodiDAO.getAll();
-        if (data != null) prodiList.addAll(data);
+        if (data != null)
+            prodiList.addAll(data);
     }
 
     private void loadKelasByProdi(String idProdi) {
         kelasList.clear();
         List<Kelas> data = kelasDAO.getByProdi(idProdi);
-        if (data != null) kelasList.addAll(data);
+        if (data != null)
+            kelasList.addAll(data);
         // Reset predicate agar semua kelas prodi ini ditampilkan
         filteredKelasList.setPredicate(k -> k.getIdProdi().equals(idProdi));
     }
@@ -206,7 +212,8 @@ public class DataProdiKelasController implements Initializable {
 
     @FXML
     private void handleTambahProdi(ActionEvent event) {
-        if (!isFormProdiValid()) return;
+        if (!isFormProdiValid())
+            return;
         prodiDAO.insert(buildProdiFromForm());
         AlertHelper.showInfo("Berhasil", "Data prodi berhasil ditambahkan.");
         loadProdi();
@@ -223,7 +230,8 @@ public class DataProdiKelasController implements Initializable {
             setEditModeProdi(true);
             return;
         }
-        if (!isFormProdiValid()) return;
+        if (!isFormProdiValid())
+            return;
         prodiDAO.update(buildProdiFromForm());
         AlertHelper.showInfo("Berhasil", "Data prodi berhasil diperbarui.");
         loadProdi();
@@ -241,8 +249,7 @@ public class DataProdiKelasController implements Initializable {
         boolean konfirmasi = AlertHelper.showConfirmation(
                 "Konfirmasi Hapus",
                 "Yakin ingin menghapus prodi \"" + selected.getNamaProdi() + "\"?\n"
-                        + "Semua kelas dalam prodi ini juga akan terhapus."
-        );
+                        + "Semua kelas dalam prodi ini juga akan terhapus.");
         if (konfirmasi) {
             prodiDAO.delete(selected.getIdProdi());
             AlertHelper.showInfo("Berhasil", "Data prodi berhasil dihapus.");
@@ -271,7 +278,8 @@ public class DataProdiKelasController implements Initializable {
             AlertHelper.showWarning("Peringatan", "Pilih prodi terlebih dahulu sebelum menambah kelas.");
             return;
         }
-        if (!isFormKelasValid()) return;
+        if (!isFormKelasValid())
+            return;
         Kelas kelas = buildKelasFromForm(selectedProdi.getIdProdi());
         kelasDAO.insert(kelas);
         AlertHelper.showInfo("Berhasil", "Data kelas berhasil ditambahkan.");
@@ -289,7 +297,8 @@ public class DataProdiKelasController implements Initializable {
             setEditModeKelas(true);
             return;
         }
-        if (!isFormKelasValid()) return;
+        if (!isFormKelasValid())
+            return;
         String idProdi = selectedProdi != null ? selectedProdi.getIdProdi() : "";
         kelasDAO.update(buildKelasFromForm(idProdi));
         AlertHelper.showInfo("Berhasil", "Data kelas berhasil diperbarui.");
@@ -308,12 +317,12 @@ public class DataProdiKelasController implements Initializable {
         boolean konfirmasi = AlertHelper.showConfirmation(
                 "Konfirmasi Hapus",
                 "Yakin ingin menghapus kelas \"" + selected.getNamaKelas() + "\" ("
-                        + selected.getIdKelas() + ")?"
-        );
+                        + selected.getIdKelas() + ")?");
         if (konfirmasi) {
             kelasDAO.delete(selected.getIdKelas());
             AlertHelper.showInfo("Berhasil", "Data kelas berhasil dihapus.");
-            if (selectedProdi != null) loadKelasByProdi(selectedProdi.getIdProdi());
+            if (selectedProdi != null)
+                loadKelasByProdi(selectedProdi.getIdProdi());
             clearFormKelas();
             setEditModeKelas(false);
         }
@@ -338,8 +347,7 @@ public class DataProdiKelasController implements Initializable {
         return new Prodi(
                 fieldIdProdi.getText().trim(),
                 fieldNamaProdi.getText().trim(),
-                fieldFakultas.getText().trim()
-        );
+                fieldFakultas.getText().trim());
     }
 
     private boolean isFormProdiValid() {
@@ -385,8 +393,7 @@ public class DataProdiKelasController implements Initializable {
                 fieldIdKelas.getText().trim(),
                 fieldNamaKelas.getText().trim(),
                 idProdi,
-                fieldTahunAkademik.getText().trim()
-        );
+                fieldTahunAkademik.getText().trim());
     }
 
     private boolean isFormKelasValid() {
@@ -439,6 +446,8 @@ public class DataProdiKelasController implements Initializable {
     }
 
     public void selectTab(int index) {
-        // Placeholder for future tab integration
+        if (tabPane != null && index >= 0 && index < tabPane.getTabs().size()) {
+            tabPane.getSelectionModel().select(index);
+        }
     }
 }

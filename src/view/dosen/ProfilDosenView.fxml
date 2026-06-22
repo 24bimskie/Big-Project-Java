@@ -19,7 +19,7 @@
                     <Insets top="10" />
                 </VBox.margin>
                 
-                <Circle radius="60" fill="#cbd5e1" />
+                <Circle fx:id="fotoProfil" radius="60" fill="#cbd5e1" />
                 <Button fx:id="btnUbahFoto" text="Ubah Foto" styleClass="btn-secondary" minWidth="-Infinity" />
 
                 <GridPane hgap="15" vgap="15" alignment="CENTER">

@@ -25,9 +25,15 @@ import java.util.UUID;
 
 /**
  * Controller untuk use case: Input Data Jadwal & Lihat Jadwal.
- * Admin dapat mengelola jadwal perkuliahan (dosen, matkul, kelas, waktu, ruangan).
+ * Admin dapat mengelola jadwal perkuliahan (dosen, matkul, kelas, waktu,
+ * ruangan).
  */
 public class DataJadwalController implements Initializable {
+
+    // ===== FXML Bindings — Tab Pane =====
+
+    @FXML
+    private TabPane tabPane;
 
     // ===== FXML Bindings — TableView =====
 
@@ -124,10 +130,10 @@ public class DataJadwalController implements Initializable {
 
     // ===== State =====
 
-    private final JadwalDAO jadwalDAO       = new JadwalDAO();
-    private final DosenDAO dosenDAO         = new DosenDAO();
+    private final JadwalDAO jadwalDAO = new JadwalDAO();
+    private final DosenDAO dosenDAO = new DosenDAO();
     private final MataKuliahDAO mataKuliahDAO = new MataKuliahDAO();
-    private final KelasDAO kelasDAO         = new KelasDAO();
+    private final KelasDAO kelasDAO = new KelasDAO();
 
     private final ObservableList<Jadwal> jadwalList = FXCollections.observableArrayList();
     private FilteredList<Jadwal> filteredList;
@@ -166,10 +172,10 @@ public class DataJadwalController implements Initializable {
     private void setupComboBoxes() {
         // Hari
         ObservableList<String> hariList = FXCollections.observableArrayList(
-                "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"
-        );
+                "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu");
         comboHari.setItems(hariList);
-        filterHari.setItems(FXCollections.observableArrayList("Semua", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"));
+        filterHari.setItems(
+                FXCollections.observableArrayList("Semua", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"));
         filterHari.setValue("Semua");
 
         // Semester
@@ -182,10 +188,15 @@ public class DataJadwalController implements Initializable {
         }
         // Tampilkan nama + kode MK di ComboBox
         comboMataKuliah.setConverter(new javafx.util.StringConverter<MataKuliah>() {
-            @Override public String toString(MataKuliah mk) {
+            @Override
+            public String toString(MataKuliah mk) {
                 return mk == null ? "" : mk.getKodeMk() + " - " + mk.getNamaMk();
             }
-            @Override public MataKuliah fromString(String s) { return null; }
+
+            @Override
+            public MataKuliah fromString(String s) {
+                return null;
+            }
         });
 
         // Dosen
@@ -197,10 +208,15 @@ public class DataJadwalController implements Initializable {
         filterDosen.setItems(dosenObs);
         // Tampilkan nama dosen di ComboBox
         javafx.util.StringConverter<Dosen> dosenConverter = new javafx.util.StringConverter<Dosen>() {
-            @Override public String toString(Dosen d) {
+            @Override
+            public String toString(Dosen d) {
                 return d == null ? "Semua Dosen" : d.getNidn() + " - " + d.getNama();
             }
-            @Override public Dosen fromString(String s) { return null; }
+
+            @Override
+            public Dosen fromString(String s) {
+                return null;
+            }
         };
         comboDosen.setConverter(dosenConverter);
         filterDosen.setConverter(dosenConverter);
@@ -214,10 +230,15 @@ public class DataJadwalController implements Initializable {
         filterKelas.setItems(kelasObs);
         // Tampilkan nama kelas di ComboBox
         javafx.util.StringConverter<Kelas> kelasConverter = new javafx.util.StringConverter<Kelas>() {
-            @Override public String toString(Kelas k) {
+            @Override
+            public String toString(Kelas k) {
                 return k == null ? "Semua Kelas" : k.getIdKelas() + " - " + k.getNamaKelas();
             }
-            @Override public Kelas fromString(String s) { return null; }
+
+            @Override
+            public Kelas fromString(String s) {
+                return null;
+            }
         };
         comboKelas.setConverter(kelasConverter);
         filterKelas.setConverter(kelasConverter);
@@ -236,12 +257,12 @@ public class DataJadwalController implements Initializable {
 
     /** Menerapkan semua kondisi filter ke FilteredList */
     private void applyFilter() {
-        String hariFilter    = filterHari.getValue();
-        Dosen dosenFilter    = filterDosen.getValue();
-        Kelas kelasFilter    = filterKelas.getValue();
+        String hariFilter = filterHari.getValue();
+        Dosen dosenFilter = filterDosen.getValue();
+        Kelas kelasFilter = filterKelas.getValue();
 
         filteredList.setPredicate(jadwal -> {
-            boolean matchHari  = (hariFilter == null || hariFilter.equals("Semua"))
+            boolean matchHari = (hariFilter == null || hariFilter.equals("Semua"))
                     || jadwal.getHari().equalsIgnoreCase(hariFilter);
             boolean matchDosen = (dosenFilter == null)
                     || jadwal.getNidn().equals(dosenFilter.getNidn());
@@ -258,8 +279,7 @@ public class DataJadwalController implements Initializable {
                     if (newSel != null) {
                         populateForm(newSel);
                     }
-                }
-        );
+                });
     }
 
     // ===== Load Data =====
@@ -277,14 +297,21 @@ public class DataJadwalController implements Initializable {
     /** Tombol Tambah — generate ID otomatis & simpan jadwal baru */
     @FXML
     private void handleTambah(ActionEvent event) {
-        if (!isFormValid()) return;
+        if (!isFormValid())
+            return;
 
         Jadwal jadwal = buildJadwalFromForm();
-        // Generate ID unik jika belum diisi
         if (jadwal.getIdJadwal().isEmpty()) {
-            jadwal.setIdJadwal("JDW-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
+            jadwal.setIdJadwal(String.valueOf(Math.abs(UUID.randomUUID().hashCode())));
         }
-        jadwalDAO.insert(jadwal);
+
+        boolean success = jadwalDAO.insert(jadwal);
+        if (!success) {
+            String detail = jadwalDAO.getLastError() != null ? "\n\nDetail: " + jadwalDAO.getLastError() : "";
+            AlertHelper.showError("Gagal", "Data jadwal gagal disimpan." + detail);
+            return;
+        }
+
         AlertHelper.showInfo("Berhasil", "Data jadwal berhasil ditambahkan.");
         loadData();
         clearForm();
@@ -304,10 +331,17 @@ public class DataJadwalController implements Initializable {
         }
 
         // Mode edit aktif → Simpan
-        if (!isFormValid()) return;
+        if (!isFormValid())
+            return;
 
         Jadwal jadwal = buildJadwalFromForm();
-        jadwalDAO.update(jadwal);
+        boolean success = jadwalDAO.update(jadwal);
+        if (!success) {
+            String detail = jadwalDAO.getLastError() != null ? "\n\nDetail: " + jadwalDAO.getLastError() : "";
+            AlertHelper.showError("Gagal", "Data jadwal gagal diperbarui." + detail);
+            return;
+        }
+
         AlertHelper.showInfo("Berhasil", "Data jadwal berhasil diperbarui.");
         loadData();
         clearForm();
@@ -326,11 +360,15 @@ public class DataJadwalController implements Initializable {
         boolean konfirmasi = AlertHelper.showConfirmation(
                 "Konfirmasi Hapus",
                 "Yakin ingin menghapus jadwal ID \"" + selected.getIdJadwal() + "\" (" +
-                        selected.getHari() + ", " + selected.getJamMulai() + " - " + selected.getJamSelesai() + ")?"
-        );
+                        selected.getHari() + ", " + selected.getJamMulai() + " - " + selected.getJamSelesai() + ")?");
 
         if (konfirmasi) {
-            jadwalDAO.delete(selected.getIdJadwal());
+            boolean success = jadwalDAO.delete(selected.getIdJadwal());
+            if (!success) {
+                String detail = jadwalDAO.getLastError() != null ? "\n\nDetail: " + jadwalDAO.getLastError() : "";
+                AlertHelper.showError("Gagal", "Data jadwal gagal dihapus." + detail);
+                return;
+            }
             AlertHelper.showInfo("Berhasil", "Data jadwal berhasil dihapus.");
             loadData();
             clearForm();
@@ -390,11 +428,12 @@ public class DataJadwalController implements Initializable {
 
     /**
      * Membangun objek Jadwal dari isian form.
+     * 
      * @return Jadwal baru berdasarkan input form
      */
     private Jadwal buildJadwalFromForm() {
-        String kodeMk  = comboMataKuliah.getValue() != null ? comboMataKuliah.getValue().getKodeMk() : "";
-        String nidn    = comboDosen.getValue() != null ? comboDosen.getValue().getNidn() : "";
+        String kodeMk = comboMataKuliah.getValue() != null ? comboMataKuliah.getValue().getKodeMk() : "";
+        String nidn = comboDosen.getValue() != null ? comboDosen.getValue().getNidn() : "";
         String idKelas = comboKelas.getValue() != null ? comboKelas.getValue().getIdKelas() : "";
 
         return new Jadwal(
@@ -407,12 +446,12 @@ public class DataJadwalController implements Initializable {
                 fieldJamSelesai.getText().trim(),
                 fieldRuangan.getText().trim(),
                 fieldTahunAkademik.getText().trim(),
-                comboSemester.getValue()
-        );
+                comboSemester.getValue());
     }
 
     /**
      * Validasi field wajib sebelum menyimpan.
+     * 
      * @return true jika semua input valid
      */
     private boolean isFormValid() {
@@ -471,6 +510,7 @@ public class DataJadwalController implements Initializable {
 
     /**
      * Mengatur mode tampilan form (tambah vs edit).
+     * 
      * @param editMode true = mode edit aktif
      */
     private void setEditMode(boolean editMode) {
@@ -489,6 +529,8 @@ public class DataJadwalController implements Initializable {
     }
 
     public void selectTab(int index) {
-        // Placeholder for future tab integration
+        if (tabPane != null && index >= 0 && index < tabPane.getTabs().size()) {
+            tabPane.getSelectionModel().select(index);
+        }
     }
 }

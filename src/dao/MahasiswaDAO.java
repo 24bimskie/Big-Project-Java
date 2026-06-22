@@ -124,6 +124,64 @@ public class MahasiswaDAO {
         return hasil;
     }
 
+    /**
+     * Ambil semua mahasiswa yang terdaftar di kelas berdasarkan kelas.id (integer).
+     * Mencocokkan mahasiswa.kelas = kelas.kelas DAN mahasiswa.prodi = kelas.Prodi.
+     */
+    public List<Mahasiswa> getByKelasId(int kelasId) {
+        List<Mahasiswa> list = new ArrayList<>();
+        String sql = "SELECT m.* FROM mahasiswa m " +
+                     "JOIN kelas k ON m.kelas = k.kelas AND m.prodi = k.Prodi " +
+                     "WHERE k.id = ? ORDER BY m.nama";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, kelasId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    list.add(map(rs));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    /**
+     * Ambil mahasiswa.id (integer) berdasarkan NIM.
+     * Digunakan untuk mapping aktor_id di tabel absensi.
+     */
+    public int getIdByNim(String nim) {
+        String sql = "SELECT id FROM mahasiswa WHERE nim = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, nim);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return rs.getInt("id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    /**
+     * Ambil mahasiswa berdasarkan id (integer).
+     */
+    public Mahasiswa getById(int id) {
+        String sql = "SELECT * FROM mahasiswa WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return map(rs);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     private String toGenderEnum(String jenisKelamin) {
         if (jenisKelamin == null)
             return "L";
