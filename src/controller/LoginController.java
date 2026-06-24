@@ -38,23 +38,27 @@ public class LoginController {
         String password = passwordField.getText();
 
         if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty()) {
-            AlertHelper.showWarning("Peringatan", "Username dan Password tidak boleh kosong!");
+            statusLabel.setText("Username dan Password tidak boleh kosong!");
+            statusLabel.setStyle("-fx-text-fill: red;");
             return;
         }
 
         // Coba autentikasi menggunakan database
         User loggedInUser = userDAO.login(username, password);
         
-        // Jika gagal dari database, kita buat fallback dummy (untuk testing jika DB belum siap)
+        // Jika login gagal, tampilkan pesan error di label dan reset form
         if (loggedInUser == null) {
-            String role = "Mahasiswa"; // Default
-            if (username.toLowerCase().contains("dosen")) {
-                role = "Dosen";
-            } else if (username.toLowerCase().contains("admin") || username.toLowerCase().contains("adm")) {
-                role = "Admin";
-            }
-            loggedInUser = new User("dummy-id", username, password, role);
-            System.out.println("⚠️ Menggunakan Dummy Login karena user tidak ditemukan di DB. Role: " + role);
+            statusLabel.setText("Password atau username tidak sesuai!");
+            statusLabel.setStyle("-fx-text-fill: red;");
+            
+            PauseTransition resetPause = new PauseTransition(Duration.seconds(1));
+            resetPause.setOnFinished(e -> {
+                usernameField.clear();
+                passwordField.clear();
+                statusLabel.setText("");
+            });
+            resetPause.play();
+            return;
         }
 
         UserSession.setCurrentUser(loggedInUser);
