@@ -20,9 +20,8 @@ import java.util.Set;
 public class ProdiDAO {
 
     public void insert(Prodi prodi) {
-        // Prodi tidak memiliki tabel sendiri di DB.
-        // Prodi ditambahkan secara implisit saat menambah kelas baru.
-        // Method ini sengaja dikosongkan.
+        // Prodi tidak punya tabel sendiri, akan disimpan via Kelas
+        // Method ini kosong karena insert dilakukan saat menambah kelas
     }
 
     public void update(Prodi prodi) {
