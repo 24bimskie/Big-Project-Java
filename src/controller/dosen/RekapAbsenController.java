@@ -3,6 +3,7 @@ package controller.dosen;
 import dao.AbsensiDAO;
 import dao.JadwalDAO;
 import dao.MahasiswaDAO;
+
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -13,26 +14,35 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
-import model.Jadwal;
-import util.AlertHelper;
+import javafx.stage.FileChooser;
 
+import util.AlertHelper;
+import util.PDFExporter;
+
+import java.io.File;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
 
 public class RekapAbsenController implements Initializable {
 
-    @FXML private Label lblMatkul;
-    @FXML private Label lblKelas;
-    @FXML private Label lblHariJam;
-    @FXML private TableView<StudentRekapRow> tableRekap;
-    
-    @FXML private Button btnKembali;
-    @FXML private Button btnCetak;
+    @FXML
+    private Label lblMatkul;
+    @FXML
+    private Label lblKelas;
+    @FXML
+    private Label lblHariJam;
+    @FXML
+    private TableView<StudentRekapRow> tableRekap;
+
+    @FXML
+    private Button btnKembali;
+    @FXML
+    private Button btnCetak;
+    @FXML
+    private Button btnRefresh;
 
     private String idJadwal;
     private final MahasiswaDAO mahasiswaDAO = new MahasiswaDAO();
@@ -47,6 +57,14 @@ public class RekapAbsenController implements Initializable {
         if (btnCetak != null) {
             btnCetak.setOnAction(e -> handleCetak());
         }
+        if (btnRefresh != null) {
+            btnRefresh.setOnAction(e -> loadRekapData());
+        }
+
+        if (tableRekap != null) {
+            tableRekap.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+            tableRekap.setMinWidth(1100);
+        }
     }
 
     public void initData(String idJadwal, String namaKelas, String namaMatkul, String hari, String jam) {
@@ -54,121 +72,117 @@ public class RekapAbsenController implements Initializable {
         lblKelas.setText(namaKelas);
         lblMatkul.setText(namaMatkul);
         lblHariJam.setText(hari + ", " + jam);
-        
+
         loadRekapData();
     }
 
     private void loadRekapData() {
-        if (idJadwal == null) return;
-        
+        if (idJadwal == null)
+            return;
+
         tableRekap.getColumns().clear();
         tableRekap.getItems().clear();
 
-        // 1. Setup static columns: No, NIM, Nama
         TableColumn<StudentRekapRow, Integer> colNo = new TableColumn<>("No");
         colNo.setCellValueFactory(cellData -> cellData.getValue().noProperty().asObject());
         colNo.setPrefWidth(50);
         colNo.setStyle("-fx-alignment: CENTER;");
 
+        TableColumn<StudentRekapRow, String> colTanggal = new TableColumn<>("Tanggal");
+        colTanggal.setCellValueFactory(cellData -> cellData.getValue().tanggalProperty());
+        colTanggal.setPrefWidth(100);
+
+        TableColumn<StudentRekapRow, String> colHariJam = new TableColumn<>("Hari / Jam");
+        colHariJam.setCellValueFactory(cellData -> cellData.getValue().hariJamProperty());
+        colHariJam.setPrefWidth(140);
+
+        TableColumn<StudentRekapRow, String> colMatkul = new TableColumn<>("Mata Kuliah");
+        colMatkul.setCellValueFactory(cellData -> cellData.getValue().mataKuliahProperty());
+        colMatkul.setPrefWidth(200);
+
+        TableColumn<StudentRekapRow, String> colKelas = new TableColumn<>("Kelas");
+        colKelas.setCellValueFactory(cellData -> cellData.getValue().kelasProperty());
+        colKelas.setPrefWidth(90);
+
         TableColumn<StudentRekapRow, String> colNim = new TableColumn<>("NIM");
         colNim.setCellValueFactory(cellData -> cellData.getValue().nimProperty());
         colNim.setPrefWidth(120);
 
-        TableColumn<StudentRekapRow, String> colNama = new TableColumn<>("Nama Mahasiswa");
+        TableColumn<StudentRekapRow, String> colNama = new TableColumn<>("Nama Lengkap");
         colNama.setCellValueFactory(cellData -> cellData.getValue().namaProperty());
         colNama.setPrefWidth(220);
 
-        tableRekap.getColumns().addAll(colNo, colNim, colNama);
+        TableColumn<StudentRekapRow, String> colKehadiran = new TableColumn<>("Kehadiran");
+        colKehadiran.setCellValueFactory(cellData -> cellData.getValue().kehadiranProperty());
+        colKehadiran.setPrefWidth(110);
 
-        // 2. Get Schedule & Class ID
-        Jadwal j = jadwalDAO.getById(idJadwal);
-        if (j == null) return;
+        TableColumn<StudentRekapRow, String> colKeterangan = new TableColumn<>("Keterangan");
+        colKeterangan.setCellValueFactory(cellData -> cellData.getValue().keteranganProperty());
+        colKeterangan.setPrefWidth(220);
 
-        int kelasId = 0;
-        try {
-            kelasId = Integer.parseInt(j.getIdKelas());
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
-        }
+        tableRekap.getColumns().addAll(colNo, colTanggal, colHariJam, colMatkul, colKelas, colNim, colNama, colKehadiran, colKeterangan);
 
-        // 3. Get students in this class
-        List<model.Mahasiswa> mahasiswas = mahasiswaDAO.getByKelasId(kelasId);
-
-        // 4. Get all unique dates when attendance was taken
-        List<LocalDate> dates = absensiDAO.getTanggalByJadwal(idJadwal);
-
-        // 5. Dynamically create columns for each attendance date
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM");
-        for (LocalDate d : dates) {
-            TableColumn<StudentRekapRow, String> colDate = new TableColumn<>(d.format(formatter));
-            colDate.setPrefWidth(85);
-            colDate.setStyle("-fx-alignment: CENTER;");
-            
-            colDate.setCellValueFactory(cellData -> {
-                String status = cellData.getValue().getStatusForDate(d);
-                return new SimpleStringProperty(status);
-            });
-
-            colDate.setCellFactory(column -> new TableCell<StudentRekapRow, String>() {
-                @Override
-                protected void updateItem(String item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (empty || item == null) {
-                        setText(null);
-                        setStyle("");
-                    } else {
-                        setText(item);
-                        switch (item) {
-                            case "M":
-                                setStyle("-fx-text-fill: #10b981; -fx-font-weight: bold; -fx-alignment: CENTER;");
-                                break;
-                            case "I":
-                                setStyle("-fx-text-fill: #3b82f6; -fx-font-weight: bold; -fx-alignment: CENTER;");
-                                break;
-                            case "S":
-                                setStyle("-fx-text-fill: #f59e0b; -fx-font-weight: bold; -fx-alignment: CENTER;");
-                                break;
-                            case "A":
-                                setStyle("-fx-text-fill: #ef4444; -fx-font-weight: bold; -fx-alignment: CENTER;");
-                                break;
-                            default:
-                                setStyle("-fx-alignment: CENTER;");
-                        }
-                    }
-                }
-            });
-
-            tableRekap.getColumns().add(colDate);
-        }
-
-        // 6. Get attendance records for this schedule
+        // Filter langsung di query SQL berdasarkan jadwal_id -- bukan mencocokkan
+        // nama kelas/mata kuliah secara string, yang rapuh dan bisa meleset.
         List<model.Absensi> absensiList = absensiDAO.getRekapByJadwal(idJadwal);
 
-        // 7. Populate rows
         ObservableList<StudentRekapRow> rowList = FXCollections.observableArrayList();
         int no = 1;
-        for (model.Mahasiswa m : mahasiswas) {
-            int dbMahasiswaId = mahasiswaDAO.getIdByNim(m.getNim());
-            String dbMahasiswaIdStr = String.valueOf(dbMahasiswaId);
-
-            StudentRekapRow row = new StudentRekapRow(no++, m.getNim(), m.getNama());
-
-            // Add attendance data for this student row
-            for (model.Absensi a : absensiList) {
-                if (dbMahasiswaIdStr.equals(a.getNim())) {
-                    row.addAttendance(a.getTanggal(), a.getStatus());
-                }
-            }
-
-            rowList.add(row);
+        for (model.Absensi a : absensiList) {
+            rowList.add(new StudentRekapRow(
+                    no++,
+                    a.getTanggal(),
+                    a.getHariJam(),
+                    a.getMataKuliah(),
+                    a.getKelas(),
+                    a.getNim(),
+                    a.getNamaLengkap(),
+                    a.getKehadiran(),
+                    a.getKeterangan()));
         }
 
         tableRekap.setItems(rowList);
     }
 
     private void handleCetak() {
-        AlertHelper.showInfo("Simulasi Cetak", "Mengekspor rekap absensi ke format cetak...\n"
-                + "Data untuk Kelas " + lblKelas.getText() + " (" + lblMatkul.getText() + ") siap dikirim ke printer.");
+        try {
+
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Simpan Rekap Absensi");
+
+            fileChooser.getExtensionFilters().add(
+                    new FileChooser.ExtensionFilter("PDF Files", "*.pdf"));
+
+            fileChooser.setInitialFileName(
+                    "Rekap_" + lblKelas.getText().replace(" ", "_") + ".pdf");
+
+            File file = fileChooser.showSaveDialog(
+                    btnCetak.getScene().getWindow());
+
+            if (file == null) {
+                return;
+            }
+
+            PDFExporter.exportTableViewToPDF(
+                    tableRekap,
+                    file.getAbsolutePath(),
+                    "REKAP ABSENSI\n"
+                            + "Mata Kuliah : " + lblMatkul.getText()
+                            + "\nKelas : " + lblKelas.getText()
+                            + "\nJadwal : " + lblHariJam.getText());
+
+            AlertHelper.showInfo(
+                    "Berhasil",
+                    "PDF berhasil disimpan di:\n" +
+                            file.getAbsolutePath());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            AlertHelper.showError(
+                    "Gagal Export PDF",
+                    e.getMessage());
+        }
     }
 
     private void kembaliKeJadwal() {
@@ -188,33 +202,62 @@ public class RekapAbsenController implements Initializable {
     // Row class representasi mahasiswa di TableView rekap
     public static class StudentRekapRow {
         private final SimpleIntegerProperty no;
+        private final SimpleStringProperty tanggal;
+        private final SimpleStringProperty hariJam;
+        private final SimpleStringProperty mataKuliah;
+        private final SimpleStringProperty kelas;
         private final SimpleStringProperty nim;
         private final SimpleStringProperty nama;
-        private final Map<LocalDate, String> attendanceMap = new HashMap<>();
+        private final SimpleStringProperty kehadiran;
+        private final SimpleStringProperty keterangan;
 
-        public StudentRekapRow(int no, String nim, String nama) {
+        public StudentRekapRow(int no, LocalDate tanggal, String hariJam, String mataKuliah, String kelas,
+                               String nim, String nama, String kehadiran, String keterangan) {
             this.no = new SimpleIntegerProperty(no);
-            this.nim = new SimpleStringProperty(nim);
-            this.nama = new SimpleStringProperty(nama);
+            this.tanggal = new SimpleStringProperty(tanggal == null ? "-" : tanggal.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+            this.hariJam = new SimpleStringProperty(hariJam == null ? "-" : hariJam);
+            this.mataKuliah = new SimpleStringProperty(mataKuliah == null ? "-" : mataKuliah);
+            this.kelas = new SimpleStringProperty(kelas == null ? "-" : kelas);
+            this.nim = new SimpleStringProperty(nim == null ? "-" : nim);
+            this.nama = new SimpleStringProperty(nama == null ? "-" : nama);
+            this.kehadiran = new SimpleStringProperty(kehadiran == null ? "-" : kehadiran);
+            this.keterangan = new SimpleStringProperty(keterangan == null ? "-" : keterangan);
         }
 
-        public SimpleIntegerProperty noProperty() { return no; }
-        public SimpleStringProperty nimProperty() { return nim; }
-        public SimpleStringProperty namaProperty() { return nama; }
-
-        public void addAttendance(LocalDate date, String status) {
-            String code = "-";
-            if (status != null) {
-                if (status.equalsIgnoreCase("Hadir")) code = "M";
-                else if (status.equalsIgnoreCase("Izin")) code = "I";
-                else if (status.equalsIgnoreCase("Sakit")) code = "S";
-                else if (status.equalsIgnoreCase("Alpha")) code = "A";
-            }
-            attendanceMap.put(date, code);
+        public SimpleIntegerProperty noProperty() {
+            return no;
         }
 
-        public String getStatusForDate(LocalDate date) {
-            return attendanceMap.getOrDefault(date, "-");
+        public SimpleStringProperty tanggalProperty() {
+            return tanggal;
+        }
+
+        public SimpleStringProperty hariJamProperty() {
+            return hariJam;
+        }
+
+        public SimpleStringProperty mataKuliahProperty() {
+            return mataKuliah;
+        }
+
+        public SimpleStringProperty kelasProperty() {
+            return kelas;
+        }
+
+        public SimpleStringProperty nimProperty() {
+            return nim;
+        }
+
+        public SimpleStringProperty namaProperty() {
+            return nama;
+        }
+
+        public SimpleStringProperty kehadiranProperty() {
+            return kehadiran;
+        }
+
+        public SimpleStringProperty keteranganProperty() {
+            return keterangan;
         }
     }
 }

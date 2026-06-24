@@ -13,6 +13,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.stage.Stage;
 import model.Mahasiswa;
+import model.Kelas;
 import util.AlertHelper;
 import util.SceneManager;
 import javafx.animation.PauseTransition;
@@ -21,6 +22,9 @@ import javafx.util.Duration;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
+import java.util.List;
+import java.util.stream.Collectors;
+import dao.KelasDAO;
 
 /**
  * Controller untuk halaman Registrasi (Khusus Mahasiswa).
@@ -51,11 +55,29 @@ public class RegisterController implements Initializable {
     private Label statusLabel;
 
     private UserDAO userDAO = new UserDAO();
+    private KelasDAO kelasDAO = new KelasDAO();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        kelasComboBox.getItems().addAll("1A", "1B", "2A", "2B", "3A", "3B");
-        prodiComboBox.getItems().addAll("Teknik Informatika", "Sistem Informasi", "Teknik Komputer");
+        // Ambil data prodi dari database (distinct dari tabel kelas)
+        List<Kelas> semuaKelas = kelasDAO.getAll();
+        List<String> prodiList = semuaKelas.stream()
+                .map(Kelas::getIdProdi)
+                .distinct()
+                .collect(Collectors.toList());
+        prodiComboBox.getItems().addAll(prodiList);
+
+        // Listener untuk mengubah daftar kelas saat prodi dipilih
+        prodiComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
+            kelasComboBox.getItems().clear();
+            if (newVal != null) {
+                List<Kelas> kelasByProdi = kelasDAO.getByProdi(newVal);
+                List<String> namaKelasList = kelasByProdi.stream()
+                        .map(Kelas::getNamaKelas)
+                        .collect(Collectors.toList());
+                kelasComboBox.getItems().addAll(namaKelasList);
+            }
+        });
     }
 
     @FXML

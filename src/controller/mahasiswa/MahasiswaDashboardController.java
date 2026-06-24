@@ -3,6 +3,11 @@ package controller.mahasiswa;
 import dao.MahasiswaDAO;
 import model.Mahasiswa;
 import util.UserSession;
+import controller.dosen.MulaiAbsenController;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -13,7 +18,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.Node;
 import javafx.stage.Stage;
 import util.SceneManager;
-import java.io.IOException;
 
 public class MahasiswaDashboardController {
 
@@ -32,6 +36,7 @@ public class MahasiswaDashboardController {
         setSubView("/view/mahasiswa/DataAbsenMahasiswaView.fxml");
     }
 
+    // --- KODINGAN LOKAL (SUKSES DINAMIS) ---
     private void loadDataMahasiswaDinamis() {
         if (UserSession.getCurrentUser() != null) {
             String nimLogin = UserSession.getCurrentUser().getUsername();
@@ -50,6 +55,35 @@ public class MahasiswaDashboardController {
         }
     }
 
+    // --- FITUR BARU DARI GITHUB (DIAMANKAN) ---
+    public void showAbsensiForm(String idJadwal, String namaKelas, String namaMatkul, String hari, String jam) {
+        URL fxmlLocation = getClass().getResource("/view/dosen/MulaiAbsenView.fxml");
+        if (fxmlLocation == null) {
+            System.err.println("[ERROR] File 'MulaiAbsenView.fxml' tidak ditemukan!");
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(fxmlLocation);
+            Parent absensiView = loader.load();
+
+            MulaiAbsenController absensiController = loader.getController();
+            absensiController.initData(idJadwal, namaKelas, namaMatkul, hari, jam);
+
+            if (contentArea != null) {
+                contentArea.getChildren().setAll(absensiView);
+                // Ditata visualnya pakai style lokal biar sinkron & gak error compile
+                btnJadwal.setStyle("-fx-background-color: #334155; -fx-text-fill: #ffffff; -fx-alignment: center-left; -fx-background-radius: 8px; -fx-font-weight: bold; -fx-cursor: hand;");
+                btnProfil.setStyle("-fx-background-color: transparent; -fx-text-fill: #94a3b8; -fx-alignment: center-left; -fx-background-radius: 8px; -fx-cursor: hand; -fx-font-weight: normal;");
+                System.out.println("[INTEGRASI] Form absensi sukses ditampilkan di dashboard mahasiswa!");
+            }
+        } catch (IOException e) {
+            System.err.println("[EROR KRITIKAL] Gagal memuat form absensi.");
+            e.printStackTrace();
+        }
+    }
+
+    // --- MEKANISME SUB-VIEW & NAVIGASI LOKAL (YANG UDAH FIX) ---
     private void setSubView(String fxmlPath) {
         try {
             java.net.URL fxmlLocation = getClass().getResource(fxmlPath);

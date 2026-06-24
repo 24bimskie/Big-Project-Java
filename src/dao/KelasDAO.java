@@ -12,6 +12,7 @@ import java.util.List;
  * Menggunakan skema tabel: kelas(id INT AUTO_INCREMENT, Prodi VARCHAR, kelas VARCHAR)
  * Catatan: id adalah integer auto-increment, bukan string.
  *          Kolom tahun_akademik tidak ada di DB saat ini.
+ *          Database sudah dibersihkan dari data invalid (Prompt Engineering, Robi Silat).
  */
 public class KelasDAO {
 
@@ -100,7 +101,7 @@ public class KelasDAO {
                 String.valueOf(rs.getInt("id")),  // id integer → string
                 rs.getString("kelas"),             // kolom kelas → namaKelas
                 rs.getString("Prodi"),             // kolom Prodi → idProdi
-                ""                                 // tahun_akademik tidak ada di DB
+                "2024/2025"                        // tahun akademik default
         );
     }
 

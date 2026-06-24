@@ -17,12 +17,13 @@ import util.AlertHelper;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.UUID;
 
 /**
- * Controller untuk use case: Input Data Prodi & Input Kelas.
- * Admin mengelola program studi; kelas merupakan «include» dari prodi.
- * Halaman ini dibagi dua panel: panel Prodi (kiri) dan panel Kelas (kanan).
- * Memilih prodi di tabel akan menampilkan kelas-kelas milik prodi tersebut.
+ * Controller untuk use case: Input Data Prodi & Kelas Gabungan.
+ * Admin mengelola program studi dan kelas secara bersamaan dalam satu form.
+ * Halaman ini dibagi dua panel: panel Prodi (kiri) dan panel Kelas (kanan) di tab "Lihat Data".
+ * Tab "Input Data" menampilkan form gabungan untuk input prodi dan kelas bersama-sama.
  */
 public class DataProdiKelasController implements Initializable {
 
@@ -31,61 +32,30 @@ public class DataProdiKelasController implements Initializable {
     @FXML
     private TabPane tabPane;
 
-    // ===== FXML Bindings — Tabel Prodi =====
-
-    @FXML
-    private TableView<Prodi> tableProdi;
-
-    @FXML
-    private TableColumn<Prodi, String> colIdProdi;
-
-    @FXML
-    private TableColumn<Prodi, String> colNamaProdi;
-
-    @FXML
-    private TableColumn<Prodi, String> colFakultas;
-
-    // ===== FXML Bindings — Form Prodi =====
-
-    @FXML
-    private TextField fieldIdProdi;
-
-    @FXML
-    private TextField fieldNamaProdi;
-
-    @FXML
-    private TextField fieldFakultas;
-
-    @FXML
-    private Button btnTambahProdi;
-
-    @FXML
-    private Button btnEditProdi;
-
-    @FXML
-    private Button btnHapusProdi;
-
-    @FXML
-    private Button btnBatalProdi;
-
     // ===== FXML Bindings — Tabel Kelas =====
 
     @FXML
-    private TableView<Kelas> tableKelas;
+    private TableView<Kelas> tableProdi;
 
     @FXML
-    private TableColumn<Kelas, String> colIdKelas;
+    private TableColumn<Kelas, String> colId;
 
     @FXML
-    private TableColumn<Kelas, String> colNamaKelas;
+    private TableColumn<Kelas, String> colProdi;
+
+    @FXML
+    private TableColumn<Kelas, String> colKelas;
 
     @FXML
     private TableColumn<Kelas, String> colTahunAkademik;
 
-    // ===== FXML Bindings — Form Kelas =====
+    @FXML
+    private TableColumn<Kelas, Void> colAksi;
+
+    // ===== FXML Bindings — Form =====
 
     @FXML
-    private TextField fieldIdKelas;
+    private TextField fieldNamaProdi;
 
     @FXML
     private TextField fieldNamaKelas;
@@ -93,21 +63,17 @@ public class DataProdiKelasController implements Initializable {
     @FXML
     private TextField fieldTahunAkademik;
 
-    /** Label yang menunjukkan prodi aktif saat menambah/edit kelas */
     @FXML
-    private Label labelProdiKelas;
+    private Button btnTambah;
 
     @FXML
-    private Button btnTambahKelas;
+    private Button btnEdit;
 
     @FXML
-    private Button btnEditKelas;
+    private Button btnHapus;
 
     @FXML
-    private Button btnHapusKelas;
-
-    @FXML
-    private Button btnBatalKelas;
+    private Button btnBatal;
 
     // ===== State =====
 
@@ -115,290 +81,215 @@ public class DataProdiKelasController implements Initializable {
     private final KelasDAO kelasDAO = new KelasDAO();
 
     private final ObservableList<Prodi> prodiList = FXCollections.observableArrayList();
-    private final ObservableList<Kelas> kelasList = FXCollections.observableArrayList();
-    private FilteredList<Kelas> filteredKelasList;
+    private final ObservableList<Kelas> kelasDisplayList = FXCollections.observableArrayList();
 
     /** Prodi yang sedang aktif/dipilih di tabel */
     private Prodi selectedProdi = null;
+    
+    /** Kelas yang sedang aktif/dipilih di tabel */
+    private Kelas selectedKelas = null;
 
-    private boolean isEditModeProdi = false;
-    private boolean isEditModeKelas = false;
+    private boolean isEditMode = false;
 
-    // ===== Lifecycle =====
+    // ===== Inisialisasi =====
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        setupTableProdi();
-        setupTableKelas();
-        setupFilterKelas();
-        loadProdi();
-        setupProdiSelectionListener();
-        setEditModeProdi(false);
-        setEditModeKelas(false);
-        // Nonaktifkan panel kelas sampai prodi dipilih
-        setPanelKelasEnabled(false);
+        setupTableCombined();
+        loadCombinedData();
+        setEditMode(false);
     }
 
-    // ===== Setup =====
+    // ===== Mapping kolom tabel kelas =====
 
-    private void setupTableProdi() {
-        colIdProdi.setCellValueFactory(new PropertyValueFactory<>("idProdi"));
-        colNamaProdi.setCellValueFactory(new PropertyValueFactory<>("namaProdi"));
-        colFakultas.setCellValueFactory(new PropertyValueFactory<>("fakultas"));
-        tableProdi.setItems(prodiList);
-    }
-
-    private void setupTableKelas() {
-        colIdKelas.setCellValueFactory(new PropertyValueFactory<>("idKelas"));
-        colNamaKelas.setCellValueFactory(new PropertyValueFactory<>("namaKelas"));
+    private void setupTableCombined() {
+        // Kolom ID dari database
+        colId.setCellValueFactory(new PropertyValueFactory<>("idKelas"));
+        
+        // Kolom Prodi (nama program studi)
+        colProdi.setCellValueFactory(new PropertyValueFactory<>("idProdi"));
+        
+        // Kolom Kelas (nama kelas)
+        colKelas.setCellValueFactory(new PropertyValueFactory<>("namaKelas"));
+        
+        // Kolom Tahun Akademik
         colTahunAkademik.setCellValueFactory(new PropertyValueFactory<>("tahunAkademik"));
-    }
+        
+        // Kolom Aksi dengan tombol Edit dan Hapus
+        colAksi.setCellValueFactory(param -> new javafx.beans.property.ReadOnlyObjectWrapper<>(null));
+        colAksi.setCellFactory(param -> new TableCell<Kelas, Void>() {
+            private final Button btnEditRow = new Button("Edit");
+            private final Button btnHapusRow = new Button("Hapus");
+            private final javafx.scene.layout.HBox pane = new javafx.scene.layout.HBox(10, btnEditRow, btnHapusRow);
 
-    /** Kelas di-filter otomatis berdasarkan prodi yang dipilih */
-    private void setupFilterKelas() {
-        filteredKelasList = new FilteredList<>(kelasList, k -> true);
-        tableKelas.setItems(filteredKelasList);
-    }
+            {
+                btnEditRow.getStyleClass().addAll("btn-primary");
+                btnEditRow.setStyle(
+                        "-fx-background-color: #f59e0b; -fx-padding: 5 10; -fx-font-size: 12px; -fx-pref-height: 25px;");
+                btnHapusRow.getStyleClass().addAll("btn-danger");
+                btnHapusRow.setStyle("-fx-padding: 5 10; -fx-font-size: 12px; -fx-pref-height: 25px;");
 
-    /**
-     * Saat prodi dipilih di tabel:
-     * - Isi form prodi
-     * - Load dan tampilkan kelas milik prodi tersebut
-     * - Aktifkan panel kelas
-     */
-    private void setupProdiSelectionListener() {
-        tableProdi.getSelectionModel().selectedItemProperty().addListener(
-                (obs, oldSel, newSel) -> {
-                    if (newSel != null) {
-                        selectedProdi = newSel;
-                        populateFormProdi(newSel);
-                        loadKelasByProdi(newSel.getIdProdi());
-                        setPanelKelasEnabled(true);
-                        clearFormKelas();
-                        setEditModeKelas(false);
-                        if (labelProdiKelas != null) {
-                            labelProdiKelas.setText("Kelas untuk Prodi: " + newSel.getNamaProdi());
-                        }
+                btnEditRow.setOnAction(event -> {
+                    Kelas k = getTableView().getItems().get(getIndex());
+                    selectedKelas = k;
+                    fieldNamaProdi.setText(k.getIdProdi());
+                    fieldNamaKelas.setText(k.getNamaKelas());
+                    fieldTahunAkademik.setText(k.getTahunAkademik());
+                    setEditMode(true);
+                    selectTab(1); // Pindah ke tab Input Data
+                });
+
+                btnHapusRow.setOnAction(event -> {
+                    Kelas k = getTableView().getItems().get(getIndex());
+                    boolean ok = AlertHelper.showConfirmation("Konfirmasi Hapus",
+                            "Yakin ingin menghapus kelas \"" + k.getNamaKelas() + "\" (" + k.getIdProdi() + ")?");
+                    if (ok) {
+                        kelasDAO.delete(k.getIdKelas());
+                        AlertHelper.showInfo("Berhasil", "Data kelas berhasil dihapus.");
+                        loadCombinedData();
+                        clearForm();
+                        selectedKelas = null;
+                        setEditMode(false);
                     }
                 });
+                pane.setAlignment(javafx.geometry.Pos.CENTER);
+            }
 
-        // Saat kelas dipilih → isi form kelas
-        tableKelas.getSelectionModel().selectedItemProperty().addListener(
-                (obs, oldSel, newSel) -> {
-                    if (newSel != null)
-                        populateFormKelas(newSel);
-                });
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                setGraphic(empty ? null : pane);
+            }
+        });
+        
+        tableProdi.setItems(kelasDisplayList);
     }
 
     // ===== Load Data =====
 
-    private void loadProdi() {
-        prodiList.clear();
-        List<Prodi> data = prodiDAO.getAll();
-        if (data != null)
-            prodiList.addAll(data);
+    private void loadCombinedData() {
+        kelasDisplayList.clear();
+        
+        // Load semua kelas dari database dan tampilkan
+        List<Kelas> allKelas = kelasDAO.getAll();
+        if (allKelas != null) {
+            kelasDisplayList.addAll(allKelas);
+        }
     }
-
-    private void loadKelasByProdi(String idProdi) {
-        kelasList.clear();
-        List<Kelas> data = kelasDAO.getByProdi(idProdi);
-        if (data != null)
-            kelasList.addAll(data);
-        // Reset predicate agar semua kelas prodi ini ditampilkan
-        filteredKelasList.setPredicate(k -> k.getIdProdi().equals(idProdi));
-    }
-
-    // ===== CRUD Prodi =====
 
     @FXML
-    private void handleTambahProdi(ActionEvent event) {
-        if (!isFormProdiValid())
+    private void handleTambah(ActionEvent event) {
+        if (!isFormValid())
             return;
-        prodiDAO.insert(buildProdiFromForm());
-        AlertHelper.showInfo("Berhasil", "Data prodi berhasil ditambahkan.");
-        loadProdi();
-        clearFormProdi();
+
+        try {
+            // Generate ID untuk kelas saja (Prodi disimpan sebagai nama di tabel kelas)
+            String idKelas = generateIdKelas();
+            String namaProdi = fieldNamaProdi.getText().trim();
+            String namaKelas = fieldNamaKelas.getText().trim();
+            String tahunAkademik = fieldTahunAkademik.getText().trim();
+
+            // Simpan langsung ke kelas dengan Prodi sebagai nama
+            Kelas newKelas = new Kelas(idKelas, namaKelas, namaProdi, tahunAkademik);
+            kelasDAO.insert(newKelas);
+
+            AlertHelper.showInfo("Berhasil", "Data prodi dan kelas berhasil ditambahkan.");
+            loadCombinedData();
+            clearForm();
+        } catch (Exception e) {
+            AlertHelper.showError("Error", "Gagal menambahkan data: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     @FXML
-    private void handleEditProdi(ActionEvent event) {
-        if (!isEditModeProdi) {
-            if (tableProdi.getSelectionModel().getSelectedItem() == null) {
-                AlertHelper.showWarning("Peringatan", "Pilih prodi yang ingin diedit terlebih dahulu.");
+    private void handleEdit(ActionEvent event) {
+        if (!isEditMode) {
+            Kelas selected = tableProdi.getSelectionModel().getSelectedItem();
+            if (selected == null) {
+                AlertHelper.showWarning("Peringatan", "Pilih kelas di tabel terlebih dahulu untuk edit.");
                 return;
             }
-            setEditModeProdi(true);
+            selectedKelas = selected;
+            
+            fieldNamaProdi.setText(selected.getIdProdi());
+            fieldNamaKelas.setText(selected.getNamaKelas());
+            fieldTahunAkademik.setText(selected.getTahunAkademik());
+            
+            setEditMode(true);
             return;
         }
-        if (!isFormProdiValid())
+
+        if (!isFormValid())
             return;
-        prodiDAO.update(buildProdiFromForm());
-        AlertHelper.showInfo("Berhasil", "Data prodi berhasil diperbarui.");
-        loadProdi();
-        clearFormProdi();
-        setEditModeProdi(false);
+
+        try {
+            // Update kelas (Prodi disimpan di field idProdi)
+            String namaProdi = fieldNamaProdi.getText().trim();
+            String namaKelas = fieldNamaKelas.getText().trim();
+            String tahunAkademik = fieldTahunAkademik.getText().trim();
+            
+            Kelas updatedKelas = new Kelas(selectedKelas.getIdKelas(), namaKelas, namaProdi, tahunAkademik);
+            kelasDAO.update(updatedKelas);
+
+            AlertHelper.showInfo("Berhasil", "Data prodi dan kelas berhasil diperbarui.");
+            loadCombinedData();
+            clearForm();
+            setEditMode(false);
+        } catch (Exception e) {
+            AlertHelper.showError("Error", "Gagal mengupdate data: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     @FXML
-    private void handleHapusProdi(ActionEvent event) {
-        Prodi selected = tableProdi.getSelectionModel().getSelectedItem();
+    private void handleHapus(ActionEvent event) {
+        Kelas selected = tableProdi.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            AlertHelper.showWarning("Peringatan", "Pilih prodi yang ingin dihapus terlebih dahulu.");
+            AlertHelper.showWarning("Peringatan", "Pilih kelas di tabel terlebih dahulu.");
             return;
         }
+        
         boolean konfirmasi = AlertHelper.showConfirmation(
                 "Konfirmasi Hapus",
-                "Yakin ingin menghapus prodi \"" + selected.getNamaProdi() + "\"?\n"
-                        + "Semua kelas dalam prodi ini juga akan terhapus.");
+                "Yakin ingin menghapus kelas \"" + selected.getNamaKelas() + "\"?");
+
         if (konfirmasi) {
-            prodiDAO.delete(selected.getIdProdi());
-            AlertHelper.showInfo("Berhasil", "Data prodi berhasil dihapus.");
-            loadProdi();
-            clearFormProdi();
-            clearFormKelas();
-            kelasList.clear();
-            setPanelKelasEnabled(false);
-            selectedProdi = null;
-            setEditModeProdi(false);
+            try {
+                kelasDAO.delete(selected.getIdKelas());
+                AlertHelper.showInfo("Berhasil", "Data kelas berhasil dihapus.");
+                loadCombinedData();
+                clearForm();
+                selectedKelas = null;
+                selectedProdi = null;
+                setEditMode(false);
+            } catch (Exception e) {
+                AlertHelper.showError("Error", "Gagal menghapus data: " + e.getMessage());
+                e.printStackTrace();
+            }
         }
     }
 
     @FXML
-    private void handleBatalProdi(ActionEvent event) {
-        clearFormProdi();
-        setEditModeProdi(false);
+    private void handleBatal(ActionEvent event) {
+        clearForm();
+        setEditMode(false);
+        selectedProdi = null;
+        selectedKelas = null;
         tableProdi.getSelectionModel().clearSelection();
     }
 
-    // ===== CRUD Kelas =====
+    // ===== Helper Methods =====
 
-    @FXML
-    private void handleTambahKelas(ActionEvent event) {
-        if (selectedProdi == null) {
-            AlertHelper.showWarning("Peringatan", "Pilih prodi terlebih dahulu sebelum menambah kelas.");
-            return;
-        }
-        if (!isFormKelasValid())
-            return;
-        Kelas kelas = buildKelasFromForm(selectedProdi.getIdProdi());
-        kelasDAO.insert(kelas);
-        AlertHelper.showInfo("Berhasil", "Data kelas berhasil ditambahkan.");
-        loadKelasByProdi(selectedProdi.getIdProdi());
-        clearFormKelas();
-    }
-
-    @FXML
-    private void handleEditKelas(ActionEvent event) {
-        if (!isEditModeKelas) {
-            if (tableKelas.getSelectionModel().getSelectedItem() == null) {
-                AlertHelper.showWarning("Peringatan", "Pilih kelas yang ingin diedit terlebih dahulu.");
-                return;
-            }
-            setEditModeKelas(true);
-            return;
-        }
-        if (!isFormKelasValid())
-            return;
-        String idProdi = selectedProdi != null ? selectedProdi.getIdProdi() : "";
-        kelasDAO.update(buildKelasFromForm(idProdi));
-        AlertHelper.showInfo("Berhasil", "Data kelas berhasil diperbarui.");
-        loadKelasByProdi(idProdi);
-        clearFormKelas();
-        setEditModeKelas(false);
-    }
-
-    @FXML
-    private void handleHapusKelas(ActionEvent event) {
-        Kelas selected = tableKelas.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            AlertHelper.showWarning("Peringatan", "Pilih kelas yang ingin dihapus terlebih dahulu.");
-            return;
-        }
-        boolean konfirmasi = AlertHelper.showConfirmation(
-                "Konfirmasi Hapus",
-                "Yakin ingin menghapus kelas \"" + selected.getNamaKelas() + "\" ("
-                        + selected.getIdKelas() + ")?");
-        if (konfirmasi) {
-            kelasDAO.delete(selected.getIdKelas());
-            AlertHelper.showInfo("Berhasil", "Data kelas berhasil dihapus.");
-            if (selectedProdi != null)
-                loadKelasByProdi(selectedProdi.getIdProdi());
-            clearFormKelas();
-            setEditModeKelas(false);
-        }
-    }
-
-    @FXML
-    private void handleBatalKelas(ActionEvent event) {
-        clearFormKelas();
-        setEditModeKelas(false);
-        tableKelas.getSelectionModel().clearSelection();
-    }
-
-    // ===== Helper — Prodi =====
-
-    private void populateFormProdi(Prodi p) {
-        fieldIdProdi.setText(p.getIdProdi());
+    private void populateFormFromProdi(Prodi p) {
         fieldNamaProdi.setText(p.getNamaProdi());
-        fieldFakultas.setText(p.getFakultas());
+        fieldNamaKelas.clear();
+        fieldTahunAkademik.clear();
     }
 
-    private Prodi buildProdiFromForm() {
-        return new Prodi(
-                fieldIdProdi.getText().trim(),
-                fieldNamaProdi.getText().trim(),
-                fieldFakultas.getText().trim());
-    }
-
-    private boolean isFormProdiValid() {
-        if (fieldIdProdi.getText().trim().isEmpty()) {
-            AlertHelper.showWarning("Validasi", "ID Prodi tidak boleh kosong.");
-            return false;
-        }
+    private boolean isFormValid() {
         if (fieldNamaProdi.getText().trim().isEmpty()) {
             AlertHelper.showWarning("Validasi", "Nama prodi tidak boleh kosong.");
-            return false;
-        }
-        return true;
-    }
-
-    private void clearFormProdi() {
-        fieldIdProdi.clear();
-        fieldNamaProdi.clear();
-        fieldFakultas.clear();
-    }
-
-    private void setEditModeProdi(boolean editMode) {
-        this.isEditModeProdi = editMode;
-        fieldIdProdi.setDisable(editMode); // ID prodi = primary key
-        if (editMode) {
-            btnEditProdi.setText("Simpan");
-            btnTambahProdi.setDisable(true);
-        } else {
-            btnEditProdi.setText("Edit");
-            btnTambahProdi.setDisable(false);
-        }
-    }
-
-    // ===== Helper — Kelas =====
-
-    private void populateFormKelas(Kelas k) {
-        fieldIdKelas.setText(k.getIdKelas());
-        fieldNamaKelas.setText(k.getNamaKelas());
-        fieldTahunAkademik.setText(k.getTahunAkademik());
-    }
-
-    private Kelas buildKelasFromForm(String idProdi) {
-        return new Kelas(
-                fieldIdKelas.getText().trim(),
-                fieldNamaKelas.getText().trim(),
-                idProdi,
-                fieldTahunAkademik.getText().trim());
-    }
-
-    private boolean isFormKelasValid() {
-        if (fieldIdKelas.getText().trim().isEmpty()) {
-            AlertHelper.showWarning("Validasi", "ID Kelas tidak boleh kosong.");
             return false;
         }
         if (fieldNamaKelas.getText().trim().isEmpty()) {
@@ -412,37 +303,29 @@ public class DataProdiKelasController implements Initializable {
         return true;
     }
 
-    private void clearFormKelas() {
-        fieldIdKelas.clear();
+    private void clearForm() {
+        fieldNamaProdi.clear();
         fieldNamaKelas.clear();
         fieldTahunAkademik.clear();
     }
 
-    private void setEditModeKelas(boolean editMode) {
-        this.isEditModeKelas = editMode;
-        fieldIdKelas.setDisable(editMode); // ID kelas = primary key
+    private void setEditMode(boolean editMode) {
+        this.isEditMode = editMode;
         if (editMode) {
-            btnEditKelas.setText("Simpan");
-            btnTambahKelas.setDisable(true);
+            btnEdit.setText("Simpan");
+            btnTambah.setDisable(true);
         } else {
-            btnEditKelas.setText("Edit");
-            btnTambahKelas.setDisable(false);
+            btnEdit.setText("Edit");
+            btnTambah.setDisable(false);
         }
     }
 
     /**
-     * Mengaktifkan atau menonaktifkan seluruh panel kelas.
-     * Panel kelas hanya bisa digunakan setelah prodi dipilih.
+     * Generate ID Kelas secara otomatis.
+     * Format: KLS-<UUID singkat>
      */
-    private void setPanelKelasEnabled(boolean enabled) {
-        tableKelas.setDisable(!enabled);
-        fieldIdKelas.setDisable(!enabled);
-        fieldNamaKelas.setDisable(!enabled);
-        fieldTahunAkademik.setDisable(!enabled);
-        btnTambahKelas.setDisable(!enabled);
-        btnEditKelas.setDisable(!enabled);
-        btnHapusKelas.setDisable(!enabled);
-        btnBatalKelas.setDisable(!enabled);
+    private String generateIdKelas() {
+        return "KLS-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
 
     public void selectTab(int index) {

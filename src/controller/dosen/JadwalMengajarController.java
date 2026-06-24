@@ -1,5 +1,6 @@
 package controller.dosen;
 
+import dao.DosenDAO;
 import dao.JadwalDAO;
 import dao.KelasDAO;
 import dao.MataKuliahDAO;
@@ -17,6 +18,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import util.AlertHelper;
+import model.Dosen;
 import model.Jadwal;
 import model.Kelas;
 import model.MataKuliah;
@@ -40,6 +43,7 @@ public class JadwalMengajarController implements Initializable {
     private JadwalDAO jadwalDAO = new JadwalDAO();
     private KelasDAO kelasDAO = new KelasDAO();
     private MataKuliahDAO mataKuliahDAO = new MataKuliahDAO();
+    private DosenDAO dosenDAO = new DosenDAO();
 
     private ObservableList<JadwalRow> jadwalList = FXCollections.observableArrayList();
 
@@ -94,8 +98,20 @@ public class JadwalMengajarController implements Initializable {
         User currentUser = UserSession.getCurrentUser();
         if (currentUser == null) return;
 
+        String dosenIdentifier = currentUser.getUsername();
+        Dosen dosen = dosenDAO.getByNidn(dosenIdentifier);
+        if (dosen == null) {
+            dosen = dosenDAO.getByNamaLengkap(dosenIdentifier);
+        }
+
         // Mendapatkan data jadwal untuk dosen yang sedang login
-        List<Jadwal> jadwals = jadwalDAO.getByDosen(currentUser.getUserId());
+        List<Jadwal> jadwals = jadwalDAO.getByDosen(dosen != null ? dosen.getNidn() : dosenIdentifier);
+        if (jadwals.isEmpty()) {
+            jadwals = jadwalDAO.getByDosen(currentUser.getUserId());
+        }
+        if (jadwals.isEmpty()) {
+            jadwals = jadwalDAO.getByDosen(currentUser.getUsername());
+        }
         int no = 1;
         for (Jadwal j : jadwals) {
             Kelas kelas = kelasDAO.getById(j.getIdKelas());
@@ -113,28 +129,10 @@ public class JadwalMengajarController implements Initializable {
      * Buka halaman Mulai Absen dan kirim data jadwal ke controller tujuan.
      */
     private void bukaMulaiAbsen(JadwalRow row) {
-        try {
-            StackPane papanKontenTengah = (StackPane) tabelJadwal.getScene().lookup("#papanKontenTengah");
-            if (papanKontenTengah != null) {
-                URL url = getClass().getResource("/view/dosen/MulaiAbsenView.fxml");
-                if (url == null) {
-                    System.err.println("File FXML tidak ditemukan: MulaiAbsenView.fxml");
-                    return;
-                }
-                FXMLLoader loader = new FXMLLoader(url);
-                Parent halamanBaru = loader.load();
-
-                // Kirim data jadwal ke controller MulaiAbsen
-                MulaiAbsenController controller = loader.getController();
-                controller.initData(row.getIdJadwal(), row.namaKelasProperty().get(), row.namaMatkulProperty().get(),
-                                    row.hariProperty().get(), row.jamProperty().get());
-
-                papanKontenTengah.getChildren().clear();
-                papanKontenTengah.getChildren().add(halamanBaru);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        AlertHelper.showInfo(
+                "Absensi Dimulai",
+                "Absensi untuk kelas " + row.namaKelasProperty().get() + " pada " + row.namaMatkulProperty().get() + " telah dimulai."
+        );
     }
 
     /**

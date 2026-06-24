@@ -29,7 +29,6 @@ public class Main extends Application {
 
             primaryStage.setTitle("Sistem Absensi Mahasiswa");
             primaryStage.setScene(scene);
-            primaryStage.setResizable(false);
             primaryStage.show();
         } catch (Exception e) {
             e.printStackTrace();

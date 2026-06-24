@@ -25,7 +25,7 @@ public class MahasiswaDAO {
 
             stmt.setString(1, m.getNim());
             stmt.setString(2, m.getNama());
-            stmt.setString(3, toGenderEnum(m.getJenisKelamin()));
+            stmt.setString(3, m.getJenisKelamin());
             stmt.setString(4, m.getAlamat());
             stmt.setString(5, m.getKelas());
             stmt.setString(6, m.getProdi());
@@ -44,7 +44,7 @@ public class MahasiswaDAO {
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, m.getNama());
-            stmt.setString(2, toGenderEnum(m.getJenisKelamin()));
+            stmt.setString(2, m.getJenisKelamin());
             stmt.setString(3, m.getAlamat());
             stmt.setString(4, m.getKelas());
             stmt.setString(5, m.getProdi());
@@ -182,21 +182,11 @@ public class MahasiswaDAO {
         return null;
     }
 
-    private String toGenderEnum(String jenisKelamin) {
-        if (jenisKelamin == null)
-            return "L";
-        return jenisKelamin.equalsIgnoreCase("Perempuan") ? "P" : "L";
-    }
-
-    private String fromGenderEnum(String gender) {
-        return "P".equalsIgnoreCase(gender) ? "Perempuan" : "Laki-laki";
-    }
-
     private Mahasiswa map(ResultSet rs) throws SQLException {
         return new Mahasiswa(
                 rs.getString("nim"),
                 rs.getString("nama"),
-                fromGenderEnum(rs.getString("gender")),
+                rs.getString("gender"),
                 rs.getString("alamat"),
                 rs.getString("kelas"),
                 rs.getString("prodi"));

@@ -88,13 +88,13 @@
                             <RadioButton fx:id="radioP" text="Perempuan" toggleGroup="$genderGroup"/>
                         </HBox>
 
-                        <Label text="Kelas:"            GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-                        <ComboBox fx:id="comboKelas" maxWidth="Infinity"
-                                  GridPane.columnIndex="1" GridPane.rowIndex="3" promptText="Pilih Kelas"/>
-
-                        <Label text="Prodi:"            GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+                        <Label text="Prodi:"            GridPane.columnIndex="0" GridPane.rowIndex="3"/>
                         <ComboBox fx:id="comboProdi" maxWidth="Infinity"
-                                  GridPane.columnIndex="1" GridPane.rowIndex="4" promptText="Pilih Prodi"/>
+                                  GridPane.columnIndex="1" GridPane.rowIndex="3" promptText="Pilih Prodi"/>
+
+                        <Label text="Kelas:"            GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+                        <ComboBox fx:id="comboKelas" maxWidth="Infinity"
+                                  GridPane.columnIndex="1" GridPane.rowIndex="4" promptText="Pilih Kelas"/>
 
                         <Label text="Alamat:"           GridPane.columnIndex="0" GridPane.rowIndex="5"/>
                         <TextField fx:id="fieldAlamat"  GridPane.columnIndex="1" GridPane.rowIndex="5"/>

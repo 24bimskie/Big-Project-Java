@@ -16,6 +16,7 @@
                 <Label text="Rekap Absensi Mahasiswa" styleClass="header-title" />
                 <Region HBox.hgrow="ALWAYS" />
                 <Label text="Tahun Ajaran 2025 - 2026" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #475569;" />
+                <Button fx:id="btnRefresh" text="Refresh" style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold; -fx-pref-height: 40px; -fx-background-radius: 8px; -fx-cursor: hand;" />
                 <Button fx:id="btnCetak" text="Cetak Rekap" style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-weight: bold; -fx-pref-height: 40px; -fx-background-radius: 8px; -fx-cursor: hand;" />
             </HBox>
 

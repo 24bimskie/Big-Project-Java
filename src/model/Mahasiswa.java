@@ -6,22 +6,40 @@ public class Mahasiswa {
     private int semester; 
     private String email;
     private String asalDaerah;
-    private String prodi; // 👈 Tambah atribut prodi
+    private String prodi;
+    
+    // Atribut dari Form Registrasi
+    private String gender;
+    private String kelas;
+    private String alamat;
 
     // Constructor Kosong
     public Mahasiswa() {}
 
-    // Constructor Lengkap
+    // Constructor untuk Registrasi (Menerima 6 String dari RegisterController)
+    public Mahasiswa(String nim, String nama, String gender, String alamat, String kelas, String prodi) {
+        this.nim = nim;
+        this.nama = nama;
+        this.gender = gender;
+        this.alamat = alamat;
+        this.asalDaerah = alamat; // Amankan kalau-kalau DAO manggil getAsalDaerah
+        this.kelas = kelas;
+        this.prodi = prodi;
+        this.semester = 1;        
+        this.email = nama.trim().toLowerCase().replace(" ", "") + "@student.umpwr.ac.id";
+    }
+
+    // Constructor Lama (Bawaan tim)
     public Mahasiswa(String nim, String nama, int semester, String email, String asalDaerah, String prodi) {
         this.nim = nim;
         this.nama = nama;
         this.semester = semester;
-        this.email = email;
+        this.email = nama.trim().toLowerCase().replace(" ", "") + "@student.umpwr.ac.id";
         this.asalDaerah = asalDaerah;
         this.prodi = prodi;
     }
 
-    // --- GETTER & SETTER LENGKAP ---
+    // --- GETTER & SETTER ---
     public String getNim() {
         return nim;
     }
@@ -62,12 +80,44 @@ public class Mahasiswa {
         this.asalDaerah = asalDaerah;
     }
 
-    // 👈 KUNCI PERBAIKAN: Getter & Setter Prodi buat MahasiswaProfilController
     public String getProdi() {
         return prodi;
     }
 
     public void setProdi(String prodi) {
         this.prodi = prodi;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    // 💡 KUNCI PENYESUAIAN: Alias khusus biar UserDAO buatan temen lu gak error
+    public String getJenisKelamin() {
+        return gender;
+    }
+
+    public void setJenisKelamin(String jenisKelamin) {
+        this.gender = jenisKelamin;
+    }
+
+    public String getKelas() {
+        return kelas;
+    }
+
+    public void setKelas(String kelas) {
+        this.kelas = kelas;
+    }
+
+    public String getAlamat() {
+        return alamat;
+    }
+
+    public void setAlamat(String alamat) {
+        this.alamat = alamat;
     }
 }

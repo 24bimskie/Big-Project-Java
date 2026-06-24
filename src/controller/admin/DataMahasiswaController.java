@@ -11,11 +11,14 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import model.Mahasiswa;
+import model.Kelas;
 import util.AlertHelper;
 
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
+import dao.KelasDAO;
 
 /**
  * Controller Data Mahasiswa.
@@ -61,6 +64,7 @@ public class DataMahasiswaController implements Initializable {
     // ===== State =====
     private final MahasiswaDAO mahasiswaDAO = new MahasiswaDAO();
     private final UserDAO userDAO = new UserDAO();
+    private final KelasDAO kelasDAO = new KelasDAO();
     private final ObservableList<Mahasiswa> mahasiswaList = FXCollections.observableArrayList();
     private FilteredList<Mahasiswa> filteredList;
     private boolean isEditMode = false;
@@ -73,6 +77,27 @@ public class DataMahasiswaController implements Initializable {
         loadData();
         setupTableSelectionListener();
         setEditMode(false);
+        setupProdiKelas();
+    }
+
+    private void setupProdiKelas() {
+        List<Kelas> semuaKelas = kelasDAO.getAll();
+        List<String> prodiList = semuaKelas.stream()
+                .map(Kelas::getIdProdi)
+                .distinct()
+                .collect(Collectors.toList());
+        comboProdi.getItems().addAll(prodiList);
+
+        comboProdi.valueProperty().addListener((obs, oldVal, newVal) -> {
+            comboKelas.getItems().clear();
+            if (newVal != null) {
+                List<Kelas> kelasByProdi = kelasDAO.getByProdi(newVal);
+                List<String> namaKelasList = kelasByProdi.stream()
+                        .map(Kelas::getNamaKelas)
+                        .collect(Collectors.toList());
+                comboKelas.getItems().addAll(namaKelasList);
+            }
+        });
     }
 
     // ===== Setup =====
@@ -286,8 +311,8 @@ public class DataMahasiswaController implements Initializable {
         else if ("P".equals(m.getJenisKelamin())) radioP.setSelected(true);
         else if (genderGroup != null) genderGroup.selectToggle(null);
         fieldAlamat.setText(m.getAlamat());
-        comboKelas.setValue(m.getKelas() != null ? m.getKelas() : null);
         comboProdi.setValue(m.getProdi() != null ? m.getProdi() : null);
+        comboKelas.setValue(m.getKelas() != null ? m.getKelas() : null);
         fieldPassword.clear();
     }
 
