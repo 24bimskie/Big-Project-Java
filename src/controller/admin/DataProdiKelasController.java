@@ -124,7 +124,7 @@ public class DataProdiKelasController implements Initializable {
     private boolean isEditModeProdi = false;
     private boolean isEditModeKelas = false;
 
-    // ===== Lifecycle =====
+    // ===== Inisialisasi =====
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -139,7 +139,7 @@ public class DataProdiKelasController implements Initializable {
         setPanelKelasEnabled(false);
     }
 
-    // ===== Setup =====
+    // ===== Mapping kolom tabel =====
 
     private void setupTableProdi() {
         colIdProdi.setCellValueFactory(new PropertyValueFactory<>("idProdi"));
