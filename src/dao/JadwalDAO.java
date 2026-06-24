@@ -137,7 +137,7 @@ public class JadwalDAO {
         return list;
     }
 
-    public List<Jadwal> getByDosen(String nidn) {
+    public List<Jadwal> getByDosen(String identifier) {
         List<Jadwal> list = new ArrayList<>();
         String query = """
                 SELECT j.id, j.hari, j.jam_mulai, j.jam_selesai, j.ruangan, j.tahun_akademik, j.semester,
@@ -148,12 +148,16 @@ public class JadwalDAO {
                 LEFT JOIN dosen d ON j.dosen_id = d.id
                 LEFT JOIN kelas k ON j.kelas_id = k.id
                 LEFT JOIN mata_kuliah m ON j.matkul_id = m.id
-                WHERE d.nidn = ?
+                WHERE d.id = ?
+                   OR d.nidn = ?
+                   OR d.nama_lengkap = ?
                 ORDER BY j.hari, j.jam_mulai
                 """;
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, nidn);
+            stmt.setString(1, identifier);
+            stmt.setString(2, identifier);
+            stmt.setString(3, identifier);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next())
                     list.add(mapRow(rs));

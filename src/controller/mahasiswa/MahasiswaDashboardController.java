@@ -1,5 +1,6 @@
 package controller.mahasiswa;
 
+import controller.dosen.MulaiAbsenController;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -60,6 +61,31 @@ public class MahasiswaDashboardController {
         if (contentArea != null) {
             contentArea.getChildren().setAll(dashboardAwalChildren);
             updateVisualTombol(btnJadwal, btnProfil);
+        }
+    }
+
+    public void showAbsensiForm(String idJadwal, String namaKelas, String namaMatkul, String hari, String jam) {
+        URL fxmlLocation = getClass().getResource("/view/dosen/MulaiAbsenView.fxml");
+        if (fxmlLocation == null) {
+            System.err.println("[ERROR] File 'MulaiAbsenView.fxml' tidak ditemukan!");
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(fxmlLocation);
+            Parent absensiView = loader.load();
+
+            MulaiAbsenController absensiController = loader.getController();
+            absensiController.initData(idJadwal, namaKelas, namaMatkul, hari, jam);
+
+            if (contentArea != null) {
+                contentArea.getChildren().setAll(absensiView);
+                updateVisualTombol(btnJadwal, btnProfil);
+                System.out.println("[INTEGRASI] Form absensi sukses ditampilkan di dashboard mahasiswa!");
+            }
+        } catch (IOException e) {
+            System.err.println("[EROR KRITIKAL] Gagal memuat form absensi.");
+            e.printStackTrace();
         }
     }
 
