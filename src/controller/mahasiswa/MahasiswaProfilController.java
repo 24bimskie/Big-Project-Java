@@ -1,36 +1,48 @@
 package controller.mahasiswa;
 
+import dao.MahasiswaDAO;
+import model.Mahasiswa;
+import util.UserSession;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import model.User;
-import util.UserSession;
 
 public class MahasiswaProfilController {
 
-    @FXML
-    private Label txtNamaBesar;
-    @FXML
-    private Label txtRole;
-    @FXML
-    private Label lblNim;
-    @FXML
-    private Label lblNama;
+    // ID sudah disesuaikan persis dengan file FXML di atas!
+    @FXML private Label lblProfilNama;
+    @FXML private Label lblProfilNim;
+    @FXML private Label lblProfilProdi;
+    @FXML private Label lblProfilSemester;
+    @FXML private Label lblProfilEmail;
+    @FXML private Label lblProfilAsalDaerah;
+
+    private MahasiswaDAO mahasiswaDAO = new MahasiswaDAO();
 
     @FXML
     public void initialize() {
-        // Ambil token data user aktif dari global session
-        User user = UserSession.getCurrentUser();
-        
-        if (user != null) {
-            // Tembakkan data session ke dalam label FXML secara real-time
-            if (txtNamaBesar != null) txtNamaBesar.setText(user.getUsername());
-            if (txtRole != null) txtRole.setText(user.getRole().toUpperCase() + " AKTIF");
-            if (lblNama != null) lblNama.setText(user.getUsername());
-            if (lblNim != null) lblNim.setText(user.getUserId());
+        loadProfilDinamis();
+    }
+
+    private void loadProfilDinamis() {
+        if (UserSession.getCurrentUser() != null) {
+            String nimLogin = UserSession.getCurrentUser().getUsername();
+            Mahasiswa mhs = mahasiswaDAO.getByNim(nimLogin);
             
-            System.out.println("[ProfilController] Sinkronisasi data sesi " + user.getUsername() + " sukses.");
-        } else {
-            System.out.println("[ProfilController] Peringatan: Sesi pengguna kosong!");
+            if (mhs != null) {
+                // Set data riil dari DB ke halaman UI
+                lblProfilNama.setText(mhs.getNama());
+                lblProfilNim.setText(mhs.getNim());
+                lblProfilProdi.setText(mhs.getProdi());       
+                lblProfilSemester.setText("Semester " + mhs.getSemester()); 
+                lblProfilEmail.setText(mhs.getEmail());       
+                lblProfilAsalDaerah.setText(mhs.getAsalDaerah()); 
+                
+                System.out.println("✅ UI Profil sinkron dengan Database untuk NIM: " + nimLogin);
+            } else {
+                System.out.println("⚠️ Akun ada tapi detail tabel mahasiswa kosong di DB.");
+                lblProfilNama.setText("Data Kosong");
+                lblProfilNim.setText(nimLogin);
+            }
         }
     }
 }

@@ -15,7 +15,7 @@
          <children>
             <VBox alignment="CENTER" prefHeight="100.0" prefWidth="260.0" style="-fx-border-color: #334155; -fx-border-width: 0 0 1 0;">
                <children>
-                  <Label text="SATE ABSENSI" textFill="#38bdf8">
+                  <Label text="ABSENSI" textFill="#38bdf8">
                      <font>
                         <Font name="System Bold" size="22.0" />
                      </font>
@@ -39,7 +39,7 @@
                   <Insets left="15.0" right="15.0" />
                </padding>
                <children>
-                  <Button fx:id="btnJadwal" mnemonicParsing="false" onAction="#showDataAbsen" prefHeight="45.0" prefWidth="230.0" style="-fx-background-color: #334155; -fx-text-fill: #ffffff; -fx-alignment: LEFT; -fx-background-radius: 8px; -fx-cursor: hand; -fx-font-weight: bold;" text="📅   Jadwal &amp; Absensi">
+                  <Button fx:id="btnJadwal" mnemonicParsing="false" onAction="#showDataAbsen" prefHeight="45.0" prefWidth="230.0" style="-fx-background-color: #334155; -fx-text-fill: #ffffff; -fx-alignment: center-left; -fx-background-radius: 8px; -fx-cursor: hand; -fx-font-weight: bold;" text="📅   Jadwal &amp; Absensi">
                      <font>
                         <Font size="13.0" />
                      </font>
@@ -48,7 +48,7 @@
                      </padding>
                   </Button>
                   
-                  <Button fx:id="btnProfil" mnemonicParsing="false" onAction="#showProfil" prefHeight="45.0" prefWidth="230.0" style="-fx-background-color: transparent; -fx-text-fill: #94a3b8; -fx-alignment: LEFT; -fx-background-radius: 8px; -fx-cursor: hand;" text="👤   Profil Saya">
+                  <Button fx:id="btnProfil" mnemonicParsing="false" onAction="#showProfil" prefHeight="45.0" prefWidth="230.0" style="-fx-background-color: transparent; -fx-text-fill: #94a3b8; -fx-alignment: center-left; -fx-background-radius: 8px; -fx-cursor: hand;" text="👤   Profil Saya">
                      <font>
                         <Font size="13.0" />
                      </font>
@@ -200,7 +200,7 @@
                         
                         <HBox layoutX="25.0" layoutY="195.0" spacing="12.0">
                            <children>
-                              <Label style="-fx-background-color: #dcfce7; -fx-text-fill: #16a34a; -fx-padding: 6px 14px; -fx-background-radius: 20px; -fx-font-weight: bold; -fx-font-size: 11px;" text="✓ CUMLOAD" />
+                              <Label style="-fx-background-color: #dcfce7; -fx-text-fill: #16a34a; -fx-padding: 6px 14px; -fx-background-radius: 20px; -fx-font-weight: bold; -fx-font-size: 11px;" text="✓ sukses" />
                               <Label style="-fx-background-color: #f0fdf4; -fx-text-fill: #15803d; -fx-padding: 6px 14px; -fx-background-radius: 20px; -fx-font-weight: bold; -fx-font-size: 11px;" text="✓ Sesi Aktif Berhasil Dimuat" />
                            </children>
                         </HBox>

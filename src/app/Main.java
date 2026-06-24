@@ -25,6 +25,7 @@ public class Main extends Application {
             if (getClass().getResource("/style/style.css") != null) {
                 scene.getStylesheets().add(getClass().getResource("/style/style.css").toExternalForm());
             }
+            
 
             primaryStage.setTitle("Sistem Absensi Mahasiswa");
             primaryStage.setScene(scene);

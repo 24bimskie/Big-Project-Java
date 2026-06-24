@@ -47,4 +47,23 @@
 
             <HBox prefHeight="50.0" prefWidth="660.0" style="-fx-background-color: #ffffff; -fx-background-radius: 8px; -fx-padding: 15px 20px; -fx-border-color: #f1f5f9; -fx-border-radius: 8px;">
                <children>
-                  <Label prefWidth="120.0" style="-fx-font
+                  <Label prefWidth="120.0" style="-fx-font-weight: bold;" text="Selasa, 10:00" textFill="#0f172a" />
+                  <Label prefWidth="240.0" text="Basis Data Lanjut" textFill="#334155" />
+                  <Label prefWidth="180.0" text="Dosen Basis Data, M.T." textFill="#64748b" />
+                  <Label prefWidth="80.0" style="-fx-background-color: #fef9c3; -fx-text-fill: #a16207; -fx-background-radius: 12px; -fx-alignment: CENTER; -fx-font-weight: bold; -fx-font-size: 11px; -fx-padding: 2px 0;" text="IZIN" />
+               </children>
+            </HBox>
+
+            <HBox prefHeight="50.0" prefWidth="660.0" style="-fx-background-color: #ffffff; -fx-background-radius: 8px; -fx-padding: 15px 20px; -fx-border-color: #f1f5f9; -fx-border-radius: 8px;">
+               <children>
+                  <Label prefWidth="120.0" style="-fx-font-weight: bold;" text="Rabu, 13:00" textFill="#0f172a" />
+                  <Label prefWidth="240.0" text="Rekayasa Perangkat Lunak" textFill="#334155" />
+                  <Label prefWidth="180.0" text="Eko Putra, M.Cs." textFill="#64748b" />
+                  <Label prefWidth="80.0" style="-fx-background-color: #fee2e2; -fx-text-fill: #991b1b; -fx-background-radius: 12px; -fx-alignment: CENTER; -fx-font-weight: bold; -fx-font-size: 11px; -fx-padding: 2px 0;" text="ALFA" />
+               </children>
+            </HBox>
+
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

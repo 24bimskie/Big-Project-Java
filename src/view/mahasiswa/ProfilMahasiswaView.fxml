@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #f8fafc;" xmlns="http://javafx.com/javafx/26.0.1" xmlns:fx="http://fxml.com/fx/1">
+<AnchorPane prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #f8fafc;" xmlns="http://javafx.com/javafx/26.0.1" xmlns:fx="http://fxml.com/fx/1" fx:controller="controller.mahasiswa.MahasiswaProfilController">
    <children>
       <VBox spacing="24.0" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="30.0">
          <children>
@@ -50,7 +50,7 @@
                         
                         <VBox alignment="CENTER" spacing="4.0">
                            <children>
-                              <Label fx:id="lblProfilNama" alignment="CENTER" text="Robby Khabiby" textAlignment="CENTER" textFill="#0f172a" wrapText="true">
+                              <Label fx:id="lblProfilNama" alignment="CENTER" text="Roby" textAlignment="CENTER" textFill="#0f172a" wrapText="true">
                                  <font>
                                     <Font name="System Bold" size="18.0" />
                                  </font>
@@ -102,14 +102,14 @@
                               <Label text="Program Studi" textFill="#64748b" GridPane.columnIndex="0" GridPane.rowIndex="1">
                                  <font><Font size="13.0" /></font>
                               </Label>
-                              <Label text="Teknologi Informasi" textFill="#1e293b" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                              <Label fx:id="lblProfilProdi" text="Teknologi Informasi" textFill="#1e293b" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                  <font><Font size="14.0" /></font>
                               </Label>
                               
                               <Label text="Semester Aktif" textFill="#64748b" GridPane.columnIndex="0" GridPane.rowIndex="2">
                                  <font><Font size="13.0" /></font>
                               </Label>
-                              <Label text="Semester 6" textFill="#1e293b" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                              <Label fx:id="lblProfilSemester" text="Semester 6" textFill="#1e293b" GridPane.columnIndex="1" GridPane.rowIndex="2">
                                  <font><Font size="14.0" /></font>
                               </Label>
                               
@@ -123,7 +123,7 @@
                               <Label text="Asal Daerah" textFill="#64748b" GridPane.columnIndex="0" GridPane.rowIndex="4">
                                  <font><Font size="13.0" /></font>
                               </Label>
-                              <Label text="Purworejo, Central Java" textFill="#1e293b" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                              <Label fx:id="lblProfilAsalDaerah" text="Purworejo, Central Java" textFill="#1e293b" GridPane.columnIndex="1" GridPane.rowIndex="4">
                                  <font><Font size="14.0" /></font>
                               </Label>
                            </children>
