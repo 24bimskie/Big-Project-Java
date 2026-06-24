@@ -11,32 +11,46 @@ import java.util.List;
 /**
  * DAO untuk operasi CRUD data Absensi.
  * Mendukung use case: Mulai Absen, Data Absen, Rekap Absen.
- * 
- * Skema tabel absensi:
- *   id INT AUTO_INCREMENT, tanggal DATE, jadwal_id INT FK,
- *   peran ENUM('Dosen','Mahasiswa'), aktor_id INT, 
- *   status ENUM('Hadir','Izin','Sakit','Alpha'), keterangan TEXT
  *
- * Catatan: aktor_id merujuk ke mahasiswa.id (bukan nim).
- *          Field nim di model Absensi menyimpan mahasiswa.id sebagai String.
+ * Skema tabel absensi (sesuai database/migrate_absensi.sql + migrate_absensi_jadwal_id.sql):
+ *   id_absensi INT AUTO_INCREMENT PK,
+ *   jadwal_id  INT NULL  (FK ke jadwal.id, ditambahkan via migrate_absensi_jadwal_id.sql),
+ *   tanggal DATE,
+ *   hari_jam VARCHAR(50),
+ *   mata_kuliah VARCHAR(100),
+ *   kelas VARCHAR(20),
+ *   nim VARCHAR(20),
+ *   nama_lengkap VARCHAR(150),
+ *   kehadiran ENUM('Hadir','Sakit','Izin','Alfa'),
+ *   keterangan TEXT
+ *
+ * Catatan penting:
+ *   - jadwal_id adalah kunci utama untuk menghubungkan satu baris absensi
+ *     ke jadwal tertentu. Mulai Absen mengisi jadwal_id saat insert,
+ *     dan Rekap Absen memfilter berdasarkan jadwal_id ini (bukan
+ *     mencocokkan string nama kelas/mata kuliah, yang rapuh).
+ *   - nim di sini adalah NIM mahasiswa asli (varchar), BUKAN mahasiswa.id.
  */
 public class AbsensiDAO {
 
     /**
-     * Insert satu record absensi baru.
-     * absensi.nim berisi String dari mahasiswa.id (aktor_id).
+     * Insert satu record absensi baru untuk satu mahasiswa pada satu jadwal & tanggal.
      */
     public void insert(Absensi absensi) {
-        String sql = "INSERT INTO absensi (tanggal, jadwal_id, peran, aktor_id, status, keterangan) "
-                   + "VALUES (?, ?, 'Mahasiswa', ?, ?, ?)";
+        String sql = "INSERT INTO absensi (jadwal_id, tanggal, hari_jam, mata_kuliah, kelas, nim, nama_lengkap, kehadiran, keterangan) "
+                   + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setDate(1, Date.valueOf(absensi.getTanggal()));
-            stmt.setInt(2, parseId(absensi.getIdJadwal()));
-            stmt.setInt(3, parseId(absensi.getNim())); // nim = mahasiswa.id as string
-            stmt.setString(4, absensi.getStatus());
-            stmt.setString(5, absensi.getKeterangan());
+            stmt.setInt(1, parseId(absensi.getIdJadwal()));
+            stmt.setDate(2, Date.valueOf(absensi.getTanggal()));
+            stmt.setString(3, absensi.getHariJam());
+            stmt.setString(4, absensi.getMataKuliah());
+            stmt.setString(5, absensi.getKelas());
+            stmt.setString(6, absensi.getNim());
+            stmt.setString(7, absensi.getNamaLengkap());
+            stmt.setString(8, absensi.getKehadiran());
+            stmt.setString(9, absensi.getKeterangan());
 
             stmt.executeUpdate();
         } catch (SQLException e) {
@@ -45,14 +59,14 @@ public class AbsensiDAO {
     }
 
     /**
-     * Update status dan keterangan absensi berdasarkan id.
+     * Update kehadiran dan keterangan absensi berdasarkan id_absensi.
      */
     public void update(Absensi absensi) {
-        String sql = "UPDATE absensi SET status=?, keterangan=? WHERE id=?";
+        String sql = "UPDATE absensi SET kehadiran=?, keterangan=? WHERE id_absensi=?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, absensi.getStatus());
+            stmt.setString(1, absensi.getKehadiran());
             stmt.setString(2, absensi.getKeterangan());
             stmt.setInt(3, parseId(absensi.getIdAbsensi()));
 
@@ -63,10 +77,10 @@ public class AbsensiDAO {
     }
 
     /**
-     * Delete data absensi berdasarkan id.
+     * Delete data absensi berdasarkan id_absensi.
      */
     public void delete(String idAbsensi) {
-        String sql = "DELETE FROM absensi WHERE id=?";
+        String sql = "DELETE FROM absensi WHERE id_absensi=?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, parseId(idAbsensi));
@@ -78,11 +92,12 @@ public class AbsensiDAO {
 
     /**
      * Ambil daftar absensi berdasarkan jadwal_id dan tanggal tertentu.
-     * Digunakan pada halaman Mulai Absen untuk mengecek apakah absensi sudah diisi.
+     * Digunakan pada halaman Mulai Absen untuk mengecek apakah absensi
+     * pada tanggal tersebut sudah pernah diisi (agar bisa di-update, bukan duplikat).
      */
     public List<Absensi> getByJadwalAndTanggal(String idJadwal, LocalDate tanggal) {
         List<Absensi> list = new ArrayList<>();
-        String sql = "SELECT * FROM absensi WHERE jadwal_id=? AND tanggal=? AND peran='Mahasiswa'";
+        String sql = "SELECT * FROM absensi WHERE jadwal_id=? AND tanggal=?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -101,12 +116,15 @@ public class AbsensiDAO {
     }
 
     /**
-     * Ambil semua record absensi untuk jadwal tertentu (semua tanggal).
-     * Digunakan untuk Rekap Absen.
+     * Ambil seluruh record rekap absensi untuk SATU jadwal tertentu,
+     * diurutkan per tanggal lalu per nim. Ini adalah method yang dipakai
+     * oleh RekapAbsenController, dan jadwal_id adalah filter satu-satunya
+     * yang dibutuhkan -- tidak perlu lagi mencocokkan nama kelas/mata kuliah
+     * secara manual di sisi Java.
      */
     public List<Absensi> getRekapByJadwal(String idJadwal) {
         List<Absensi> list = new ArrayList<>();
-        String sql = "SELECT * FROM absensi WHERE jadwal_id=? AND peran='Mahasiswa' ORDER BY tanggal, aktor_id";
+        String sql = "SELECT * FROM absensi WHERE jadwal_id=? ORDER BY tanggal, nim";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -128,7 +146,7 @@ public class AbsensiDAO {
      */
     public List<LocalDate> getTanggalByJadwal(String idJadwal) {
         List<LocalDate> dates = new ArrayList<>();
-        String sql = "SELECT DISTINCT tanggal FROM absensi WHERE jadwal_id=? AND peran='Mahasiswa' ORDER BY tanggal";
+        String sql = "SELECT DISTINCT tanggal FROM absensi WHERE jadwal_id=? ORDER BY tanggal";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -146,15 +164,15 @@ public class AbsensiDAO {
     }
 
     /**
-     * Ambil absensi berdasarkan mahasiswa (nim sebagai mahasiswa.id string).
+     * Ambil seluruh riwayat absensi seorang mahasiswa (berdasarkan NIM) di semua jadwal.
      */
-    public List<Absensi> getByMahasiswa(String idMahasiswa) {
+    public List<Absensi> getByMahasiswa(String nim) {
         List<Absensi> list = new ArrayList<>();
-        String sql = "SELECT * FROM absensi WHERE aktor_id=? AND peran='Mahasiswa' ORDER BY tanggal";
+        String sql = "SELECT * FROM absensi WHERE nim=? ORDER BY tanggal";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, parseId(idMahasiswa));
+            stmt.setString(1, nim);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     list.add(mapRow(rs));
@@ -167,16 +185,16 @@ public class AbsensiDAO {
     }
 
     /**
-     * Ambil absensi per mahasiswa per jadwal.
+     * Ambil absensi satu mahasiswa pada satu jadwal tertentu (semua tanggal).
      */
-    public List<Absensi> getByJadwalAndMahasiswa(String idJadwal, String idMahasiswa) {
+    public List<Absensi> getByJadwalAndMahasiswa(String idJadwal, String nim) {
         List<Absensi> list = new ArrayList<>();
-        String sql = "SELECT * FROM absensi WHERE jadwal_id=? AND aktor_id=? AND peran='Mahasiswa' ORDER BY tanggal";
+        String sql = "SELECT * FROM absensi WHERE jadwal_id=? AND nim=? ORDER BY tanggal";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, parseId(idJadwal));
-            stmt.setInt(2, parseId(idMahasiswa));
+            stmt.setString(2, nim);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     list.add(mapRow(rs));
@@ -188,14 +206,24 @@ public class AbsensiDAO {
         return list;
     }
 
-    /** Memetakan satu baris ResultSet ke objek Absensi */
+    /** Memetakan satu baris ResultSet ke objek Absensi sesuai skema absensi saat ini. */
     private Absensi mapRow(ResultSet rs) throws SQLException {
         Absensi a = new Absensi();
-        a.setIdAbsensi(String.valueOf(rs.getInt("id")));
-        a.setIdJadwal(String.valueOf(rs.getInt("jadwal_id")));
-        a.setNim(String.valueOf(rs.getInt("aktor_id"))); // aktor_id → nim (as mahasiswa.id string)
-        a.setTanggal(rs.getDate("tanggal").toLocalDate());
-        a.setStatus(rs.getString("status"));
+        a.setIdAbsensi(String.valueOf(rs.getInt("id_absensi")));
+
+        int jadwalId = rs.getInt("jadwal_id");
+        a.setIdJadwal(rs.wasNull() ? null : String.valueOf(jadwalId));
+
+        Date tgl = rs.getDate("tanggal");
+        a.setTanggal(tgl == null ? null : tgl.toLocalDate());
+
+        a.setHariJam(rs.getString("hari_jam"));
+        a.setMataKuliah(rs.getString("mata_kuliah"));
+        a.setKelas(rs.getString("kelas"));
+        a.setNim(rs.getString("nim"));
+        a.setNamaLengkap(rs.getString("nama_lengkap"));
+        a.setKehadiran(rs.getString("kehadiran"));
+        a.setStatus(rs.getString("kehadiran"));
         a.setKeterangan(rs.getString("keterangan"));
         return a;
     }

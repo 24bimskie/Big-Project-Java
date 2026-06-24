@@ -89,7 +89,7 @@ public class MulaiAbsenController implements Initializable {
         colKehadiran.setCellFactory(param -> new TableCell<SiswaAbsenRow, String>() {
             private final ComboBox<String> choiceBox = new ComboBox<>();
             {
-                choiceBox.getItems().addAll("Hadir", "Izin", "Sakit", "Alpha");
+                choiceBox.getItems().addAll("Hadir", "Izin", "Sakit", "Alfa");
                 choiceBox.getStyleClass().add("combo-box");
                 choiceBox.setStyle("-fx-pref-height: 30px; -fx-font-size: 13px; -fx-background-radius: 6px; -fx-border-radius: 6px;");
                 choiceBox.setPrefWidth(120);
@@ -170,19 +170,16 @@ public class MulaiAbsenController implements Initializable {
         // 2. Get all students in this class
         List<model.Mahasiswa> mahasiswas = mahasiswaDAO.getByKelasId(kelasId);
         
-        // 3. Get attendance list on selected date
+        // 3. Get attendance list on selected date (filtered by jadwal_id + tanggal)
         LocalDate tanggal = datePickerTanggal.getValue();
         List<model.Absensi> absensiList = absensiDAO.getByJadwalAndTanggal(idJadwal, tanggal);
         
         int no = 1;
         for (model.Mahasiswa m : mahasiswas) {
-            int dbMahasiswaId = mahasiswaDAO.getIdByNim(m.getNim());
-            String dbMahasiswaIdStr = String.valueOf(dbMahasiswaId);
-            
-            // Search for existing attendance record
+            // Search for existing attendance record by NIM (not mahasiswa.id)
             model.Absensi matchingAbs = null;
             for (model.Absensi a : absensiList) {
-                if (dbMahasiswaIdStr.equals(a.getNim())) {
+                if (m.getNim().equals(a.getNim())) {
                     matchingAbs = a;
                     break;
                 }
@@ -193,12 +190,12 @@ public class MulaiAbsenController implements Initializable {
             String idAbsensi = null;
             
             if (matchingAbs != null) {
-                status = matchingAbs.getStatus();
+                status = matchingAbs.getKehadiran();
                 keterangan = matchingAbs.getKeterangan();
                 idAbsensi = matchingAbs.getIdAbsensi();
             }
             
-            siswaList.add(new SiswaAbsenRow(no++, m.getNim(), m.getNama(), dbMahasiswaIdStr, status, keterangan, idAbsensi));
+            siswaList.add(new SiswaAbsenRow(no++, m.getNim(), m.getNama(), status, keterangan, idAbsensi));
         }
         
         tableMahasiswa.setItems(siswaList);
@@ -218,12 +215,20 @@ public class MulaiAbsenController implements Initializable {
         }
         
         try {
+            String namaMatkul = lblMatkul.getText();
+            String namaKelas = lblKelas.getText();
+            String hariJam = lblHariJam.getText();
+
             for (SiswaAbsenRow row : siswaList) {
                 model.Absensi a = new model.Absensi();
                 a.setIdJadwal(idJadwal);
-                a.setNim(row.getIdMahasiswa()); // aktor_id in db
+                a.setNim(row.getNim());
+                a.setNamaLengkap(row.getNama());
+                a.setMataKuliah(namaMatkul);
+                a.setKelas(namaKelas);
+                a.setHariJam(hariJam);
                 a.setTanggal(tanggal);
-                a.setStatus(row.getStatus());
+                a.setKehadiran(row.getStatus());
                 a.setKeterangan(row.getKeterangan());
                 
                 if (row.getIdAbsensi() != null && !row.getIdAbsensi().isEmpty()) {
@@ -271,16 +276,14 @@ public class MulaiAbsenController implements Initializable {
         private final SimpleIntegerProperty no;
         private final SimpleStringProperty nim;
         private final SimpleStringProperty nama;
-        private final String idMahasiswa; // Database ID (mahasiswa.id)
         private final SimpleStringProperty status;
         private final SimpleStringProperty keterangan;
         private String idAbsensi;
 
-        public SiswaAbsenRow(int no, String nim, String nama, String idMahasiswa, String status, String keterangan, String idAbsensi) {
+        public SiswaAbsenRow(int no, String nim, String nama, String status, String keterangan, String idAbsensi) {
             this.no = new SimpleIntegerProperty(no);
             this.nim = new SimpleStringProperty(nim);
             this.nama = new SimpleStringProperty(nama);
-            this.idMahasiswa = idMahasiswa;
             this.status = new SimpleStringProperty(status);
             this.keterangan = new SimpleStringProperty(keterangan);
             this.idAbsensi = idAbsensi;
@@ -295,8 +298,6 @@ public class MulaiAbsenController implements Initializable {
 
         public String getNama() { return nama.get(); }
         public SimpleStringProperty namaProperty() { return nama; }
-
-        public String getIdMahasiswa() { return idMahasiswa; }
 
         public String getStatus() { return status.get(); }
         public SimpleStringProperty statusProperty() { return status; }
