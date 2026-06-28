@@ -132,8 +132,8 @@ public class DataMataKuliahController implements Initializable {
         cmbSemester.setItems(semesterList);
         cmbFilterSemester.setItems(semesterList);
 
-        // Tidak perlu lagi load ComboBox untuk prodi, karena user akan mengetik
-        // langsung.
+        // Prodi filter akan diisi dari data mata kuliah yang tampil di tabel
+        cmbFilterProdi.setItems(FXCollections.observableArrayList());
     }
 
     /**
@@ -144,6 +144,7 @@ public class DataMataKuliahController implements Initializable {
         tblMataKuliah.setItems(filteredList);
 
         txtSearch.textProperty().addListener((obs, o, n) -> applyFilter());
+        cmbFilterProdi.valueProperty().addListener((obs, o, n) -> applyFilter());
         cmbFilterSemester.valueProperty().addListener((obs, o, n) -> applyFilter());
     }
 
@@ -151,14 +152,18 @@ public class DataMataKuliahController implements Initializable {
     private void applyFilter() {
         String keyword = txtSearch.getText() == null ? "" : txtSearch.getText().toLowerCase().trim();
         Integer semesterFilter = cmbFilterSemester.getValue();
+        String prodiFilter = cmbFilterProdi.getValue();
 
         filteredList.setPredicate(mk -> {
+            String prodiName = mk.getIdProdi() == null ? "" : mk.getIdProdi().toLowerCase();
             boolean matchSearch = keyword.isEmpty()
                     || mk.getKodeMk().toLowerCase().contains(keyword)
                     || mk.getNamaMk().toLowerCase().contains(keyword)
-                    || mk.getIdProdi().toLowerCase().contains(keyword);
+                    || prodiName.contains(keyword);
             boolean matchSemester = semesterFilter == null || semesterFilter == mk.getSemester();
-            return matchSearch && matchSemester;
+            boolean matchProdi = prodiFilter == null || prodiFilter.trim().isEmpty()
+                    || prodiName.equals(prodiFilter.toLowerCase());
+            return matchSearch && matchSemester && matchProdi;
         });
     }
 
@@ -178,6 +183,21 @@ public class DataMataKuliahController implements Initializable {
         List<MataKuliah> data = mataKuliahDAO.getAll();
         if (data != null)
             mkList.addAll(data);
+
+        populateProdiFilterOptions();
+        applyFilter();
+    }
+
+    private void populateProdiFilterOptions() {
+        ObservableList<String> prodiItems = FXCollections.observableArrayList();
+        for (MataKuliah mk : mkList) {
+            String prodi = mk.getIdProdi();
+            if (prodi != null && !prodi.trim().isEmpty() && !prodiItems.contains(prodi)) {
+                prodiItems.add(prodi);
+            }
+        }
+        prodiItems.sort(String::compareToIgnoreCase);
+        cmbFilterProdi.setItems(prodiItems);
     }
 
     // ===== CRUD Handlers =====
