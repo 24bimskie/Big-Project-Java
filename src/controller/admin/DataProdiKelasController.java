@@ -22,17 +22,19 @@ import java.util.UUID;
 /**
  * Controller untuk use case: Input Data Prodi & Kelas Gabungan.
  * Admin mengelola program studi dan kelas secara bersamaan dalam satu form.
- * Halaman ini dibagi dua panel: panel Prodi (kiri) dan panel Kelas (kanan) di tab "Lihat Data".
- * Tab "Input Data" menampilkan form gabungan untuk input prodi dan kelas bersama-sama.
+ * Halaman ini dibagi dua panel: panel Prodi (kiri) dan panel Kelas (kanan) di
+ * tab "Lihat Data".
+ * Tab "Input Data" menampilkan form gabungan untuk input prodi dan kelas
+ * bersama-sama.
  */
 public class DataProdiKelasController implements Initializable {
 
-    // ===== FXML Bindings — Tab Pane =====
+    // FXML Bindings — Tab Pane
 
     @FXML
     private TabPane tabPane;
 
-    // ===== FXML Bindings — Tabel Kelas =====
+    // FXML Bindings — Tabel Kelas
 
     @FXML
     private TableView<Kelas> tableProdi;
@@ -52,7 +54,7 @@ public class DataProdiKelasController implements Initializable {
     @FXML
     private TableColumn<Kelas, Void> colAksi;
 
-    // ===== FXML Bindings — Form =====
+    // FXML Bindings — Form
 
     @FXML
     private TextField fieldNamaProdi;
@@ -75,7 +77,7 @@ public class DataProdiKelasController implements Initializable {
     @FXML
     private Button btnBatal;
 
-    // ===== State =====
+    // State
 
     private final ProdiDAO prodiDAO = new ProdiDAO();
     private final KelasDAO kelasDAO = new KelasDAO();
@@ -85,13 +87,13 @@ public class DataProdiKelasController implements Initializable {
 
     /** Prodi yang sedang aktif/dipilih di tabel */
     private Prodi selectedProdi = null;
-    
+
     /** Kelas yang sedang aktif/dipilih di tabel */
     private Kelas selectedKelas = null;
 
     private boolean isEditMode = false;
 
-    // ===== Inisialisasi =====
+    // Inisialisasi
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -100,21 +102,21 @@ public class DataProdiKelasController implements Initializable {
         setEditMode(false);
     }
 
-    // ===== Mapping kolom tabel kelas =====
+    // Mapping kolom tabel kelas
 
     private void setupTableCombined() {
         // Kolom ID dari database
         colId.setCellValueFactory(new PropertyValueFactory<>("idKelas"));
-        
+
         // Kolom Prodi (nama program studi)
         colProdi.setCellValueFactory(new PropertyValueFactory<>("idProdi"));
-        
+
         // Kolom Kelas (nama kelas)
         colKelas.setCellValueFactory(new PropertyValueFactory<>("namaKelas"));
-        
+
         // Kolom Tahun Akademik
         colTahunAkademik.setCellValueFactory(new PropertyValueFactory<>("tahunAkademik"));
-        
+
         // Kolom Aksi dengan tombol Edit dan Hapus
         colAksi.setCellValueFactory(param -> new javafx.beans.property.ReadOnlyObjectWrapper<>(null));
         colAksi.setCellFactory(param -> new TableCell<Kelas, Void>() {
@@ -161,15 +163,15 @@ public class DataProdiKelasController implements Initializable {
                 setGraphic(empty ? null : pane);
             }
         });
-        
+
         tableProdi.setItems(kelasDisplayList);
     }
 
-    // ===== Load Data =====
+    // Load Data
 
     private void loadCombinedData() {
         kelasDisplayList.clear();
-        
+
         // Load semua kelas dari database dan tampilkan
         List<Kelas> allKelas = kelasDAO.getAll();
         if (allKelas != null) {
@@ -211,11 +213,11 @@ public class DataProdiKelasController implements Initializable {
                 return;
             }
             selectedKelas = selected;
-            
+
             fieldNamaProdi.setText(selected.getIdProdi());
             fieldNamaKelas.setText(selected.getNamaKelas());
             fieldTahunAkademik.setText(selected.getTahunAkademik());
-            
+
             setEditMode(true);
             return;
         }
@@ -228,7 +230,7 @@ public class DataProdiKelasController implements Initializable {
             String namaProdi = fieldNamaProdi.getText().trim();
             String namaKelas = fieldNamaKelas.getText().trim();
             String tahunAkademik = fieldTahunAkademik.getText().trim();
-            
+
             Kelas updatedKelas = new Kelas(selectedKelas.getIdKelas(), namaKelas, namaProdi, tahunAkademik);
             kelasDAO.update(updatedKelas);
 
@@ -249,7 +251,7 @@ public class DataProdiKelasController implements Initializable {
             AlertHelper.showWarning("Peringatan", "Pilih kelas di tabel terlebih dahulu.");
             return;
         }
-        
+
         boolean konfirmasi = AlertHelper.showConfirmation(
                 "Konfirmasi Hapus",
                 "Yakin ingin menghapus kelas \"" + selected.getNamaKelas() + "\"?");
@@ -279,7 +281,7 @@ public class DataProdiKelasController implements Initializable {
         tableProdi.getSelectionModel().clearSelection();
     }
 
-    // ===== Helper Methods =====
+    // Helper Methods
 
     private void populateFormFromProdi(Prodi p) {
         fieldNamaProdi.setText(p.getNamaProdi());

@@ -43,9 +43,7 @@ public class MataKuliahDAO {
         }
     }
 
-    /**
-     * Memperbarui data mata kuliah berdasarkan kode_mk (primary key logis).
-     */
+    // Memperbarui data mata kuliah berdasarkan kode_mk (primary key logis).
     public boolean update(MataKuliah mk) {
         lastError = null;
         String query = "UPDATE mata_kuliah SET nama_mk=?, sks=?, semester=?, id_prodi=? WHERE kode_mk=?";
@@ -65,9 +63,7 @@ public class MataKuliahDAO {
         }
     }
 
-    /**
-     * Menghapus mata kuliah berdasarkan kode_mk.
-     */
+    // Menghapus mata kuliah berdasarkan kode_mk.
     public boolean delete(String kodeMk) {
         lastError = null;
         String query = "DELETE FROM mata_kuliah WHERE kode_mk=?";
@@ -83,9 +79,7 @@ public class MataKuliahDAO {
         }
     }
 
-    /**
-     * Mengambil satu data mata kuliah berdasarkan kode_mk.
-     */
+    // Mengambil satu data mata kuliah berdasarkan kode_mk.
     public MataKuliah getByKode(String kodeMk) {
         String query = "SELECT * FROM mata_kuliah WHERE kode_mk=?";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -101,9 +95,7 @@ public class MataKuliahDAO {
         return null;
     }
 
-    /**
-     * Mengambil semua data mata kuliah, diurutkan berdasarkan nama.
-     */
+    // Mengambil semua data mata kuliah, diurutkan berdasarkan nama.
     public List<MataKuliah> getAll() {
         List<MataKuliah> list = new ArrayList<>();
         String query = "SELECT * FROM mata_kuliah ORDER BY nama_mk";
@@ -118,9 +110,7 @@ public class MataKuliahDAO {
         return list;
     }
 
-    /**
-     * Mengambil mata kuliah berdasarkan program studi.
-     */
+    // Mengambil mata kuliah berdasarkan program studi.
     public List<MataKuliah> getByProdi(String idProdi) {
         List<MataKuliah> list = new ArrayList<>();
         String query = "SELECT * FROM mata_kuliah WHERE id_prodi=? ORDER BY nama_mk";
@@ -137,9 +127,7 @@ public class MataKuliahDAO {
         return list;
     }
 
-    /**
-     * Memetakan satu baris ResultSet ke objek MataKuliah.
-     */
+    // Memetakan satu baris ResultSet ke objek MataKuliah.
     private MataKuliah mapRow(ResultSet rs) throws SQLException {
         return new MataKuliah(
                 rs.getString("kode_mk"),

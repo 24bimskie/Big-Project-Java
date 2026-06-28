@@ -25,12 +25,12 @@ import java.util.ResourceBundle;
  */
 public class DataMataKuliahController implements Initializable {
 
-    // ===== FXML Bindings — Tab Pane =====
+    // FXML Bindings — Tab Pane
 
     @FXML
     private TabPane tabPane;
 
-    // ===== FXML Bindings — TableView =====
+    // FXML Bindings — TableView
 
     @FXML
     private TableView<MataKuliah> tblMataKuliah;
@@ -50,7 +50,7 @@ public class DataMataKuliahController implements Initializable {
     @FXML
     private TableColumn<MataKuliah, String> colProdi;
 
-    // ===== FXML Bindings — Form Input =====
+    // FXML Bindings — Form Input
 
     @FXML
     private TextField txtKodeMatkul;
@@ -67,7 +67,7 @@ public class DataMataKuliahController implements Initializable {
     @FXML
     private TextField txtProdi;
 
-    // ===== FXML Bindings — Filter & Kontrol =====
+    // FXML Bindings — Filter & Kontrol
 
     @FXML
     private TextField txtSearch;
@@ -87,8 +87,7 @@ public class DataMataKuliahController implements Initializable {
     @FXML
     private Button btnSimpan;
 
-    // ===== State =====
-
+    // State
     private final MataKuliahDAO mataKuliahDAO = new MataKuliahDAO();
     private final ProdiDAO prodiDAO = new ProdiDAO();
 
@@ -97,7 +96,7 @@ public class DataMataKuliahController implements Initializable {
 
     private boolean isEditMode = false;
 
-    // ===== Lifecycle =====
+    // Lifecycle
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -109,9 +108,9 @@ public class DataMataKuliahController implements Initializable {
         setEditMode(false);
     }
 
-    // ===== Setup =====
+    // Setup
 
-    /** Mapping kolom TableView ke properti model MataKuliah */
+    // Mapping kolom TableView ke properti model MataKuliah
     private void setupTable() {
         colKodeMatkul.setCellValueFactory(new PropertyValueFactory<>("kodeMk"));
         colNamaMatkul.setCellValueFactory(new PropertyValueFactory<>("namaMk"));
@@ -121,7 +120,7 @@ public class DataMataKuliahController implements Initializable {
         tblMataKuliah.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
 
-    /** Mengisi ComboBox dengan data SKS, Semester, dan Prodi */
+    // Mengisi ComboBox dengan data SKS, Semester, dan Prodi
     private void setupComboBoxes() {
         // SKS: hanya 2 dan 3
         ObservableList<Integer> sksList = FXCollections.observableArrayList(2, 3);
@@ -136,9 +135,7 @@ public class DataMataKuliahController implements Initializable {
         // langsung.
     }
 
-    /**
-     * Filter real-time berdasarkan pencarian teks + filter prodi + filter semester
-     */
+    // Filter real-time berdasarkan pencarian teks + filter prodi + filter semester
     private void setupSearchAndFilter() {
         filteredList = new FilteredList<>(mkList, p -> true);
         tblMataKuliah.setItems(filteredList);
@@ -147,7 +144,7 @@ public class DataMataKuliahController implements Initializable {
         cmbFilterSemester.valueProperty().addListener((obs, o, n) -> applyFilter());
     }
 
-    /** Menerapkan predicate filter ke FilteredList */
+    // Menerapkan predicate filter ke FilteredList
     private void applyFilter() {
         String keyword = txtSearch.getText() == null ? "" : txtSearch.getText().toLowerCase().trim();
         Integer semesterFilter = cmbFilterSemester.getValue();
@@ -162,7 +159,7 @@ public class DataMataKuliahController implements Initializable {
         });
     }
 
-    /** Listener saat baris tabel dipilih → isi form */
+    // Listener saat baris tabel dipilih → isi form
     private void setupTableSelectionListener() {
         tblMataKuliah.getSelectionModel().selectedItemProperty().addListener(
                 (obs, oldSel, newSel) -> {
@@ -171,7 +168,7 @@ public class DataMataKuliahController implements Initializable {
                 });
     }
 
-    // ===== Load Data =====
+    // Load Data
 
     private void loadData() {
         mkList.clear();
@@ -180,9 +177,8 @@ public class DataMataKuliahController implements Initializable {
             mkList.addAll(data);
     }
 
-    // ===== CRUD Handlers =====
-
-    /** Tombol Simpan: mode Tambah atau mode Edit */
+    // CRUD Handlers
+    // Tombol Simpan: mode Tambah atau mode Edit
     @FXML
     private void handleSimpan(ActionEvent event) {
         if (!isFormValid())
@@ -227,13 +223,13 @@ public class DataMataKuliahController implements Initializable {
         tblMataKuliah.getSelectionModel().clearSelection();
     }
 
-    /** Tombol Cari (opsional trigger manual) */
+    // Tombol Cari (opsional trigger manual)
     @FXML
     private void handleCari(ActionEvent event) {
         applyFilter();
     }
 
-    /** Tombol Reset Filter */
+    // Tombol Reset Filter
     @FXML
     private void handleResetFilter(ActionEvent event) {
         txtSearch.clear();
@@ -241,7 +237,7 @@ public class DataMataKuliahController implements Initializable {
         cmbFilterSemester.setValue(null);
     }
 
-    /** Klik kanan / tombol Edit dari luar (opsional) */
+    // Klik kanan / tombol Edit dari luar (opsional)
     @FXML
     private void handleEdit(ActionEvent event) {
         MataKuliah selected = tblMataKuliah.getSelectionModel().getSelectedItem();
@@ -278,9 +274,8 @@ public class DataMataKuliahController implements Initializable {
         }
     }
 
-    // ===== Helper Methods =====
-
-    /** Mengisi form input dari data yang dipilih di tabel */
+    // Helper Methods
+    // Mengisi form input dari data yang dipilih di tabel
     private void populateForm(MataKuliah mk) {
         txtKodeMatkul.setText(mk.getKodeMk());
         txtNamaMatkul.setText(mk.getNamaMk());
@@ -289,7 +284,7 @@ public class DataMataKuliahController implements Initializable {
         txtProdi.setText(mk.getIdProdi());
     }
 
-    /** Membangun objek MataKuliah dari input form */
+    // Membangun objek MataKuliah dari input form
     private MataKuliah buildFromForm() {
         return new MataKuliah(
                 txtKodeMatkul.getText().trim().toUpperCase(),
@@ -299,7 +294,7 @@ public class DataMataKuliahController implements Initializable {
                 txtProdi.getText().trim());
     }
 
-    /** Validasi form sebelum simpan */
+    // Validasi form sebelum simpan
     private boolean isFormValid() {
         if (txtKodeMatkul.getText().trim().isEmpty()) {
             AlertHelper.showWarning("Validasi", "Kode mata kuliah tidak boleh kosong.");
@@ -324,7 +319,7 @@ public class DataMataKuliahController implements Initializable {
         return true;
     }
 
-    /** Mengosongkan semua field form */
+    // Mengosongkan semua field form
     private void clearForm() {
         txtKodeMatkul.clear();
         txtNamaMatkul.clear();
@@ -333,7 +328,7 @@ public class DataMataKuliahController implements Initializable {
         txtProdi.clear();
     }
 
-    /** Mengatur mode Edit/Tambah pada form */
+    // Mengatur mode Edit/Tambah pada form
     private void setEditMode(boolean editMode) {
         this.isEditMode = editMode;
         txtKodeMatkul.setDisable(editMode); // kode MK = primary key, tidak bisa diubah

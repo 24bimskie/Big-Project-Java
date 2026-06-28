@@ -131,10 +131,10 @@ public class MahasiswaDAO {
     public List<Mahasiswa> getByKelasId(int kelasId) {
         List<Mahasiswa> list = new ArrayList<>();
         String sql = "SELECT m.* FROM mahasiswa m " +
-                     "JOIN kelas k ON m.kelas = k.kelas AND m.prodi = k.Prodi " +
-                     "WHERE k.id = ? ORDER BY m.nama";
+                "JOIN kelas k ON m.kelas = k.kelas AND m.prodi = k.Prodi " +
+                "WHERE k.id = ? ORDER BY m.nama";
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, kelasId);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
@@ -154,10 +154,11 @@ public class MahasiswaDAO {
     public int getIdByNim(String nim) {
         String sql = "SELECT id FROM mahasiswa WHERE nim = ?";
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, nim);
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) return rs.getInt("id");
+                if (rs.next())
+                    return rs.getInt("id");
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -171,10 +172,11 @@ public class MahasiswaDAO {
     public Mahasiswa getById(int id) {
         String sql = "SELECT * FROM mahasiswa WHERE id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) return map(rs);
+                if (rs.next())
+                    return map(rs);
             }
         } catch (SQLException e) {
             e.printStackTrace();

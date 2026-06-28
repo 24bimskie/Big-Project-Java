@@ -23,19 +23,17 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
-/**
- * Controller untuk use case: Input Data Jadwal & Lihat Jadwal.
- * Admin dapat mengelola jadwal perkuliahan (dosen, matkul, kelas, waktu,
- * ruangan).
- */
+// Controller untuk use case: Input Data Jadwal & Lihat Jadwal.
+// Admin dapat mengelola jadwal perkuliahan (dosen, matkul, kelas, waktu,
+// ruangan)
 public class DataJadwalController implements Initializable {
 
-    // ===== FXML Bindings — Tab Pane =====
+    // FXML Bindings — Tab Pane
 
     @FXML
     private TabPane tabPane;
 
-    // ===== FXML Bindings — TableView =====
+    // FXML Bindings — TableView
 
     @FXML
     private TableView<Jadwal> tableJadwal;
@@ -70,7 +68,7 @@ public class DataJadwalController implements Initializable {
     @FXML
     private TableColumn<Jadwal, String> colSemester;
 
-    // ===== FXML Bindings — Form Input =====
+    // FXML Bindings — Form Input
 
     @FXML
     private TextField fieldIdJadwal;
@@ -102,7 +100,7 @@ public class DataJadwalController implements Initializable {
     @FXML
     private ComboBox<String> comboSemester;
 
-    // ===== FXML Bindings — Filter & Kontrol =====
+    // FXML Bindings — Filter & Kontrol
 
     @FXML
     private ComboBox<String> filterHari;
@@ -128,7 +126,7 @@ public class DataJadwalController implements Initializable {
     @FXML
     private Button btnBatal;
 
-    // ===== State =====
+    // State
 
     private final JadwalDAO jadwalDAO = new JadwalDAO();
     private final DosenDAO dosenDAO = new DosenDAO();
@@ -140,7 +138,7 @@ public class DataJadwalController implements Initializable {
 
     private boolean isEditMode = false;
 
-    // ===== Lifecycle =====
+    // Lifecycle
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -152,9 +150,9 @@ public class DataJadwalController implements Initializable {
         setEditMode(false);
     }
 
-    // ===== Setup =====
+    // Setup
 
-    /** Mapping kolom TableView ke properti model Jadwal */
+    // Mapping kolom TableView ke properti model Jadwal
     private void setupTable() {
         colIdJadwal.setCellValueFactory(new PropertyValueFactory<>("idJadwal"));
         colKodeMk.setCellValueFactory(new PropertyValueFactory<>("kodeMk"));
@@ -168,7 +166,7 @@ public class DataJadwalController implements Initializable {
         colSemester.setCellValueFactory(new PropertyValueFactory<>("semester"));
     }
 
-    /** Mengisi semua ComboBox dengan data dari DAO */
+    // Mengisi semua ComboBox dengan data dari DAO
     private void setupComboBoxes() {
         // Hari
         ObservableList<String> hariList = FXCollections.observableArrayList(
@@ -244,7 +242,7 @@ public class DataJadwalController implements Initializable {
         filterKelas.setConverter(kelasConverter);
     }
 
-    /** Menyambungkan FilteredList dengan filter hari, dosen, dan kelas */
+    // Menyambungkan FilteredList dengan filter hari, dosen, dan kelas
     private void setupFilter() {
         filteredList = new FilteredList<>(jadwalList, p -> true);
         tableJadwal.setItems(filteredList);
@@ -255,7 +253,7 @@ public class DataJadwalController implements Initializable {
         filterKelas.valueProperty().addListener((obs, o, n) -> applyFilter());
     }
 
-    /** Menerapkan semua kondisi filter ke FilteredList */
+    // Menerapkan semua kondisi filter ke FilteredList
     private void applyFilter() {
         String hariFilter = filterHari.getValue();
         Dosen dosenFilter = filterDosen.getValue();
@@ -272,7 +270,7 @@ public class DataJadwalController implements Initializable {
         });
     }
 
-    /** Listener saat baris tabel dipilih — isi form dengan data jadwal */
+    // Listener saat baris tabel dipilih — isi form dengan data jadwal
     private void setupTableSelectionListener() {
         tableJadwal.getSelectionModel().selectedItemProperty().addListener(
                 (obs, oldSel, newSel) -> {
@@ -282,7 +280,7 @@ public class DataJadwalController implements Initializable {
                 });
     }
 
-    // ===== Load Data =====
+    // Load Data
 
     private void loadData() {
         jadwalList.clear();
@@ -292,9 +290,9 @@ public class DataJadwalController implements Initializable {
         }
     }
 
-    // ===== CRUD Handlers =====
+    // CRUD Handlers
 
-    /** Tombol Tambah — generate ID otomatis & simpan jadwal baru */
+    // Tombol Tambah — generate ID otomatis & simpan jadwal baru
     @FXML
     private void handleTambah(ActionEvent event) {
         if (!isFormValid())
@@ -317,7 +315,7 @@ public class DataJadwalController implements Initializable {
         clearForm();
     }
 
-    /** Tombol Edit — aktifkan mode edit, lalu Simpan perubahan */
+    // Tombol Edit — aktifkan mode edit, lalu Simpan perubahan
     @FXML
     private void handleEdit(ActionEvent event) {
         if (!isEditMode) {
@@ -348,7 +346,7 @@ public class DataJadwalController implements Initializable {
         setEditMode(false);
     }
 
-    /** Tombol Hapus — konfirmasi lalu hapus jadwal yang dipilih */
+    // Tombol Hapus — konfirmasi lalu hapus jadwal yang dipilih
     @FXML
     private void handleHapus(ActionEvent event) {
         Jadwal selected = tableJadwal.getSelectionModel().getSelectedItem();
@@ -376,7 +374,7 @@ public class DataJadwalController implements Initializable {
         }
     }
 
-    /** Tombol Batal — reset form dan keluar dari mode edit */
+    // Tombol Batal — reset form dan keluar dari mode edit
     @FXML
     private void handleBatal(ActionEvent event) {
         clearForm();
@@ -384,7 +382,7 @@ public class DataJadwalController implements Initializable {
         tableJadwal.getSelectionModel().clearSelection();
     }
 
-    /** Tombol Reset Filter — kembalikan semua filter ke nilai awal */
+    // Tombol Reset Filter — kembalikan semua filter ke nilai awal
     @FXML
     private void handleResetFilter(ActionEvent event) {
         filterHari.setValue("Semua");
@@ -392,12 +390,11 @@ public class DataJadwalController implements Initializable {
         filterKelas.setValue(null);
     }
 
-    // ===== Helper Methods =====
+    // Helper Methods
 
-    /**
-     * Mengisi form dari data jadwal yang dipilih di tabel.
-     * ComboBox dipilih berdasarkan kecocokan ID/kode.
-     */
+    // Mengisi form dari data jadwal yang dipilih di tabel.
+    // ComboBox dipilih berdasarkan kecocokan ID/kode.
+
     private void populateForm(Jadwal jadwal) {
         fieldIdJadwal.setText(jadwal.getIdJadwal());
         comboHari.setValue(jadwal.getHari());
@@ -494,7 +491,7 @@ public class DataJadwalController implements Initializable {
         return true;
     }
 
-    /** Mengosongkan semua field form */
+    // Mengosongkan semua field form
     private void clearForm() {
         fieldIdJadwal.clear();
         comboMataKuliah.setValue(null);

@@ -14,7 +14,7 @@ public class DosenDAO {
 
     public void insert(Dosen d) {
         String sql = "INSERT INTO dosen (nidn, nama_lengkap, email, fakultas) VALUES (?, ?, ?, ?)";
-
+        // tabel dosen tidak memiliki fk langsung insert
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
 

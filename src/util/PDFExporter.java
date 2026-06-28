@@ -20,42 +20,33 @@ public class PDFExporter {
 
         Document document = new Document();
 
-        PdfWriter.getInstance(
-                document,
-                new FileOutputStream(filePath));
-
+        PdfWriter.getInstance(document, new FileOutputStream(filePath));
         document.open();
 
+        // TITLE
         document.add(new Paragraph(title));
         document.add(new Paragraph(" "));
 
-        PdfPTable pdfTable = new PdfPTable(tableView.getColumns().size());
+        int columnCount = tableView.getColumns().size();
+        PdfPTable pdfTable = new PdfPTable(columnCount);
 
-        // Header
+        // HEADER
         for (TableColumn<?, ?> column : tableView.getColumns()) {
-
-            PdfPCell cell = new PdfPCell(
-                    new Phrase(column.getText()));
-
+            PdfPCell cell = new PdfPCell(new Phrase(column.getText()));
             pdfTable.addCell(cell);
         }
 
-        // Data
-        for (int row = 0; row < tableView.getItems().size(); row++) {
+        for (Object rowData : tableView.getItems()) {
 
             for (TableColumn<?, ?> column : tableView.getColumns()) {
 
-                Object value = column.getCellData(row);
+                Object value = column.getCellData(rowData);
 
-                pdfTable.addCell(
-                        value == null
-                                ? ""
-                                : value.toString());
+                pdfTable.addCell(value == null ? "" : value.toString());
             }
         }
 
         document.add(pdfTable);
-
         document.close();
     }
 }
