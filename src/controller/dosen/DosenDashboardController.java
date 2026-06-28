@@ -1,5 +1,7 @@
 package controller.dosen;
 
+import dao.DosenDAO;
+import dao.MahasiswaDAO;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -10,6 +12,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import model.Dosen;
 import model.User;
 import util.AlertHelper;
 import util.SceneManager;
@@ -32,11 +35,14 @@ public class DosenDashboardController implements Initializable {
     @FXML private TextField txtSearch;
     @FXML private Button btnCari;
 
+    private final DosenDAO dosenDAO = new DosenDAO();
+    private final MahasiswaDAO mahasiswaDAO = new MahasiswaDAO();
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         User currentUser = UserSession.getCurrentUser();
         if (currentUser != null && lblNamaDosen != null) {
-            lblNamaDosen.setText(currentUser.getUsername());
+            lblNamaDosen.setText(resolveDisplayName(currentUser));
         }
 
         // Klik tombol asli sidebar langsung ganti isi wadah tengah!
@@ -53,6 +59,13 @@ public class DosenDashboardController implements Initializable {
                 sidebar.setVisible(!isVisible);
                 sidebar.setManaged(!isVisible);
             });
+        }
+
+        if (btnCari != null) {
+            btnCari.setOnAction(e -> cariMahasiswa());
+        }
+        if (txtSearch != null) {
+            txtSearch.setOnAction(e -> cariMahasiswa());
         }
         
         // Default halaman pertama pas dibuka
@@ -87,6 +100,55 @@ public class DosenDashboardController implements Initializable {
         }
         if (activeButton != null) {
             activeButton.getStyleClass().add("sidebar-btn-active");
+        }
+    }
+
+    private String resolveDisplayName(User currentUser) {
+        if (currentUser == null) {
+            return "Dosen";
+        }
+
+        String username = currentUser.getUsername();
+        Dosen dosen = dosenDAO.getByNidn(username);
+        if (dosen == null) {
+            dosen = dosenDAO.getByNamaLengkap(username);
+        }
+
+        if (dosen != null && dosen.getNamaLengkap() != null && !dosen.getNamaLengkap().isBlank()) {
+            return dosen.getNamaLengkap();
+        }
+        return username;
+    }
+
+    private void cariMahasiswa() {
+        if (txtSearch == null) {
+            return;
+        }
+
+        String keyword = txtSearch.getText() == null ? "" : txtSearch.getText().trim();
+        if (keyword.isEmpty()) {
+            AlertHelper.showWarning("Pencarian", "Masukkan NIM atau nama mahasiswa terlebih dahulu.");
+            return;
+        }
+
+        var mahasiswaList = mahasiswaDAO.getAll();
+        var hasil = mahasiswaList.stream()
+                .filter(m -> {
+                    String nim = m.getNim() == null ? "" : m.getNim().toLowerCase();
+                    String nama = m.getNama() == null ? "" : m.getNama().toLowerCase();
+                    String k = keyword.toLowerCase();
+                    return nim.contains(k) || nama.contains(k);
+                })
+                .toList();
+
+        if (hasil.isEmpty()) {
+            AlertHelper.showWarning("Pencarian", "Tidak ada mahasiswa yang cocok dengan pencarian Anda.");
+        } else {
+            StringBuilder msg = new StringBuilder();
+            for (var m : hasil) {
+                msg.append("- ").append(m.getNim()).append(" | ").append(m.getNama()).append("\n");
+            }
+            AlertHelper.showInfo("Hasil Pencarian", msg.toString());
         }
     }
 

@@ -13,8 +13,6 @@ import java.util.List;
 public class DosenDAO {
 
     public void insert(Dosen d) {
-        String sql = "INSERT INTO dosen (nidn, nama_lengkap, email, fakultas) VALUES (?, ?, ?, ?)";
-        // tabel dosen tidak memiliki fk langsung insert
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -22,6 +20,7 @@ public class DosenDAO {
             stmt.setString(2, d.getNamaLengkap());
             stmt.setString(3, d.getEmail());
             stmt.setString(4, d.getFakultas());
+            stmt.setString(5, d.getFotoProfil());
 
             stmt.executeUpdate();
 
@@ -31,7 +30,7 @@ public class DosenDAO {
     }
 
     public void update(Dosen d) {
-        String sql = "UPDATE dosen SET nama_lengkap=?, email=?, fakultas=? WHERE nidn=?";
+        String sql = "UPDATE dosen SET nama_lengkap=?, email=?, fakultas=?, foto_profil=? WHERE nidn=?";
 
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -39,7 +38,8 @@ public class DosenDAO {
             stmt.setString(1, d.getNamaLengkap());
             stmt.setString(2, d.getEmail());
             stmt.setString(3, d.getFakultas());
-            stmt.setString(4, d.getNidn());
+            stmt.setString(4, d.getFotoProfil());
+            stmt.setString(5, d.getNidn());
 
             stmt.executeUpdate();
 
@@ -135,10 +135,12 @@ public class DosenDAO {
     }
 
     private Dosen map(ResultSet rs) throws SQLException {
-        return new Dosen(
+        Dosen dosen = new Dosen(
                 rs.getString("nidn"),
                 rs.getString("nama_lengkap"),
                 rs.getString("email"),
                 rs.getString("fakultas"));
+        dosen.setFotoProfil(rs.getString("foto_profil"));
+        return dosen;
     }
 }

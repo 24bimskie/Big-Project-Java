@@ -17,6 +17,11 @@ public class Absensi {
     private LocalTime waktuAbsen;
     private String status; // "Hadir", "Izin", "Sakit", "Alpha"
     private String keterangan;
+    private String hariJam;
+    private String mataKuliah;
+    private String kelas;
+    private String namaLengkap;
+    private String kehadiran;
     private int pertemuanKe;
 
     public Absensi() {}
@@ -54,6 +59,21 @@ public class Absensi {
 
     public String getKeterangan() { return keterangan; }
     public void setKeterangan(String keterangan) { this.keterangan = keterangan; }
+
+    public String getHariJam() { return hariJam; }
+    public void setHariJam(String hariJam) { this.hariJam = hariJam; }
+
+    public String getMataKuliah() { return mataKuliah; }
+    public void setMataKuliah(String mataKuliah) { this.mataKuliah = mataKuliah; }
+
+    public String getKelas() { return kelas; }
+    public void setKelas(String kelas) { this.kelas = kelas; }
+
+    public String getNamaLengkap() { return namaLengkap; }
+    public void setNamaLengkap(String namaLengkap) { this.namaLengkap = namaLengkap; }
+
+    public String getKehadiran() { return kehadiran; }
+    public void setKehadiran(String kehadiran) { this.kehadiran = kehadiran; }
 
     public int getPertemuanKe() { return pertemuanKe; }
     public void setPertemuanKe(int pertemuanKe) { this.pertemuanKe = pertemuanKe; }

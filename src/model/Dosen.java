@@ -10,6 +10,7 @@ public class Dosen {
     private String namaLengkap;
     private String email;
     private String fakultas;
+    private String fotoProfil;
 
     public Dosen() {}
 
@@ -38,4 +39,7 @@ public class Dosen {
 
     public String getFakultas() { return fakultas; }
     public void setFakultas(String fakultas) { this.fakultas = fakultas; }
+
+    public String getFotoProfil() { return fotoProfil; }
+    public void setFotoProfil(String fotoProfil) { this.fotoProfil = fotoProfil; }
 }
