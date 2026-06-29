@@ -13,6 +13,7 @@ import java.util.List;
 public class DosenDAO {
 
     public void insert(Dosen d) {
+        String sql = "INSERT INTO dosen (nidn, nama_lengkap, email, fakultas, foto_profil) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
 
